@@ -1,0 +1,504 @@
+Divison,District,Upazila,"Lat,long",worker,citizen,Coordinator ,Planner,sensors,centers
+Rajshahi,Bogura District,1. Adamdighi Upazila,"24.8335772, 89.0438527",worker1,citizen1,Coordinator1,Planner1,sensor1,center1
+,,2. Bogura Sadar Upazila,"24.8481221, 89.37302550000001",worker2,citizen2,Coordinator2,Planner2,sensor2,center2
+,,3. Dhunat Upazila,"24.6779694, 89.5403279",worker3,citizen3,Coordinator3,Planner3,sensor3,center3
+,,4. Dhupchanchia Upazila,"24.8812002, 89.17774200000001",worker4,citizen4,Coordinator4,Planner4,sensor4,center4
+,,5. Gabtali Upazila,"24.8794971, 89.4553088",worker5,citizen5,Coordinator5,Planner5,sensor5,center5
+,,6. Kahaloo Upazila,"24.833136, 89.26885999999999",worker6,citizen6,Coordinator6,Planner6,sensor6,center6
+,,7. Nandigram Upazila,"24.6455812, 89.2480041",worker7,citizen7,Coordinator7,Planner7,sensor7,center7
+,,8. Sariakandi Upazila,"24.8887731, 89.5709844",worker8,citizen8,Coordinator8,Planner8,sensor8,center8
+,,9. Shajahanpur Upazila,"24.7661428, 89.3837983",worker9,citizen9,Coordinator9,Planner9,sensor9,center9
+,,10. Sherpur Upazila,"24.6599286, 89.42199",worker10,citizen10,Coordinator10,Planner10,sensor10,center10
+,,11. Shibganj Upazila,"25.002018, 89.3219218",worker11,citizen11,Coordinator11,Planner11,sensor11,center11
+,,12. Sonatola Upazila,"25.0400804, 89.49775819999999",worker12,citizen12,Coordinator12,Planner12,sensor12,center12
+,,13. Mokamtola Upazila,"25.0129366, 89.36887999999999",worker13,citizen13,Coordinator13,Planner13,sensor13,center13
+,Chapai Nawabganj District,1. Bholahat Upazila,"24.9169992, 88.1876676",worker14,citizen14,Coordinator14,Planner14,sensor14,center14
+,,2. Gomastapur Upazila,"24.7933883, 88.2897742",worker15,citizen15,Coordinator15,Planner15,sensor15,center15
+,,3. Nachole Upazila,"24.7326602, 88.4137279",worker16,citizen16,Coordinator16,Planner16,sensor16,center16
+,,4. Nawabganj Sadar Upazila,"24.5925571, 88.2705311",worker17,citizen17,Coordinator17,Planner17,sensor17,center17
+,,5. Shibganj Upazila,"25.002018, 89.3219218",worker18,citizen18,Coordinator18,Planner18,sensor18,center18
+,Joypurhat District,1. Akkelpur Upazila,"24.9693195, 89.0202655",worker19,citizen19,Coordinator19,Planner19,sensor19,center19
+,,2. Joypurhat Sadar Upazila,"25.1024205, 89.0269604",worker20,citizen20,Coordinator20,Planner20,sensor20,center20
+,,3. Kalai Upazila,"25.0626219, 89.1746462",worker21,citizen21,Coordinator21,Planner21,sensor21,center21
+,,4. Khetlal Upazila,"25.0385295, 89.11955309999999",worker22,citizen22,Coordinator22,Planner22,sensor22,center22
+,,5. Panchbibi Upazila,"25.1858842, 89.0179122",worker23,citizen23,Coordinator23,Planner23,sensor23,center23
+,Naogaon District,1. Atrai Upazila,"24.6121527, 88.9828998",worker24,citizen24,Coordinator24,Planner24,sensor24,center24
+,,2. Badalgachhi Upazila,"24.9844254, 88.8587149",worker25,citizen25,Coordinator25,Planner25,sensor25,center25
+,,3. Dhamoirhat Upazila,"25.1503961, 88.85150279999999",worker26,citizen26,Coordinator26,Planner26,sensor26,center26
+,,4. Manda Upazila,"24.759933, 88.7029407",worker27,citizen27,Coordinator27,Planner27,sensor27,center27
+,,5. Mohadevpur Upazila,"24.917338, 88.75173009999999",worker28,citizen28,Coordinator28,Planner28,sensor28,center28
+,,6. Naogaon Sadar Upazila,"24.7936199, 88.9317702",worker29,citizen29,Coordinator29,Planner29,sensor29,center29
+,,7. Niamatpur Upazila,"24.8355273, 88.5679981",worker30,citizen30,Coordinator30,Planner30,sensor30,center30
+,,8. Patnitala Upazila,"25.0612282, 88.73247119999999",worker31,citizen31,Coordinator31,Planner31,sensor31,center31
+,,9. Porsha Upazila,"25.0078982, 88.4925433",worker32,citizen32,Coordinator32,Planner32,sensor32,center32
+,,10. Raninagar Upazila,"24.7284859, 88.95574979999999",worker33,citizen33,Coordinator33,Planner33,sensor33,center33
+,,11. Sapahar Upazila,"25.1258991, 88.587932",worker34,citizen34,Coordinator34,Planner34,sensor34,center34
+,Natore District,1. Bagatipara Upazila,"24.3032204, 88.9638615",worker35,citizen35,Coordinator35,Planner35,sensor35,center35
+,,2. Baraigram Upazila,"24.3189424, 89.17186339999999",worker36,citizen36,Coordinator36,Planner36,sensor36,center36
+,,3. Gurudaspur Upazila,"24.3683404, 89.23317639999999",worker37,citizen37,Coordinator37,Planner37,sensor37,center37
+,,4. Lalpur Upazila,"24.183436, 88.9504236",worker38,citizen38,Coordinator38,Planner38,sensor38,center38
+,,5. Naldanga Upazila,"24.4969457, 88.96053649999999",worker39,citizen39,Coordinator39,Planner39,sensor39,center39
+,,6. Natore Sadar Upazila,"24.4084122, 88.9750353",worker40,citizen40,Coordinator40,Planner40,sensor40,center40
+,,7. Singra Upazila,"24.4999846, 89.1429216",worker41,citizen41,Coordinator41,Planner41,sensor41,center41
+,Pabna District,1. Atgharia Upazila,"24.1133788, 89.2431288",worker42,citizen42,Coordinator42,Planner42,sensor42,center42
+,,2. Bera Upazila,"24.0769424, 89.61545199999999",worker43,citizen43,Coordinator43,Planner43,sensor43,center43
+,,3. Bhangura Upazila,"24.2080142, 89.365369",worker44,citizen44,Coordinator44,Planner44,sensor44,center44
+,,4. Chatmohar Upazila,"24.2309522, 89.2871152",worker45,citizen45,Coordinator45,Planner45,sensor45,center45
+,,5. Faridpur Upazila,"24.1554753, 89.4443257",worker46,citizen46,Coordinator46,Planner46,sensor46,center46
+,,6. Ishwardi Upazila,"24.1237185, 89.0643336",worker47,citizen47,Coordinator47,Planner47,sensor47,center47
+,,7. Pabna Sadar Upazila,"24.0076123, 89.2383285",worker48,citizen48,Coordinator48,Planner48,sensor48,center48
+,,8. Santhia Upazila,"24.055533, 89.5492429",worker49,citizen49,Coordinator49,Planner49,sensor49,center49
+,,9. Sujanagar Upazila,"23.9373592, 89.4173363",worker50,citizen50,Coordinator50,Planner50,sensor50,center50
+,Rajshahi District,1. Bagha Upazila,"24.1970647, 88.83692870000002",worker51,citizen51,Coordinator51,Planner51,sensor51,center51
+,,2. Bagmara Upazila,"24.5972948, 88.8310561",worker52,citizen52,Coordinator52,Planner52,sensor52,center52
+,,3. Charghat Upazila,"24.2785308, 88.75180499999999",worker53,citizen53,Coordinator53,Planner53,sensor53,center53
+,,4. Durgapur Upazila,"24.4450645, 88.7709835",worker54,citizen54,Coordinator54,Planner54,sensor54,center54
+,,5. Godagari Upazila,"24.4588129, 88.3360493",worker55,citizen55,Coordinator55,Planner55,sensor55,center55
+,,6. Mohanpur Upazila,"24.544858, 88.63619589999999",worker56,citizen56,Coordinator56,Planner56,sensor56,center56
+,,7. Paba Upazila,"24.4350479, 88.64343079999999",worker57,citizen57,Coordinator57,Planner57,sensor57,center57
+,,8. Puthia Upazila,"24.3638464, 88.8366628",worker58,citizen58,Coordinator58,Planner58,sensor58,center58
+,,9. Tanore Upazila,"24.5892635, 88.5764603",worker59,citizen59,Coordinator59,Planner59,sensor59,center59
+,Sirajganj District,1. Belkuchi Upazila,"24.2931357, 89.6974346",worker60,citizen60,Coordinator60,Planner60,sensor60,center60
+,,2. Chauhali Upazila,"24.1942685, 89.7470163",worker61,citizen61,Coordinator61,Planner61,sensor61,center61
+,,3. Kamarkhanda Upazila,"24.360539, 89.66519679999999",worker62,citizen62,Coordinator62,Planner62,sensor62,center62
+,,4. Kazipur Upazila,"24.6520833, 89.6335162",worker63,citizen63,Coordinator63,Planner63,sensor63,center63
+,,5. Raiganj Upazila,"24.5294849, 89.54521079999999",worker64,citizen64,Coordinator64,Planner64,sensor64,center64
+,,6. Shahjadpur Upazila,"24.175939, 89.5946441",worker65,citizen65,Coordinator65,Planner65,sensor65,center65
+,,7. Sirajganj Sadar Upazila,"24.4524175, 89.7045249",worker66,citizen66,Coordinator66,Planner66,sensor66,center66
+,,8. Tarash Upazila,"24.4305719, 89.37157429999999",worker67,citizen67,Coordinator67,Planner67,sensor67,center67
+,,9. Ullahpara Upazila,"24.3127536, 89.56848959999999",worker68,citizen68,Coordinator68,Planner68,sensor68,center68
+Rangpur,Dinajpur District,1. Biral Upazila,"25.6334796, 88.5504897",worker69,citizen69,Coordinator69,Planner69,sensor69,center69
+,,2. Birampur Upazila,"25.3898693, 88.99189419999999",worker70,citizen70,Coordinator70,Planner70,sensor70,center70
+,,3. Birganj Upazila,"25.8606598, 88.65497289999999",worker71,citizen71,Coordinator71,Planner71,sensor71,center71
+,,4. Bochaganj Upazila,"25.7997217, 88.46218909999999",worker72,citizen72,Coordinator72,Planner72,sensor72,center72
+,,5. Chirirbandar Upazila,"25.6502881, 88.77603649999999",worker73,citizen73,Coordinator73,Planner73,sensor73,center73
+,,6. Dinajpur Sadar Upazila,"25.636567, 88.63857300000001",worker74,citizen74,Coordinator74,Planner74,sensor74,center74
+,,7. Ghoraghat Upazila,"25.3006863, 89.1808503",worker75,citizen75,Coordinator75,Planner75,sensor75,center75
+,,8. Hakimpur Upazila,"25.2748194, 89.0132306",worker76,citizen76,Coordinator76,Planner76,sensor76,center76
+,,9. Kaharole Upazila,"25.7947183, 88.6031434",worker77,citizen77,Coordinator77,Planner77,sensor77,center77
+,,10. Khansama Upazila,"25.9243343, 88.7308139",worker78,citizen78,Coordinator78,Planner78,sensor78,center78
+,,11. Nawabganj Upazila,"23.6611431, 90.1620514",worker79,citizen79,Coordinator79,Planner79,sensor79,center79
+,,12. Parbatipur Upazila,"25.6543901, 88.9162387",worker80,citizen80,Coordinator80,Planner80,sensor80,center80
+,,13. Phulbari Upazila,"25.4963019, 88.9532744",worker81,citizen81,Coordinator81,Planner81,sensor81,center81
+,Gaibandha District,1. Gaibandha Sadar Upazila,"25.3297044, 89.5428879",worker82,citizen82,Coordinator82,Planner82,sensor82,center82
+,,2. Gobindaganj Upazila,"25.1363054, 89.3871999",worker83,citizen83,Coordinator83,Planner83,sensor83,center83
+,,3. Palashbari Upazila,"25.2810386, 89.35327699999999",worker84,citizen84,Coordinator84,Planner84,sensor84,center84
+,,4. Phulchhari Upazila,"25.3198082, 89.5958514",worker85,citizen85,Coordinator85,Planner85,sensor85,center85
+,,5. Sadullapur Upazila,"25.3909385, 89.46594619999999",worker86,citizen86,Coordinator86,Planner86,sensor86,center86
+,,6. Sughatta Upazila,"25.1221798, 89.5856475",worker87,citizen87,Coordinator87,Planner87,sensor87,center87
+,,7. Sundarganj Upazila,"25.5653814, 89.521136",worker88,citizen88,Coordinator88,Planner88,sensor88,center88
+,Kurigram District,1. Bhurungamari Upazila,"26.1083682, 89.66989339999999",worker89,citizen89,Coordinator89,Planner89,sensor89,center89
+,,2. Char Rajibpur Upazila,"25.44511, 89.7930466",worker90,citizen90,Coordinator90,Planner90,sensor90,center90
+,,3. Chilmari Upazila,"25.5810414, 89.66163519999999",worker91,citizen91,Coordinator91,Planner91,sensor91,center91
+,,4. Kurigram Sadar Upazila,"25.8281684, 89.68162079999999",worker92,citizen92,Coordinator92,Planner92,sensor92,center92
+,,5. Nageshwari Upazila,"25.9659064, 89.6912763",worker93,citizen93,Coordinator93,Planner93,sensor93,center93
+,,6. Phulbari Upazila,"25.4963019, 88.9532744",worker94,citizen94,Coordinator94,Planner94,sensor94,center94
+,,7. Rajarhat Upazila,"25.7982283, 89.5450458",worker95,citizen95,Coordinator95,Planner95,sensor95,center95
+,,8. Raomari Upazila,"25.5916955, 89.83177289999999",worker96,citizen96,Coordinator96,Planner96,sensor96,center96
+,,9. Ulipur Upazila,"25.6564202, 89.62045619999999",worker97,citizen97,Coordinator97,Planner97,sensor97,center97
+,Lalmonirhat District,1. Aditmari Upazila,"25.927289, 89.3841989",worker98,citizen98,Coordinator98,Planner98,sensor98,center98
+,,2. Hatibandha Upazila,"26.1422221, 89.1348697",worker99,citizen99,Coordinator99,Planner99,sensor99,center99
+,,3. Kaliganj Upazila,"23.3562518, 89.1515476",worker100,citizen100,Coordinator100,Planner100,sensor100,center100
+,,4. Lalmonirhat Sadar Upazila,"25.9188238, 89.4456295",worker101,citizen101,Coordinator101,Planner101,sensor101,center101
+,,5. Patgram Upazila,"26.3569512, 89.0083726",worker102,citizen102,Coordinator102,Planner102,sensor102,center102
+,Nilphamari District,1. Dimla Upazila,"26.1488689, 88.9196987",worker103,citizen103,Coordinator103,Planner103,sensor103,center103
+,,2. Domar Upazila,"26.1015154, 88.82147189999999",worker104,citizen104,Coordinator104,Planner104,sensor104,center104
+,,3. Jaldhaka Upazila,"26.0196636, 89.0165912",worker105,citizen105,Coordinator105,Planner105,sensor105,center105
+,,4. Kishoreganj Upazila,"25.9023526, 89.0227048",worker106,citizen106,Coordinator106,Planner106,sensor106,center106
+,,5. Nilphamari Sadar Upazila,"25.9485395, 88.8373514",worker107,citizen107,Coordinator107,Planner107,sensor107,center107
+,,6. Saidpur Upazila,"25.7780239, 88.8976227",worker108,citizen108,Coordinator108,Planner108,sensor108,center108
+,Panchagarh District,1. Atwari Upazila,"26.2366009, 88.41380769999999",worker109,citizen109,Coordinator109,Planner109,sensor109,center109
+,,2. Boda Upazila,"26.1982136, 88.5546556",worker110,citizen110,Coordinator110,Planner110,sensor110,center110
+,,3. Debiganj Upazila,"26.1202169, 88.7589007",worker111,citizen111,Coordinator111,Planner111,sensor111,center111
+,,4. Panchagarh Sadar Upazila,"26.3354784, 88.5522474",worker112,citizen112,Coordinator112,Planner112,sensor112,center112
+,,5. Tetulia Upazila,"26.4954355, 88.3406528",worker113,citizen113,Coordinator113,Planner113,sensor113,center113
+,Rangpur District,1. Badarganj Upazila,"25.6539681, 89.07047659999999",worker114,citizen114,Coordinator114,Planner114,sensor114,center114
+,,2. Gangachhara Upazila,"25.8300734, 89.1195784",worker115,citizen115,Coordinator115,Planner115,sensor115,center115
+,,3. Kaunia Upazila,"25.7741665, 89.4316601",worker116,citizen116,Coordinator116,Planner116,sensor116,center116
+,,4. Mithapukur Upazila,"25.5544164, 89.27541570000001",worker117,citizen117,Coordinator117,Planner117,sensor117,center117
+,,5. Pirgachha Upazila,"25.655698, 89.40326309999999",worker118,citizen118,Coordinator118,Planner118,sensor118,center118
+,,6. Pirganj Upazila,"25.4166007, 89.3075204",worker119,citizen119,Coordinator119,Planner119,sensor119,center119
+,,7. Rangpur Sadar Upazila,"25.7438934, 89.2755983",worker120,citizen120,Coordinator120,Planner120,sensor120,center120
+,,8. Taraganj Upazila,"25.8079777, 89.0355579",worker121,citizen121,Coordinator121,Planner121,sensor121,center121
+,Thakurgaon District,1. Baliadangi Upazila,"26.0854593, 88.2765381",worker122,citizen122,Coordinator122,Planner122,sensor122,center122
+,,2. Haripur Upazila,"25.834299, 88.1243489",worker123,citizen123,Coordinator123,Planner123,sensor123,center123
+,,3. Pirganj Upazila,"25.4166007, 89.3075204",worker124,citizen124,Coordinator124,Planner124,sensor124,center124
+,,4. Ranisankail Upazila,"25.8920465, 88.2582857",worker125,citizen125,Coordinator125,Planner125,sensor125,center125
+,,5. Thakurgaon Sadar Upazila,"26.0287744, 88.47855310000001",worker126,citizen126,Coordinator126,Planner126,sensor126,center126
+,,6. Ruhia Upazila,Not Found,worker127,citizen127,Coordinator127,Planner127,sensor127,center127
+,,7. Bhully Upazila,Not Found,worker128,citizen128,Coordinator128,Planner128,sensor128,center128
+Mymensingh,Jamalpur District,1. Baksiganj Upazila,"25.1830617, 89.8701469",worker129,citizen129,Coordinator129,Planner129,sensor129,center129
+,,2. Dewanganj Upazila,"25.3310623, 89.79131629999999",worker130,citizen130,Coordinator130,Planner130,sensor130,center130
+,,3. Islampur Upazila,"25.0812952, 89.7894766",worker131,citizen131,Coordinator131,Planner131,sensor131,center131
+,,4. Jamalpur Sadar Upazila,"24.9270016, 89.9480542",worker132,citizen132,Coordinator132,Planner132,sensor132,center132
+,,5. Madarganj Upazila,"24.9068332, 89.7166965",worker133,citizen133,Coordinator133,Planner133,sensor133,center133
+,,6. Melandaha Upazila,"24.9817005, 89.8291768",worker134,citizen134,Coordinator134,Planner134,sensor134,center134
+,,7. Sarishabari Upazila,"24.7669433, 89.8409152",worker135,citizen135,Coordinator135,Planner135,sensor135,center135
+,Mymensingh District,1. Bhaluka Upazila,"24.4078575, 90.3865746",worker136,citizen136,Coordinator136,Planner136,sensor136,center136
+,,2. Dhobaura Upazila,"25.0899993, 90.5222045",worker137,citizen137,Coordinator137,Planner137,sensor137,center137
+,,3. Fulbaria Upazila,"24.6322057, 90.2708037",worker138,citizen138,Coordinator138,Planner138,sensor138,center138
+,,4. Gafargaon Upazila,"24.4572407, 90.54866799999999",worker139,citizen139,Coordinator139,Planner139,sensor139,center139
+,,5. South Gafargaon Upazila,"24.4572407, 90.54866799999999",worker140,citizen140,Coordinator140,Planner140,sensor140,center140
+,,6. Gauripur Upazila,"24.7545607, 90.56782729999999",worker141,citizen141,Coordinator141,Planner141,sensor141,center141
+,,7. Haluaghat Upazila,"25.1242115, 90.33955139999999",worker142,citizen142,Coordinator142,Planner142,sensor142,center142
+,,8. Ishwarganj Upazila,"24.6884385, 90.5966222",worker143,citizen143,Coordinator143,Planner143,sensor143,center143
+,,9. Muktagachha Upazila,"24.7646495, 90.2567893",worker144,citizen144,Coordinator144,Planner144,sensor144,center144
+,,10. Mymensingh Sadar Upazila,"24.7851062, 90.3560076",worker145,citizen145,Coordinator145,Planner145,sensor145,center145
+,,11. Nandail Upazila,"24.5687223, 90.6903529",worker146,citizen146,Coordinator146,Planner146,sensor146,center146
+,,12. Phulpur Upazila,"24.9545481, 90.3629287",worker147,citizen147,Coordinator147,Planner147,sensor147,center147
+,,13. Tara Khanda Upazila,"24.8559556, 90.4879916",worker148,citizen148,Coordinator148,Planner148,sensor148,center148
+,,14. Trishal Upazila,"24.5826359, 90.3947592",worker149,citizen149,Coordinator149,Planner149,sensor149,center149
+,Netrokona District,1. Atpara Upazila,"24.8097761, 90.8603645",worker150,citizen150,Coordinator150,Planner150,sensor150,center150
+,,2. Barhatta Upazila,"24.8986484, 90.8841992",worker151,citizen151,Coordinator151,Planner151,sensor151,center151
+,,3. Durgapur Upazila,"24.4450645, 88.7709835",worker152,citizen152,Coordinator152,Planner152,sensor152,center152
+,,4. Kalmakanda Upazila,"25.0765713, 90.88896779999999",worker153,citizen153,Coordinator153,Planner153,sensor153,center153
+,,5. Khaliajuri Upazila,"24.6891728, 91.1327756",worker154,citizen154,Coordinator154,Planner154,sensor154,center154
+,,6. Kendua Upazila,"24.6703752, 90.8436885",worker155,citizen155,Coordinator155,Planner155,sensor155,center155
+,,7. Madan Upazila,"24.7142924, 90.9462345",worker156,citizen156,Coordinator156,Planner156,sensor156,center156
+,,8. Mohanganj Upazila,"24.8743218, 90.979677",worker157,citizen157,Coordinator157,Planner157,sensor157,center157
+,,9. Netrokona Sadar Upazila,"24.8820862, 90.72308699999999",worker158,citizen158,Coordinator158,Planner158,sensor158,center158
+,,10. Purbadhala Upazila,"24.9430683, 90.6002879",worker159,citizen159,Coordinator159,Planner159,sensor159,center159
+,Sherpur District,1. Jhenaigati Upazila,"25.1859383, 90.0629989",worker160,citizen160,Coordinator160,Planner160,sensor160,center160
+,,2. Nakla Upazila,"24.9717344, 90.17856379999999",worker161,citizen161,Coordinator161,Planner161,sensor161,center161
+,,3. Nalitabari Upazila,"25.0850233, 90.1939932",worker162,citizen162,Coordinator162,Planner162,sensor162,center162
+,,4. Sherpur Sadar Upazila,"25.0190502, 90.01383650000001",worker163,citizen163,Coordinator163,Planner163,sensor163,center163
+,,5. Sreebardi Upazila,"25.147401, 89.9393363",worker164,citizen164,Coordinator164,Planner164,sensor164,center164
+Barisal,Barguna District,1. Amtali Upazila,"22.1331256, 90.23055169999999",worker165,citizen165,Coordinator165,Planner165,sensor165,center165
+,,2. Bamna Upazila,"22.2741614, 90.04665589999999",worker166,citizen166,Coordinator166,Planner166,sensor166,center166
+,,3. Barguna Sadar Upazila,"22.1604747, 90.1200741",worker167,citizen167,Coordinator167,Planner167,sensor167,center167
+,,4. Betagi Upazila,"22.4141607, 90.1658856",worker168,citizen168,Coordinator168,Planner168,sensor168,center168
+,,5. Patharghata Upazila,"22.0385459, 89.96959790000001",worker169,citizen169,Coordinator169,Planner169,sensor169,center169
+,,6. Taltali Upazila,"22.0237385, 90.13077969999999",worker170,citizen170,Coordinator170,Planner170,sensor170,center170
+,Barisal District,1. Agailjhara Upazila,"22.9713291, 90.16354419999999",worker171,citizen171,Coordinator171,Planner171,sensor171,center171
+,,2. Babuganj Upazila,"22.8173132, 90.324615",worker172,citizen172,Coordinator172,Planner172,sensor172,center172
+,,3. Bakerganj Upazila,"22.5408653, 90.3332458",worker173,citizen173,Coordinator173,Planner173,sensor173,center173
+,,4. Banaripara Upazila,"22.7687676, 90.15418000000001",worker174,citizen174,Coordinator174,Planner174,sensor174,center174
+,,5. Barisal Sadar Upazila,"22.7010325, 90.3534708",worker175,citizen175,Coordinator175,Planner175,sensor175,center175
+,,6. Gaurnadi Upazila,"22.9726047, 90.2222575",worker176,citizen176,Coordinator176,Planner176,sensor176,center176
+,,7. Hizla Upazila,"22.928412, 90.44125489999999",worker177,citizen177,Coordinator177,Planner177,sensor177,center177
+,,8. Mehendiganj Upazila,"22.8260701, 90.5269639",worker178,citizen178,Coordinator178,Planner178,sensor178,center178
+,,9. Muladi Upazila,"22.8875337, 90.3889622",worker179,citizen179,Coordinator179,Planner179,sensor179,center179
+,,10. Wazirpur Upazila,"22.8193437, 90.2502935",worker180,citizen180,Coordinator180,Planner180,sensor180,center180
+,Bhola District,1. Bhola Sadar Upazila,"22.6854519, 90.64388369999999",worker181,citizen181,Coordinator181,Planner181,sensor181,center181
+,,2. Burhanuddin Upazila,"22.497857, 90.71744249999999",worker182,citizen182,Coordinator182,Planner182,sensor182,center182
+,,3. Char Fasson Upazila,"22.1860271, 90.76032599999999",worker183,citizen183,Coordinator183,Planner183,sensor183,center183
+,,4. Daulatkhan Upazila,"22.6051091, 90.7413661",worker184,citizen184,Coordinator184,Planner184,sensor184,center184
+,,5. Lalmohan Upazila,"22.3404052, 90.7347111",worker185,citizen185,Coordinator185,Planner185,sensor185,center185
+,,6. Manpura Upazila,"22.2583212, 90.9663614",worker186,citizen186,Coordinator186,Planner186,sensor186,center186
+,,7. Tazumuddin Upazila,"22.4179785, 90.85083449999999",worker187,citizen187,Coordinator187,Planner187,sensor187,center187
+,Jhalokati District,1. Jhalokati Sadar Upazila,"22.6407231, 90.1986968",worker188,citizen188,Coordinator188,Planner188,sensor188,center188
+,,2. Kathalia Upazila,"22.4410253, 90.14063159999999",worker189,citizen189,Coordinator189,Planner189,sensor189,center189
+,,3. Nalchity Upazila,"22.6282923, 90.2688178",worker190,citizen190,Coordinator190,Planner190,sensor190,center190
+,,4. Rajapur Upazila,"22.570369, 90.14390929999999",worker191,citizen191,Coordinator191,Planner191,sensor191,center191
+,Patuakhali District,1. Bauphal Upazila,"22.4192529, 90.55651379999999",worker192,citizen192,Coordinator192,Planner192,sensor192,center192
+,,2. Dashmina Upazila,"22.2791401, 90.56833990000001",worker193,citizen193,Coordinator193,Planner193,sensor193,center193
+,,3. Dumki Upazila,"22.4644533, 90.38425269999999",worker194,citizen194,Coordinator194,Planner194,sensor194,center194
+,,4. Galachipa Upazila,"22.1633734, 90.41016189999999",worker195,citizen195,Coordinator195,Planner195,sensor195,center195
+,,5. Kalapara Upazila,"21.9851561, 90.23105559999999",worker196,citizen196,Coordinator196,Planner196,sensor196,center196
+,,6. Mirzaganj Upazila,"22.3621428, 90.211018",worker197,citizen197,Coordinator197,Planner197,sensor197,center197
+,,7. Patuakhali Sadar Upazila,"22.3587792, 90.34523809999999",worker198,citizen198,Coordinator198,Planner198,sensor198,center198
+,,8. Rangabali Upazila,"21.9040401, 90.4125181",worker199,citizen199,Coordinator199,Planner199,sensor199,center199
+,Pirojpur District,1. Bhandaria Upazila,"22.4889287, 90.03473629999999",worker200,citizen200,Coordinator200,Planner200,sensor200,center200
+,,2. Indurkani Upazila,"22.4857641, 89.9603461",worker201,citizen201,Coordinator201,Planner201,sensor201,center201
+,,3. Kawkhali Upazila,"22.6074484, 90.08446599999999",worker202,citizen202,Coordinator202,Planner202,sensor202,center202
+,,4. Mathbaria Upazila,"22.292034, 89.9580821",worker203,citizen203,Coordinator203,Planner203,sensor203,center203
+,,5. Nazirpur Upazila,"22.7867163, 89.9813445",worker204,citizen204,Coordinator204,Planner204,sensor204,center204
+,,6. Nesarabad (Swarupkati) Upazila,"22.7449644, 90.1167463",worker205,citizen205,Coordinator205,Planner205,sensor205,center205
+,,7. Pirojpur Sadar Upazila,"22.5841393, 89.97207639999999",worker206,citizen206,Coordinator206,Planner206,sensor206,center206
+Chittagong,Bandarban District,1. Ali Kadam Upazila,"21.6530087, 92.31476769999999",worker207,citizen207,Coordinator207,Planner207,sensor207,center207
+,,2. Bandarban Sadar Upazila,"22.1960332, 92.21760630000001",worker208,citizen208,Coordinator208,Planner208,sensor208,center208
+,,3. Lama Upazila,"21.7739055, 92.1968917",worker209,citizen209,Coordinator209,Planner209,sensor209,center209
+,,4. Naikhongchhari Upazila,"21.4269481, 92.17572779999999",worker210,citizen210,Coordinator210,Planner210,sensor210,center210
+,,5. Rowangchhari Upazila,"22.1832381, 92.3366846",worker211,citizen211,Coordinator211,Planner211,sensor211,center211
+,,6. Ruma Upazila,"22.0554765, 92.3986731",worker212,citizen212,Coordinator212,Planner212,sensor212,center212
+,,7. Thanchi Upazila,"21.8210961, 92.435696",worker213,citizen213,Coordinator213,Planner213,sensor213,center213
+,Brahmanbaria District,1. Akhaura Upazila,"23.8673991, 91.2081173",worker214,citizen214,Coordinator214,Planner214,sensor214,center214
+,,2. Bancharampur Upazila,"23.7731336, 90.80082139999999",worker215,citizen215,Coordinator215,Planner215,sensor215,center215
+,,3. Brahmanbaria Sadar Upazila,"23.9674376, 91.1117536",worker216,citizen216,Coordinator216,Planner216,sensor216,center216
+,,4. Kasba Upazila,"23.7473663, 91.1257167",worker217,citizen217,Coordinator217,Planner217,sensor217,center217
+,,5. Nabinagar Upazila,"23.8884944, 90.9659192",worker218,citizen218,Coordinator218,Planner218,sensor218,center218
+,,6. Nasirnagar Upazila,"24.1953566, 91.19837",worker219,citizen219,Coordinator219,Planner219,sensor219,center219
+,,7. Sarail Upazila,"24.0745179, 91.1113216",worker220,citizen220,Coordinator220,Planner220,sensor220,center220
+,,8. Ashuganj Upazila,"24.0385467, 91.003458",worker221,citizen221,Coordinator221,Planner221,sensor221,center221
+,,9. Bijoynagar Upazila,"24.0141859, 91.2265536",worker222,citizen222,Coordinator222,Planner222,sensor222,center222
+,Chandpur District,1. Chandpur Sadar Upazila,"23.2249389, 90.65472799999999",worker223,citizen223,Coordinator223,Planner223,sensor223,center223
+,,2. Faridganj Upazila,"23.1274882, 90.75090449999999",worker224,citizen224,Coordinator224,Planner224,sensor224,center224
+,,3. Haimchar Upazila,"23.0595392, 90.5919691",worker225,citizen225,Coordinator225,Planner225,sensor225,center225
+,,4. Haziganj Upazila,"23.2508859, 90.8498709",worker226,citizen226,Coordinator226,Planner226,sensor226,center226
+,,5. Kachua Upazila,"23.3431888, 90.8913478",worker227,citizen227,Coordinator227,Planner227,sensor227,center227
+,,6. Matlab Dakshin Upazila,"23.344576, 90.7068188",worker228,citizen228,Coordinator228,Planner228,sensor228,center228
+,,7. Matlab Uttar Upazila,"23.3837473, 90.61812789999999",worker229,citizen229,Coordinator229,Planner229,sensor229,center229
+,,8. Shahrasti Upazila,"23.2306433, 90.9486223",worker230,citizen230,Coordinator230,Planner230,sensor230,center230
+,Chittagong District,1. Anwara Upazila,"22.2337164, 91.8659809",worker231,citizen231,Coordinator231,Planner231,sensor231,center231
+,,2. Banshkhali Upazila,"22.0254192, 91.94631849999999",worker232,citizen232,Coordinator232,Planner232,sensor232,center232
+,,3. Boalkhali Upazila,"22.3791057, 91.9172519",worker233,citizen233,Coordinator233,Planner233,sensor233,center233
+,,4. Chandanaish Upazila,"22.2439381, 92.0125527",worker234,citizen234,Coordinator234,Planner234,sensor234,center234
+,,5. Fatikchhari North Upazila,"22.7594211, 91.7392812",worker235,citizen235,Coordinator235,Planner235,sensor235,center235
+,,6. Fatikchhari Upazila,"22.7587557, 91.73881349999999",worker236,citizen236,Coordinator236,Planner236,sensor236,center236
+,,7. Hathazari Upazila,"22.5084634, 91.80745859999999",worker237,citizen237,Coordinator237,Planner237,sensor237,center237
+,,8. Karnaphuli Upazila,Not Found,worker238,citizen238,Coordinator238,Planner238,sensor238,center238
+,,9. Lohagara Upazila,"22.0449236, 92.10782150000001",worker239,citizen239,Coordinator239,Planner239,sensor239,center239
+,,10. Mirsharai Upazila,"22.773039, 91.5741517",worker240,citizen240,Coordinator240,Planner240,sensor240,center240
+,,11. Patiya Upazila,"22.2964332, 91.9779193",worker241,citizen241,Coordinator241,Planner241,sensor241,center241
+,,12. Rangunia Upazila,"22.4695344, 92.05180610000001",worker242,citizen242,Coordinator242,Planner242,sensor242,center242
+,,13. Raozan Upazila,"22.5348906, 91.9104006",worker243,citizen243,Coordinator243,Planner243,sensor243,center243
+,,14. Sandwip Upazila,"22.4862451, 91.48544969999999",worker244,citizen244,Coordinator244,Planner244,sensor244,center244
+,,15. Satkania Upazila,"22.1000226, 92.0812156",worker245,citizen245,Coordinator245,Planner245,sensor245,center245
+,,16. Sitakunda Upazila,"22.6168106, 91.6808612",worker246,citizen246,Coordinator246,Planner246,sensor246,center246
+,Cumilla District,1. Bangra Upazila,Not Found,worker247,citizen247,Coordinator247,Planner247,sensor247,center247
+,,2. Barura Upazila,"23.3762244, 91.0556407",worker248,citizen248,Coordinator248,Planner248,sensor248,center248
+,,3. Brahmanpara Upazila,"23.6225266, 91.1017334",worker249,citizen249,Coordinator249,Planner249,sensor249,center249
+,,4. Burichang Upazila,"23.5534788, 91.1266892",worker250,citizen250,Coordinator250,Planner250,sensor250,center250
+,,5. Chandina Upazila,"23.4892481, 91.00836369999999",worker251,citizen251,Coordinator251,Planner251,sensor251,center251
+,,6. Chauddagram Upazila,"23.3057897, 91.26984750000001",worker252,citizen252,Coordinator252,Planner252,sensor252,center252
+,,7. Daudkandi Upazila,"23.5337738, 90.7247008",worker253,citizen253,Coordinator253,Planner253,sensor253,center253
+,,8. Debidwar Upazila,"23.6115377, 90.9772835",worker254,citizen254,Coordinator254,Planner254,sensor254,center254
+,,9. Homna Upazila,"23.6824728, 90.78329079999999",worker255,citizen255,Coordinator255,Planner255,sensor255,center255
+,,10. Laksam Upazila,"23.2384025, 91.1238537",worker256,citizen256,Coordinator256,Planner256,sensor256,center256
+,,11. Lalmai Upazila,"23.3585488, 91.1479713",worker257,citizen257,Coordinator257,Planner257,sensor257,center257
+,,12. Muradnagar Upazila,"23.6392755, 90.9310271",worker258,citizen258,Coordinator258,Planner258,sensor258,center258
+,,13. Nangalkot Upazila,"23.1668383, 91.1983186",worker259,citizen259,Coordinator259,Planner259,sensor259,center259
+,,14. Cumilla Adarsha Sadar Upazila,"23.4607132, 91.1808387",worker260,citizen260,Coordinator260,Planner260,sensor260,center260
+,,15. Meghna Upazila,"23.6248412, 90.70103189999999",worker261,citizen261,Coordinator261,Planner261,sensor261,center261
+,,16. Titas Upazila,"23.6004277, 90.8153224",worker262,citizen262,Coordinator262,Planner262,sensor262,center262
+,,17. Monohargonj Upazila,"23.1122951, 91.11583189999999",worker263,citizen263,Coordinator263,Planner263,sensor263,center263
+,,18. Cumilla Sadar Dakshin Upazila,"23.4189058, 91.1726637",worker264,citizen264,Coordinator264,Planner264,sensor264,center264
+,Cox's Bazar District,1. Chakaria Upazila,"21.7596391, 92.0765164",worker265,citizen265,Coordinator265,Planner265,sensor265,center265
+,,2. Cox's Bazar Sadar Upazila,"21.4358519, 91.9928068",worker266,citizen266,Coordinator266,Planner266,sensor266,center266
+,,3. Kutubdia Upazila,"21.816667, 91.858333",worker267,citizen267,Coordinator267,Planner267,sensor267,center267
+,,4. Maheshkhali Upazila,"21.5373654, 91.9417617",worker268,citizen268,Coordinator268,Planner268,sensor268,center268
+,,5. Ramu Upazila,"21.4285335, 92.0951583",worker269,citizen269,Coordinator269,Planner269,sensor269,center269
+,,6. Teknaf Upazila,"20.858343, 92.2945843",worker270,citizen270,Coordinator270,Planner270,sensor270,center270
+,,7. Ukhia Upazila,"21.2446617, 92.13891579999999",worker271,citizen271,Coordinator271,Planner271,sensor271,center271
+,,8. Pekua Upazila,"21.8327393, 91.9573985",worker272,citizen272,Coordinator272,Planner272,sensor272,center272
+,,9. Eidgaon Upazila,Not Found,worker273,citizen273,Coordinator273,Planner273,sensor273,center273
+,,10. Matamuhuri Upazila,"21.6031593666061, 92.20251546878258",worker274,citizen274,Coordinator274,Planner274,sensor274,center274
+,Feni District,1. Chhagalnaiya Upazila,"23.0397105, 91.5203971",worker275,citizen275,Coordinator275,Planner275,sensor275,center275
+,,2. Daganbhuiyan Upazila,"22.9720014, 91.3083685",worker276,citizen276,Coordinator276,Planner276,sensor276,center276
+,,3. Feni Sadar Upazila,"23.0100149, 91.3991863",worker277,citizen277,Coordinator277,Planner277,sensor277,center277
+,,4. Parshuram Upazila,"23.2108438, 91.4455519",worker278,citizen278,Coordinator278,Planner278,sensor278,center278
+,,5. Sonagazi Upazila,"22.8491219, 91.3915948",worker279,citizen279,Coordinator279,Planner279,sensor279,center279
+,,6. Fulgazi Upazila,"23.1425162, 91.43140009999999",worker280,citizen280,Coordinator280,Planner280,sensor280,center280
+,Khagrachhari District,1. Dighinala Upazila,"23.2408468, 92.0640687",worker281,citizen281,Coordinator281,Planner281,sensor281,center281
+,,2. Khagrachhari Sadar Upazila,"23.1137064, 91.97949630000001",worker282,citizen282,Coordinator282,Planner282,sensor282,center282
+,,3. Lakshmichhari Upazila,"22.7961681, 91.91236640000001",worker283,citizen283,Coordinator283,Planner283,sensor283,center283
+,,4. Mahalchhari Upazila,"22.9316977, 92.02976799999999",worker284,citizen284,Coordinator284,Planner284,sensor284,center284
+,,5. Manikchhari Upazila,"22.8417234, 91.83671",worker285,citizen285,Coordinator285,Planner285,sensor285,center285
+,,6. Matiranga Upazila,"23.0407988, 91.8733017",worker286,citizen286,Coordinator286,Planner286,sensor286,center286
+,,7. Panchhari Upazila,"23.3024586, 91.89771309999999",worker287,citizen287,Coordinator287,Planner287,sensor287,center287
+,,8. Ramgarh Upazila,"22.9944438, 91.7419757",worker288,citizen288,Coordinator288,Planner288,sensor288,center288
+,,9. Guimara Upazila,"22.9603925, 91.8695046",worker289,citizen289,Coordinator289,Planner289,sensor289,center289
+,Lakshmipur District,1. Lakshmipur Sadar Upazila,"22.9446471, 90.8281883",worker290,citizen290,Coordinator290,Planner290,sensor290,center290
+,,2. Raipur Upazila,"23.0367317, 90.7615158",worker291,citizen291,Coordinator291,Planner291,sensor291,center291
+,,3. Ramganj Upazila,"23.0992453, 90.8609927",worker292,citizen292,Coordinator292,Planner292,sensor292,center292
+,,4. Ramgati Upazila,"22.6577315, 90.91035169999999",worker293,citizen293,Coordinator293,Planner293,sensor293,center293
+,,5. Kamalnagar Upazila,"22.737006, 90.86849319999999",worker294,citizen294,Coordinator294,Planner294,sensor294,center294
+,,6. Chandraganj Upazila,"22.9448938, 90.9913184",worker295,citizen295,Coordinator295,Planner295,sensor295,center295
+,Noakhali District,1. Begumganj Upazila,"22.9320465, 91.0923963",worker296,citizen296,Coordinator296,Planner296,sensor296,center296
+,,2. Noakhali Sadar Upazila,"22.8652943, 91.0970586",worker297,citizen297,Coordinator297,Planner297,sensor297,center297
+,,3. Chatkhil Upazila,"23.0513752, 90.97745979999999",worker298,citizen298,Coordinator298,Planner298,sensor298,center298
+,,4. Companiganj Upazila,"22.8736722, 91.27794449999999",worker299,citizen299,Coordinator299,Planner299,sensor299,center299
+,,5. Hatiya Upazila,"22.469593, 91.1294747",worker300,citizen300,Coordinator300,Planner300,sensor300,center300
+,,6. Senbagh Upazila,"22.9874648, 91.23375779999999",worker301,citizen301,Coordinator301,Planner301,sensor301,center301
+,,7. Sonaimuri Upazila,"23.0509273, 91.1113216",worker302,citizen302,Coordinator302,Planner302,sensor302,center302
+,,8. Subarnachar Upazila,"22.6755632, 91.1256666",worker303,citizen303,Coordinator303,Planner303,sensor303,center303
+,,9. Kabirhat Upazila,"22.7956429, 91.1989169",worker304,citizen304,Coordinator304,Planner304,sensor304,center304
+,Rangamati District,1. Bagaichhari Upazila,"23.1649165, 92.19136429999999",worker305,citizen305,Coordinator305,Planner305,sensor305,center305
+,,2. Barkal Upazila,"22.7251557, 92.3795109",worker306,citizen306,Coordinator306,Planner306,sensor306,center306
+,,3. Kawkhali Upazila,"22.6074484, 90.08446599999999",worker307,citizen307,Coordinator307,Planner307,sensor307,center307
+,,4. Belaichhari Upazila,"22.4912827, 92.33812879999999",worker308,citizen308,Coordinator308,Planner308,sensor308,center308
+,,5. Kaptai Upazila,"22.4943822, 92.2212071",worker309,citizen309,Coordinator309,Planner309,sensor309,center309
+,,6. Juraichhari Upazila,"22.6708223, 92.3788939",worker310,citizen310,Coordinator310,Planner310,sensor310,center310
+,,7. Langadu Upazila,"22.8993392, 92.1534914",worker311,citizen311,Coordinator311,Planner311,sensor311,center311
+,,8. Naniyachar Upazila,"22.862167, 92.1106617",worker312,citizen312,Coordinator312,Planner312,sensor312,center312
+,,9. Rajasthali Upazila,"22.3762383, 92.15228049999999",worker313,citizen313,Coordinator313,Planner313,sensor313,center313
+,,10. Rangamati Sadar Upazila,"22.6530165, 92.1788229",worker314,citizen314,Coordinator314,Planner314,sensor314,center314
+Dhaka,Dhaka District,1. Dhamrai Upazila,"23.905154, 90.2200451",worker315,citizen315,Coordinator315,Planner315,sensor315,center315
+,,2. Dohar Upazila,"23.6183388, 90.1196181",worker316,citizen316,Coordinator316,Planner316,sensor316,center316
+,,3. Keraniganj Upazila,"23.7012548, 90.3974582",worker317,citizen317,Coordinator317,Planner317,sensor317,center317
+,,4. Nawabganj Upazila,"23.6611431, 90.1620514",worker318,citizen318,Coordinator318,Planner318,sensor318,center318
+,,5. Savar Upazila,"23.8479013, 90.257699",worker319,citizen319,Coordinator319,Planner319,sensor319,center319
+,Faridpur District,1. Alfadanga Upazila,"23.2901138, 89.70261300000001",worker320,citizen320,Coordinator320,Planner320,sensor320,center320
+,,2. Bhanga Upazila,"23.3846258, 89.9820228",worker321,citizen321,Coordinator321,Planner321,sensor321,center321
+,,3. Boalmari Upazila,"23.3909152, 89.6838116",worker322,citizen322,Coordinator322,Planner322,sensor322,center322
+,,4. Charbhadrasan Upazila,"23.5670897, 89.9952165",worker323,citizen323,Coordinator323,Planner323,sensor323,center323
+,,5. Faridpur Sadar Upazila,"23.6019361, 89.8333981",worker324,citizen324,Coordinator324,Planner324,sensor324,center324
+,,6. Madhukhali Upazila,"23.5429117, 89.62716139999999",worker325,citizen325,Coordinator325,Planner325,sensor325,center325
+,,7. Nagarkanda Upazila,"23.4537695, 89.9066314",worker326,citizen326,Coordinator326,Planner326,sensor326,center326
+,,8. Sadarpur Upazila,"23.4657012, 90.0279867",worker327,citizen327,Coordinator327,Planner327,sensor327,center327
+,,9. Saltha Upazila,"23.4328101, 89.7825682",worker328,citizen328,Coordinator328,Planner328,sensor328,center328
+,Gazipur District,1. Gazipur Sadar Upazila,"23.9999322, 90.4202176",worker329,citizen329,Coordinator329,Planner329,sensor329,center329
+,,2. Kaliakair Upazila,"24.0777777, 90.20977289999999",worker330,citizen330,Coordinator330,Planner330,sensor330,center330
+,,3. Kaliganj Upazila,"23.3562518, 89.1515476",worker331,citizen331,Coordinator331,Planner331,sensor331,center331
+,,4. Kapasia Upazila,"24.1115572, 90.5661173",worker332,citizen332,Coordinator332,Planner332,sensor332,center332
+,,5. Sreepur Upazila,"24.200673, 90.47364329999999",worker333,citizen333,Coordinator333,Planner333,sensor333,center333
+,Gopalganj District,1. Gopalganj Sadar Upazila,"23.0084941, 89.8285341",worker334,citizen334,Coordinator334,Planner334,sensor334,center334
+,,2. Kashiani Upazila,"23.2331635, 89.7239244",worker335,citizen335,Coordinator335,Planner335,sensor335,center335
+,,3. Kotalipara Upazila,"22.9892822, 90.0279867",worker336,citizen336,Coordinator336,Planner336,sensor336,center336
+,,4. Muksudpur Upazila,"23.3198489, 89.8668828",worker337,citizen337,Coordinator337,Planner337,sensor337,center337
+,,5. Tungipara Upazila,"22.9073374, 89.89845079999999",worker338,citizen338,Coordinator338,Planner338,sensor338,center338
+,Kishoreganj District,1. Austagram Upazila,"24.2796229, 91.1195412",worker339,citizen339,Coordinator339,Planner339,sensor339,center339
+,,2. Bajitpur Upazila,"24.2127712, 90.9509188",worker340,citizen340,Coordinator340,Planner340,sensor340,center340
+,,3. Bhairab Upazila,"24.0550524, 90.9830697",worker341,citizen341,Coordinator341,Planner341,sensor341,center341
+,,4. Hossainpur Upazila,"24.4165619, 90.6555614",worker342,citizen342,Coordinator342,Planner342,sensor342,center342
+,,5. Itna Upazila,"24.5277816, 91.09584249999999",worker343,citizen343,Coordinator343,Planner343,sensor343,center343
+,,6. Karimganj Upazila,"24.4680101, 90.8724819",worker344,citizen344,Coordinator344,Planner344,sensor344,center344
+,,7. Katiadi Upazila,"24.252139, 90.79694769999999",worker345,citizen345,Coordinator345,Planner345,sensor345,center345
+,,8. Kishoreganj Sadar Upazila,"24.4323946, 90.7868039",worker346,citizen346,Coordinator346,Planner346,sensor346,center346
+,,9. Kuliarchar Upazila,"24.1367698, 90.9116263",worker347,citizen347,Coordinator347,Planner347,sensor347,center347
+,,10. Mithamain Upazila,"24.4195583, 91.0634024",worker348,citizen348,Coordinator348,Planner348,sensor348,center348
+,,11. Nikli Upazila,"24.3242946, 90.9336121",worker349,citizen349,Coordinator349,Planner349,sensor349,center349
+,,12. Pakundia Upazila,"24.3280114, 90.6800847",worker350,citizen350,Coordinator350,Planner350,sensor350,center350
+,,13. Tarail Upazila,"24.5494898, 90.8893308",worker351,citizen351,Coordinator351,Planner351,sensor351,center351
+,Madaripur District,1. Rajoir Upazila,"23.2100451, 90.04852819999999",worker352,citizen352,Coordinator352,Planner352,sensor352,center352
+,,2. Madaripur Sadar Upazila,"23.1649342, 90.19391139999999",worker353,citizen353,Coordinator353,Planner353,sensor353,center353
+,,3. Kalkini Upazila,"23.0755017, 90.22673069999999",worker354,citizen354,Coordinator354,Planner354,sensor354,center354
+,,4. Shibchar Upazila,"23.3343469, 90.1866407",worker355,citizen355,Coordinator355,Planner355,sensor355,center355
+,,5. Dasar Upazila,Not Found,worker356,citizen356,Coordinator356,Planner356,sensor356,center356
+,Manikganj District,1. Daulatpur Upazila,"24.0031127, 88.8759694",worker357,citizen357,Coordinator357,Planner357,sensor357,center357
+,,2. Ghior Upazila,"23.8966166, 89.87127",worker358,citizen358,Coordinator358,Planner358,sensor358,center358
+,,3. Harirampur Upazila,"23.7495773, 89.9746656",worker359,citizen359,Coordinator359,Planner359,sensor359,center359
+,,4. Manikgonj Sadar Upazila,"23.8346765, 90.0186555",worker360,citizen360,Coordinator360,Planner360,sensor360,center360
+,,5. Saturia Upazila,"23.9729721, 90.0361533",worker361,citizen361,Coordinator361,Planner361,sensor361,center361
+,,6. Shivalaya Upazila,"23.8374291, 89.7873597",worker362,citizen362,Coordinator362,Planner362,sensor362,center362
+,,7. Singair Upazila,"23.8143458, 90.1451337",worker363,citizen363,Coordinator363,Planner363,sensor363,center363
+,Munshiganj District,1. Gazaria Upazila,"23.5478112, 90.62041649999999",worker364,citizen364,Coordinator364,Planner364,sensor364,center364
+,,2. Lohajang Upazila,"23.4743053, 90.32072989999999",worker365,citizen365,Coordinator365,Planner365,sensor365,center365
+,,3. Munshiganj Sadar Upazila,"23.5416259, 90.5302758",worker366,citizen366,Coordinator366,Planner366,sensor366,center366
+,,4. Sirajdikhan Upazila,"23.5961616, 90.3936722",worker367,citizen367,Coordinator367,Planner367,sensor367,center367
+,,5. Sreenagar Upazila,"23.542889, 90.29497289999999",worker368,citizen368,Coordinator368,Planner368,sensor368,center368
+,,6. Tongibari Upazila,"23.5096549, 90.4667501",worker369,citizen369,Coordinator369,Planner369,sensor369,center369
+,Narayanganj District,1. Araihazar Upazila,"23.7916557, 90.6535914",worker370,citizen370,Coordinator370,Planner370,sensor370,center370
+,,2. Bandar Upazila,"23.6327767, 90.5246511",worker371,citizen371,Coordinator371,Planner371,sensor371,center371
+,,3. Narayanganj Sadar Upazila,"23.6237484, 90.4998615",worker372,citizen372,Coordinator372,Planner372,sensor372,center372
+,,4. Rupganj Upazila,"23.8277907, 90.5416345",worker373,citizen373,Coordinator373,Planner373,sensor373,center373
+,,5. Sonargaon Upazila,"23.6359567, 90.5949594",worker374,citizen374,Coordinator374,Planner374,sensor374,center374
+,Narsingdi District,1. Narsingdi Sadar Upazila,"23.9214006, 90.719657",worker375,citizen375,Coordinator375,Planner375,sensor375,center375
+,,2. Belabo Upazila,"24.105044, 90.8514464",worker376,citizen376,Coordinator376,Planner376,sensor376,center376
+,,3. Monohardi Upazila,"24.1409605, 90.7031816",worker377,citizen377,Coordinator377,Planner377,sensor377,center377
+,,4. Palash Upazila,"23.9805097, 90.64670339999999",worker378,citizen378,Coordinator378,Planner378,sensor378,center378
+,,5. Raipura Upazila,"23.99444, 90.87175669999999",worker379,citizen379,Coordinator379,Planner379,sensor379,center379
+,,6. Shibpur Upazila,"23.9801051, 90.7332793",worker380,citizen380,Coordinator380,Planner380,sensor380,center380
+,Rajbari District,1. Baliakandi Upazila,"23.6347999, 89.5472523",worker381,citizen381,Coordinator381,Planner381,sensor381,center381
+,,2. Goalandaghat Upazila,"23.7236607, 89.76373029999999",worker382,citizen382,Coordinator382,Planner382,sensor382,center382
+,,3. Pangsha Upazila,"23.7790871, 89.4192291",worker383,citizen383,Coordinator383,Planner383,sensor383,center383
+,,4. Rajbari Sadar Upazila,"23.7527349, 89.64458599999999",worker384,citizen384,Coordinator384,Planner384,sensor384,center384
+,,5. Kalukhali Upazila,"23.7653703, 89.48563039999999",worker385,citizen385,Coordinator385,Planner385,sensor385,center385
+,Shariatpur District,1. Bhedarganj Upazila,"23.1971126, 90.4455606",worker386,citizen386,Coordinator386,Planner386,sensor386,center386
+,,2. Damudya Upazila,"23.1447429, 90.436391",worker387,citizen387,Coordinator387,Planner387,sensor387,center387
+,,3. Gosairhat Upazila,"23.0988395, 90.45259539999999",worker388,citizen388,Coordinator388,Planner388,sensor388,center388
+,,4. Naria Upazila,"23.3068418, 90.40746469999999",worker389,citizen389,Coordinator389,Planner389,sensor389,center389
+,,5. Shariatpur Sadar Upazila,"23.219547, 90.34825119999999",worker390,citizen390,Coordinator390,Planner390,sensor390,center390
+,,6. Zajira Upazila,"23.3403249, 90.3324856",worker391,citizen391,Coordinator391,Planner391,sensor391,center391
+,Tangail District,1. Gopalpur Upazila,"24.5620716, 89.9280467",worker392,citizen392,Coordinator392,Planner392,sensor392,center392
+,,2. Basail Upazila,"24.2330971, 90.0513246",worker393,citizen393,Coordinator393,Planner393,sensor393,center393
+,,3. Bhuapur Upazila,"24.4584326, 89.8752394",worker394,citizen394,Coordinator394,Planner394,sensor394,center394
+,,4. Delduar Upazila,"24.1647394, 89.96501339999999",worker395,citizen395,Coordinator395,Planner395,sensor395,center395
+,,5. Ghatail Upazila,"24.4803796, 89.9733698",worker396,citizen396,Coordinator396,Planner396,sensor396,center396
+,,6. Kalihati Upazila,"24.3882285, 89.99538919999999",worker397,citizen397,Coordinator397,Planner397,sensor397,center397
+,,7. Madhupur Upazila,"24.6072161, 90.0288144",worker398,citizen398,Coordinator398,Planner398,sensor398,center398
+,,8. Mirzapur Upazila,"24.1020998, 90.0945308",worker399,citizen399,Coordinator399,Planner399,sensor399,center399
+,,9. Nagarpur Upazila,"24.0576707, 89.87623769999999",worker400,citizen400,Coordinator400,Planner400,sensor400,center400
+,,10. Sakhipur Upazila,"24.3191857, 90.1752525",worker401,citizen401,Coordinator401,Planner401,sensor401,center401
+,,11. Dhanbari Upazila,"24.6770884, 89.95219519999999",worker402,citizen402,Coordinator402,Planner402,sensor402,center402
+,,12. Tangail Sadar Upazila,"24.2510087, 89.9169233",worker403,citizen403,Coordinator403,Planner403,sensor403,center403
+Khulna,Bagerhat District,1. Bagerhat Sadar Upazila,"22.6562568, 89.7950346",worker404,citizen404,Coordinator404,Planner404,sensor404,center404
+,,2. Chitalmari Upazila,"22.7904387, 89.8778169",worker405,citizen405,Coordinator405,Planner405,sensor405,center405
+,,3. Fakirhat Upazila,"22.777513, 89.7074695",worker406,citizen406,Coordinator406,Planner406,sensor406,center406
+,,4. Kachua Upazila,"23.3431888, 90.8913478",worker407,citizen407,Coordinator407,Planner407,sensor407,center407
+,,5. Mollahat Upazila,"22.926679, 89.8060758",worker408,citizen408,Coordinator408,Planner408,sensor408,center408
+,,6. Mongla Upazila,"22.5304664, 89.5901256",worker409,citizen409,Coordinator409,Planner409,sensor409,center409
+,,7. Morrelganj Upazila,"22.4499409, 89.85284159999999",worker410,citizen410,Coordinator410,Planner410,sensor410,center410
+,,8. Rampal Upazila,"22.5837317, 89.6721038",worker411,citizen411,Coordinator411,Planner411,sensor411,center411
+,,9. Sarankhola Upazila,"22.3129365, 89.8480496",worker412,citizen412,Coordinator412,Planner412,sensor412,center412
+,Chuadanga District,1. Alamdanga Upazila,"23.7602951, 88.9489407",worker413,citizen413,Coordinator413,Planner413,sensor413,center413
+,,2. Chuadanga Sadar Upazila,"23.6422267, 88.85755119999999",worker414,citizen414,Coordinator414,Planner414,sensor414,center414
+,,3. Damurhuda Upazila,"23.6067377, 88.7758503",worker415,citizen415,Coordinator415,Planner415,sensor415,center415
+,,4. Jibannagar Upazila,"23.420935, 88.822277",worker416,citizen416,Coordinator416,Planner416,sensor416,center416
+,Jashore District,1. Abhaynagar Upazila,"23.0119596, 89.3889825",worker417,citizen417,Coordinator417,Planner417,sensor417,center417
+,,2. Bagherpara Upazila,"23.2204236, 89.3466838",worker418,citizen418,Coordinator418,Planner418,sensor418,center418
+,,3. Chaugachha Upazila,"23.2630483, 89.020432",worker419,citizen419,Coordinator419,Planner419,sensor419,center419
+,,4. Jhikargachha Upazila,"23.1004467, 89.09922159999999",worker420,citizen420,Coordinator420,Planner420,sensor420,center420
+,,5. Keshabpur Upazila,"22.908431, 89.2194193",worker421,citizen421,Coordinator421,Planner421,sensor421,center421
+,,6. Jashore Sadar Upazila,"23.1778945, 89.1800385",worker422,citizen422,Coordinator422,Planner422,sensor422,center422
+,,7. Manirampur Upazila,"23.0241761, 89.2329287",worker423,citizen423,Coordinator423,Planner423,sensor423,center423
+,,8. Sharsha Upazila,"23.055077, 88.9516415",worker424,citizen424,Coordinator424,Planner424,sensor424,center424
+,Jhenaida District,1. Harinakunda Upazila,"23.6486567, 89.0453399",worker425,citizen425,Coordinator425,Planner425,sensor425,center425
+,,2. Jhenaidah Sadar Upazila,"23.54493, 89.1725247",worker426,citizen426,Coordinator426,Planner426,sensor426,center426
+,,3. Kaliganj Upazila,"23.3562518, 89.1515476",worker427,citizen427,Coordinator427,Planner427,sensor427,center427
+,,4. Kotchandpur Upazila,"23.4071352, 89.0105399",worker428,citizen428,Coordinator428,Planner428,sensor428,center428
+,,5. Maheshpur Upazila,"23.3598198, 88.9171619",worker429,citizen429,Coordinator429,Planner429,sensor429,center429
+,,6. Shailkupa Upazila,"23.6840828, 89.2419658",worker430,citizen430,Coordinator430,Planner430,sensor430,center430
+,Khulna District,1. Batiaghata Upazila,"22.7263608, 89.5025641",worker431,citizen431,Coordinator431,Planner431,sensor431,center431
+,,2. Dacope Upazila,"22.6049011, 89.5198862",worker432,citizen432,Coordinator432,Planner432,sensor432,center432
+,,3. Dumuria Upazila,"22.8051822, 89.4193885",worker433,citizen433,Coordinator433,Planner433,sensor433,center433
+,,4. Dighalia Upazila,"22.8958119, 89.5218474",worker434,citizen434,Coordinator434,Planner434,sensor434,center434
+,,5. Koyra Upazila,"22.3515215, 89.28590849999999",worker435,citizen435,Coordinator435,Planner435,sensor435,center435
+,,6. Paikgachha Upazila,"22.593841, 89.3126166",worker436,citizen436,Coordinator436,Planner436,sensor436,center436
+,,7. Phultala Upazila,"22.9705775, 89.45055099999999",worker437,citizen437,Coordinator437,Planner437,sensor437,center437
+,,8. Rupsha Upazila,"22.8004577, 89.5868179",worker438,citizen438,Coordinator438,Planner438,sensor438,center438
+,,9. Terokhada Upazila,"22.9353223, 89.6675144",worker439,citizen439,Coordinator439,Planner439,sensor439,center439
+,Kushtia District,1. Bheramara Upazila,"24.1055071, 88.9654154",worker440,citizen440,Coordinator440,Planner440,sensor440,center440
+,,2. Daulatpur Upazila,"24.0031127, 88.8759694",worker441,citizen441,Coordinator441,Planner441,sensor441,center441
+,,3. Khoksa Upazila,"23.8058265, 89.2836391",worker442,citizen442,Coordinator442,Planner442,sensor442,center442
+,,4. Kumarkhali Upazila,"23.8620935, 89.2408504",worker443,citizen443,Coordinator443,Planner443,sensor443,center443
+,,5. Kushtia Sadar Upazila,"23.8799007, 89.0920225",worker444,citizen444,Coordinator444,Planner444,sensor444,center444
+,,6. Mirpur Upazila,"23.9376771, 88.99773789999999",worker445,citizen445,Coordinator445,Planner445,sensor445,center445
+,Magura District,1. Magura Sadar Upazila,"23.4857954, 89.4190136",worker446,citizen446,Coordinator446,Planner446,sensor446,center446
+,,2. Mohammadpur Upazila,"23.3996487, 89.5827044",worker447,citizen447,Coordinator447,Planner447,sensor447,center447
+,,3. Shalikha Upazila,"23.3020599, 89.37612279999999",worker448,citizen448,Coordinator448,Planner448,sensor448,center448
+,,4. Sreepur Upazila,"24.200673, 90.47364329999999",worker449,citizen449,Coordinator449,Planner449,sensor449,center449
+,Meherpur District,1. Gangni Upazila,"23.8206519, 88.74218309999999",worker450,citizen450,Coordinator450,Planner450,sensor450,center450
+,,2. Meherpur Sadar Upazila,"23.7783277, 88.63143149999999",worker451,citizen451,Coordinator451,Planner451,sensor451,center451
+,,3. Mujibnagar Upazila,"23.6468395, 88.5928589",worker452,citizen452,Coordinator452,Planner452,sensor452,center452
+,Narail District,1. Kalia Upazila,"23.0381139, 89.6325445",worker453,citizen453,Coordinator453,Planner453,sensor453,center453
+,,2. Lohagara Upazila,"22.0449236, 92.10782150000001",worker454,citizen454,Coordinator454,Planner454,sensor454,center454
+,,3. Narail Sadar Upazila,"23.1733806, 89.5004273",worker455,citizen455,Coordinator455,Planner455,sensor455,center455
+,Satkhira District,1. Assasuni Upazila,"22.5462297, 89.1725987",worker456,citizen456,Coordinator456,Planner456,sensor456,center456
+,,2. Debhata Upazila,"22.5809462, 88.9892448",worker457,citizen457,Coordinator457,Planner457,sensor457,center457
+,,3. Kalaroa Upazila,"22.8573021, 89.0417406",worker458,citizen458,Coordinator458,Planner458,sensor458,center458
+,,4. Kaliganj Upazila,"23.9210751, 90.56688729999999",worker459,citizen459,Coordinator459,Planner459,sensor459,center459
+,,5. Satkhira Sadar Upazila,"22.7184973, 89.0704787",worker460,citizen460,Coordinator460,Planner460,sensor460,center460
+,,6. Shyamnagar Upazila,"22.3392217, 89.10597899999999",worker461,citizen461,Coordinator461,Planner461,sensor461,center461
+,,7. Tala Upazila,"22.7502633, 89.25624080000001",worker462,citizen462,Coordinator462,Planner462,sensor462,center462
+Sylhet,Habiganj District,1. Ajmiriganj Upazila,"24.5489217, 91.2361706",worker463,citizen463,Coordinator463,Planner463,sensor463,center463
+,,2. Bahubal Upazila,"24.3412478, 91.5378109",worker464,citizen464,Coordinator464,Planner464,sensor464,center464
+,,3. Baniyachong Upazila,"24.52431, 91.36156410000001",worker465,citizen465,Coordinator465,Planner465,sensor465,center465
+,,4. Chunarughat Upazila,"24.1973581, 91.51723150000001",worker466,citizen466,Coordinator466,Planner466,sensor466,center466
+,,5. Habiganj Sadar Upazila,"24.3841001, 91.4168792",worker467,citizen467,Coordinator467,Planner467,sensor467,center467
+,,6. Lakhai Upazila,"24.3106095, 91.30236769999999",worker468,citizen468,Coordinator468,Planner468,sensor468,center468
+,,7. Madhabpur Upazila,"24.0998223, 91.2963269",worker469,citizen469,Coordinator469,Planner469,sensor469,center469
+,,8. Nabiganj Upazila,"24.5663626, 91.51737279999999",worker470,citizen470,Coordinator470,Planner470,sensor470,center470
+,,9. Shayestaganj Upazila,"24.2766967, 91.4555525",worker471,citizen471,Coordinator471,Planner471,sensor471,center471
+,Moulvibazar District,1. Barlekha Upazila,"24.707272, 92.19170179999999",worker472,citizen472,Coordinator472,Planner472,sensor472,center472
+,,2. Juri Upazila,"24.5971882, 92.1140094",worker473,citizen473,Coordinator473,Planner473,sensor473,center473
+,,3. Kamalganj Upazila,"24.3544944, 91.852704",worker474,citizen474,Coordinator474,Planner474,sensor474,center474
+,,4. Kulaura Upazila,"24.5225457, 92.0343996",worker475,citizen475,Coordinator475,Planner475,sensor475,center475
+,,5. Moulvibazar Sadar Upazila,"24.4843071, 91.7685278",worker476,citizen476,Coordinator476,Planner476,sensor476,center476
+,,6. Rajnagar Upazila,"24.5277729, 91.85491689999999",worker477,citizen477,Coordinator477,Planner477,sensor477,center477
+,,7. Sreemangal Upazila,"24.3094552, 91.7314423",worker478,citizen478,Coordinator478,Planner478,sensor478,center478
+,Sunamganj District,1. Bishwamvarpur Upazila,"25.0987573, 91.299939",worker479,citizen479,Coordinator479,Planner479,sensor479,center479
+,,2. Chhatak Upazila,"25.0361323, 91.66441929999999",worker480,citizen480,Coordinator480,Planner480,sensor480,center480
+,,3. Shantiganj Upazila,"24.9149748, 91.4580948",worker481,citizen481,Coordinator481,Planner481,sensor481,center481
+,,4. Derai Upazila,"24.7880558, 91.35417559999999",worker482,citizen482,Coordinator482,Planner482,sensor482,center482
+,,5. Dharamapasha Upazila,"24.8993243, 91.0119509",worker483,citizen483,Coordinator483,Planner483,sensor483,center483
+,,6. Dowarabazar Upazila,"25.0482866, 91.55880619999999",worker484,citizen484,Coordinator484,Planner484,sensor484,center484
+,,7. Jagannathpur Upazila,"24.7715237, 91.5454018",worker485,citizen485,Coordinator485,Planner485,sensor485,center485
+,,8. Jamalganj Upazila,"24.9970758, 91.23370179999999",worker486,citizen486,Coordinator486,Planner486,sensor486,center486
+,,9. Sullah Upazila,"24.6704225, 91.2626287",worker487,citizen487,Coordinator487,Planner487,sensor487,center487
+,,10. Sunamganj Sadar Upazila,"25.071382, 91.3992751",worker488,citizen488,Coordinator488,Planner488,sensor488,center488
+,,11. Tahirpur Upazila,"25.0990489, 91.1755002",worker489,citizen489,Coordinator489,Planner489,sensor489,center489
+,,12. Madhyanagar Upazila,Not Found,worker490,citizen490,Coordinator490,Planner490,sensor490,center490
+,Sylhet District,1. Balaganj Upazila,"24.6548635, 91.8240007",worker491,citizen491,Coordinator491,Planner491,sensor491,center491
+,,2. Beanibazar Upazila,"24.8219613, 92.1585314",worker492,citizen492,Coordinator492,Planner492,sensor492,center492
+,,3. Bishwanath Upazila,"24.8132769, 91.7557623",worker493,citizen493,Coordinator493,Planner493,sensor493,center493
+,,4. Companiganj Upazila,"22.8736722, 91.27794449999999",worker494,citizen494,Coordinator494,Planner494,sensor494,center494
+,,5. Dakshin Surma Upazila,"24.8078774, 91.9128781",worker495,citizen495,Coordinator495,Planner495,sensor495,center495
+,,6. Fenchuganj Upazila,"24.69583, 91.944132",worker496,citizen496,Coordinator496,Planner496,sensor496,center496
+,,7. Golapganj Upazila,"24.857422, 92.0136994",worker497,citizen497,Coordinator497,Planner497,sensor497,center497
+,,8. Gowainghat Upazila,"25.0910204, 91.98233239999999",worker498,citizen498,Coordinator498,Planner498,sensor498,center498
+,,9. Jaintiapur Upazila,"25.1349003, 92.1223018",worker499,citizen499,Coordinator499,Planner499,sensor499,center499
+,,10. Kanaighat Upazila,"25.0088198, 92.25565429999999",worker500,citizen500,Coordinator500,Planner500,sensor500,center500
+,,11. Osmani Nagar Upazila,"24.7190186, 91.74658079999999",worker501,citizen501,Coordinator501,Planner501,sensor501,center501
+,,12. Sylhet Sadar Upazila,"24.8950536, 91.8688172",worker502,citizen502,Coordinator502,Planner502,sensor502,center502
+,,13. Zakiganj Upazila,"24.8772973, 92.3698184",worker503,citizen503,Coordinator503,Planner503,sensor503,center503
