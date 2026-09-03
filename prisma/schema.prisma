@@ -1,0 +1,232 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// User Roles for Multi-Tier Authorization
+enum Role {
+  CITIZEN
+  WORKER
+  COORDINATOR
+  PLANNER
+  ADMIN
+}
+
+// Administrative Hierarchy Tiers
+enum NodeTier {
+  COUNTRY
+  DIVISION
+  DISTRICT
+  UPAZILA
+}
+
+// Environmental Sensor Metric Categories
+enum SensorType {
+  WATER
+  WIND
+  SALINITY
+  SEISMOGRAPH
+}
+
+// Operational Status for Hardware & Nodes
+enum NodeStatus {
+  ACTIVE
+  MAINTENANCE
+  OFFLINE
+}
+
+// Severity Levels for System & Citizen Alerts
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+// Status Lifecycle for Simulation Response Policies
+enum PolicyStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+// --- CORE MODELS ---
+
+// 1. User Accounts (Citizens, Workers, Coordinators, Planners, Admins)
+model User {
+  id             String               @id @default(uuid())
+  username       String               @unique
+  email          String               @unique
+  passwordHash   String
+  fullName       String
+  role           Role                 @default(CITIZEN)
+  phone          String?
+  organization   String?              // e.g., "DDM", "Red Cross", "Fire Service", "Planning Board"
+  districtNodeId String?
+  districtNode   AdministrativeNode?  @relation(fields: [districtNodeId], references: [id], onDelete: SetNull)
+  
+  // JSON Storage Column for Direct In-App User Messages & Direct Notifications
+  messages       Json                 @default("[]")
+  
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  chatMessages   ChatMessage[]
+
+  @@map("users")
+}
+
+// 2. 4-Tier Administrative Node Network (Country -> Division -> District -> Upazila)
+model AdministrativeNode {
+  id           String               @id @default(uuid())
+  name         String               // e.g., "Adamdighi", "Bogura", "Rajshahi", "Bangladesh National HQ"
+  tier         NodeTier             // COUNTRY, DIVISION, DISTRICT, UPAZILA
+  code         String               @unique // e.g., "UPZ-BOGURA-ADAMDIGHI"
+  
+  // Self-referential Directed Graph Hierarchy
+  parentId     String?
+  parent       AdministrativeNode?  @relation("NodeHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children     AdministrativeNode[] @relation("NodeHierarchy")
+
+  // Geographic Spatial Coordinates
+  latitude     Float?
+  longitude    Float?
+
+  // Native JSON Storage Fields for Dynamic Telemetry & State
+  inventory        Json  @default("{\"food_packs\": 0, \"water_liters\": 0, \"medical_kits\": 0, \"dry_food_bags\": 0, \"emergency_tents\": 0}")
+  requirements     Json  @default("{\"food_packs_needed\": 0, \"water_liters_needed\": 0, \"medical_kits_needed\": 0, \"tents_needed\": 0}")
+  affectedPeople   Json  @default("{\"total_affected\": 0, \"displaced\": 0, \"injured\": 0, \"casualties\": 0, \"vulnerable_groups\": {\"children\": 0, \"elderly\": 0, \"pregnant\": 0}}")
+  sensorData       Json  @default("{\"water_level_m\": 0.0, \"rainfall_mm\": 0.0, \"wind_speed_kmh\": 0.0, \"salinity_ppt\": 0.0, \"status\": \"NORMAL\"}")
+  incidents        Json  @default("[]")
+  situationReport  Json  @default("{\"status\": \"STABLE\", \"summary\": \"Normal operations\", \"last_updated\": \"\", \"updated_by\": \"\"}")
+  messages         Json  @default("[]")
+
+  // Relationships
+  users        User[]
+  sensors      SensorNode[]
+  shelters     ReliefCenter[]
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("administrative_nodes")
+}
+
+// 3. Sensor Hardware Infrastructure (4 Per Upazila: WATER, WIND, SALINITY, SEISMOGRAPH)
+model SensorNode {
+  id             String              @id @default(uuid())
+  sensorCode     String              @unique // e.g., "SN-UPZ-ADAMDIGHI-WATER"
+  districtNodeId String
+  districtNode   AdministrativeNode  @relation(fields: [districtNodeId], references: [id], onDelete: Cascade)
+  type           SensorType
+  latitude       Float
+  longitude      Float
+  metricValue    String              // Current reading (e.g., "4.2m", "65km/h", "12.4ppt", "3.1M")
+  status         NodeStatus          @default(ACTIVE)
+  lastPing       DateTime            @default(now())
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@map("sensor_nodes")
+}
+
+// 4. Emergency Relief Centers & Shelters (1 Per Upazila with 4 JSON Stock Columns)
+model ReliefCenter {
+  id                    String              @id @default(uuid())
+  centerCode            String              @unique // e.g., "RC-UPZ-ADAMDIGHI"
+  name                  String
+  districtNodeId        String
+  districtNode          AdministrativeNode  @relation(fields: [districtNodeId], references: [id], onDelete: Cascade)
+  latitude              Float
+  longitude             Float
+  capacity              Int                 @default(500)
+  occupancy             Int                 @default(0)
+  contactNum            String?
+  isOperational         Boolean             @default(true)
+
+  // 1) Stock Policy: Required readiness allocations (beds, food, medicine, vehicles, tents)
+  stockPolicy           Json                @default("{\"beds\": 500, \"food_packs\": 1000, \"medical_kits\": 200, \"vehicles\": 5, \"tents\": 50}")
+
+  // 2) Current Stock: On-hand available inventory
+  currentStock          Json                @default("{\"beds\": 350, \"food_packs\": 700, \"medical_kits\": 120, \"vehicles\": 3, \"tents\": 30}")
+
+  // 3) Emergency Requirement: Immediate active crisis deficit
+  emergencyRequirement  Json                @default("{\"beds\": 50, \"food_packs\": 100, \"medical_kits\": 20, \"vehicles\": 1, \"tents\": 10}")
+
+  // 4) Restocking Requirement: Delta between Policy and Current Stock
+  restockingRequirement Json                @default("{\"beds\": 150, \"food_packs\": 300, \"medical_kits\": 80, \"vehicles\": 2, \"tents\": 20}")
+
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  @@map("relief_centers")
+}
+
+// 5. Multi-Tier Worker & NGO Chat Communication System
+model ChatMessage {
+  id        String   @id @default(uuid())
+  channel   String   // e.g., "upazila-{id}", "district-{id}", "division-{id}", "country-national"
+  text      String   @db.Text
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@map("chat_messages")
+}
+
+// 6. Citizen Disaster Broadcast Alerts
+model DisasterAlert {
+  id          String        @id @default(uuid())
+  title       String
+  description String        @db.Text
+  district    String        // Target district or "NATIONWIDE"
+  severity    AlertSeverity @default(WARNING)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("disaster_alerts")
+}
+
+// 7. Planner Disaster Response Policies
+model ResponsePolicy {
+  id              String         @id @default(uuid())
+  name            String         // e.g., "Cost-Minimized Pre-positioning v1"
+  description     String?        @db.Text
+  status          PolicyStatus   @default(DRAFT)
+  tierScope       NodeTier       @default(COUNTRY)
+
+  triggers        Json           // Operational activation thresholds
+  allocationRules Json           // Per capita supply ratios & safety buffers
+  priorityWeights Json           // Multi-criteria optimization weights
+  costParameters  Json           // Unit transport, holding, and unmet demand penalties
+
+  simulations     SimulationRun[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@map("response_policies")
+}
+
+// 8. Simulation Execution Results & Scorecards
+model SimulationRun {
+  id                  String          @id @default(uuid())
+  scenarioName        String          // e.g., "Category 4 Cyclone Simulation"
+  policyId            String
+  policy              ResponsePolicy  @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  
+  totalCost           Float
+  totalTransportCost  Float
+  totalHoldingCost    Float
+  totalPenaltyCost    Float
+  fulfillmentRate     Float
+  optimizedAllocation Json
+
+  runBy               String
+  createdAt           DateTime        @default(now())
+
+  @@map("simulation_runs")
+}
