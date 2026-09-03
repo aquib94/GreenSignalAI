@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B-NDRSS Database & User Account Manager</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans bg-slate-950 text-slate-100">
+
+  <!-- TOP HEADER -->
+  <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex items-center justify-between shrink-0 shadow-lg">
+    <div class="flex items-center space-x-3">
+      <div class="bg-indigo-600 p-2.5 rounded-lg shadow-md shadow-indigo-500/20">
+        <i class="fa-solid fa-database text-white text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+          B-NDRSS Database Studio & Impersonation Hub
+          <span class="text-xs bg-indigo-500/20 text-indigo-400 px-2.5 py-0.5 rounded-full font-mono border border-indigo-500/30">DEV TOOLS</span>
+        </h1>
+        <p class="text-xs text-slate-400">Direct PostgreSQL Table Inspector, Live User Account Impersonator & Raw SQL Execution Console</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-3">
+      <button onclick="exportDatabaseSQL()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow flex items-center gap-2">
+        <i class="fa-solid fa-file-export"></i> Export Entire DB (.sql)
+      </button>
+      <button onclick="fetchDatabaseStats()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-rotate text-xs"></i> Refresh Stats
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- LEFT SIDEBAR: QUICK USER IMPERSONATION & ACTIONS -->
+    <aside class="w-80 bg-slate-900/70 border-r border-slate-800 p-4 flex flex-col gap-5 shrink-0 overflow-y-auto custom-scrollbar">
+      
+      <!-- QUICK SIGN IN / IMPERSONATION BOX -->
+      <div class="bg-slate-800/80 rounded-xl p-4 border border-indigo-500/30 shadow-lg">
+        <h2 class="text-sm font-bold text-indigo-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-user-gear text-indigo-400"></i> Account Impersonator
+        </h2>
+        <p class="text-xs text-slate-400 mb-3">Sign into any user account instantly and open their designated role dashboard in a new tab.</p>
+        
+        <div class="space-y-3">
+          <div>
+            <label class="text-[11px] font-semibold text-slate-300 block mb-1">Search or Enter Username / Email</label>
+            <input type="text" id="impersonateInput" placeholder="e.g. Adamdighi Citizen or Bogura Coordinator" 
+                   class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+          </div>
+
+          <!-- Quick Account Presets -->
+          <div>
+            <label class="text-[11px] font-semibold text-slate-400 block mb-1">Quick Presets</label>
+            <div class="grid grid-cols-2 gap-1.5 text-[10px]">
+              <button onclick="fillImpersonate('Adamdighi Citizen')" class="bg-slate-700/60 hover:bg-slate-700 text-slate-200 py-1 px-2 rounded border border-slate-600/50 truncate text-left">
+                👤 Adamdighi Citizen
+              </button>
+              <button onclick="fillImpersonate('Adamdighi Coordinator')" class="bg-slate-700/60 hover:bg-slate-700 text-slate-200 py-1 px-2 rounded border border-slate-600/50 truncate text-left">
+                🏢 Upazila Coordinator
+              </button>
+              <button onclick="fillImpersonate('Bogura Coordinator')" class="bg-slate-700/60 hover:bg-slate-700 text-slate-200 py-1 px-2 rounded border border-slate-600/50 truncate text-left">
+                🏛️ District Coordinator
+              </button>
+              <button onclick="fillImpersonate('Bogura Planner')" class="bg-slate-700/60 hover:bg-slate-700 text-slate-200 py-1 px-2 rounded border border-slate-600/50 truncate text-left">
+                📐 District Planner
+              </button>
+              <button onclick="fillImpersonate('Rajshahi Coordinator')" class="bg-slate-700/60 hover:bg-slate-700 text-slate-200 py-1 px-2 rounded border border-slate-600/50 truncate text-left">
+                🗺️ Division Coordinator
+              </button>
+              <button onclick="fillImpersonate('Admin')" class="bg-slate-700/60 hover:bg-slate-700 text-slate-200 py-1 px-2 rounded border border-slate-600/50 truncate text-left">
+                ⚡ Master Admin
+              </button>
+            </div>
+          </div>
+
+          <button onclick="loginAndOpenNewTab()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2.5 rounded-lg transition shadow flex items-center justify-center gap-2">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Sign In & Open View (New Tab)
+          </button>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE TEST RIG (Messages & Alerts) -->
+      <div class="bg-slate-800/80 rounded-xl p-4 border border-slate-700 shadow">
+        <h2 class="text-sm font-bold text-amber-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-vial text-amber-400"></i> Direct Feature Tester
+        </h2>
+        <div class="space-y-3">
+          <!-- Inject Chat Message -->
+          <div class="border-t border-slate-700/80 pt-2">
+            <label class="text-[11px] font-semibold text-slate-300 block mb-1">Inject Chat Message</label>
+            <input type="text" id="msgTextInput" placeholder="Emergency message body..." class="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white mb-2">
+            <button onclick="injectChatMessage()" class="w-full bg-amber-600 hover:bg-amber-500 text-white text-xs py-1.5 rounded transition font-medium">
+              Post to Chat Messages Table
+            </button>
+          </div>
+
+          <!-- Broadcast Disaster Alert -->
+          <div class="border-t border-slate-700/80 pt-2">
+            <label class="text-[11px] font-semibold text-slate-300 block mb-1">Broadcast Disaster Alert</label>
+            <input type="text" id="alertTitleInput" placeholder="Flash Flood Warning" class="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white mb-1">
+            <select id="alertSeveritySelect" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white mb-2">
+              <option value="INFO">INFO</option>
+              <option value="WARNING" selected>WARNING</option>
+              <option value="CRITICAL">CRITICAL</option>
+            </select>
+            <button onclick="broadcastAlert()" class="w-full bg-rose-600 hover:bg-rose-500 text-white text-xs py-1.5 rounded transition font-medium">
+              Insert into disaster_alerts
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATABASE METRICS OVERVIEW -->
+      <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-800">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">System Table Stats</h3>
+        <div id="tableStatsList" class="space-y-1.5 text-xs text-slate-300">
+          <div class="flex justify-between py-1 border-b border-slate-800"><span>users</span><span id="stat-users" class="font-mono text-indigo-400">...</span></div>
+          <div class="flex justify-between py-1 border-b border-slate-800"><span>administrative_nodes</span><span id="stat-nodes" class="font-mono text-indigo-400">...</span></div>
+          <div class="flex justify-between py-1 border-b border-slate-800"><span>sensor_nodes</span><span id="stat-sensors" class="font-mono text-indigo-400">...</span></div>
+          <div class="flex justify-between py-1 border-b border-slate-800"><span>relief_centers</span><span id="stat-relief" class="font-mono text-indigo-400">...</span></div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT CONTENT AREA: TABLE SELECTOR, CRUD GRID, & SQL CONSOLE -->
+    <main class="flex-1 flex flex-col bg-slate-950 overflow-hidden">
+      
+      <!-- NAVIGATION TABS: DATA EXPLORER vs RAW SQL EDITOR -->
+      <div class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between shrink-0">
+        <div class="flex space-x-2">
+          <button id="tabBtnExplorer" onclick="switchMainTab('explorer')" class="px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition flex items-center gap-2">
+            <i class="fa-solid fa-table"></i> Table CRUD Explorer
+          </button>
+          <button id="tabBtnSql" onclick="switchMainTab('sql')" class="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-2">
+            <i class="fa-solid fa-terminal"></i> Raw SQL Console
+          </button>
+        </div>
+
+        <!-- TABLE DROP DOWN SELECTOR -->
+        <div id="tableSelectorContainer" class="flex items-center space-x-3">
+          <label class="text-xs text-slate-400 font-medium">Select Table:</label>
+          <select id="tableSelect" onchange="loadTableData()" class="bg-slate-950 border border-slate-700 text-indigo-300 text-xs font-mono font-bold rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-500">
+            <option value="users">users (User Accounts)</option>
+            <option value="relief_centers">relief_centers (Relief Centers & Stock JSONs)</option>
+            <option value="sensor_nodes">sensor_nodes (Sensors)</option>
+            <option value="administrative_nodes">administrative_nodes (Nodes & Telemetry)</option>
+            <option value="chat_messages">chat_messages (Messages Log)</option>
+            <option value="disaster_alerts">disaster_alerts (System Alerts)</option>
+            <option value="response_policies">response_policies (Planner Policies)</option>
+            <option value="simulation_runs">simulation_runs (Simulation Outputs)</option>
+          </select>
+          <button onclick="openCreateModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+            <i class="fa-solid fa-plus text-xs"></i> Add Record
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW 1: TABLE CRUD EXPLORER -->
+      <div id="viewExplorer" class="flex-1 flex flex-col p-6 overflow-hidden">
+        
+        <!-- SEARCH & ROW COUNTER -->
+        <div class="mb-4 flex items-center justify-between">
+          <div class="relative w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+            <input type="text" id="searchTableInput" onkeyup="filterTableRows()" placeholder="Filter current view..." 
+                   class="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+          </div>
+          <div class="text-xs text-slate-400">
+            Total Records: <span id="recordCount" class="font-bold text-indigo-400">0</span>
+          </div>
+        </div>
+
+        <!-- DYNAMIC DATA TABLE GRID -->
+        <div class="flex-1 bg-slate-900 border border-slate-800 rounded-xl overflow-auto custom-scrollbar shadow-inner relative">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead id="tableHeader" class="bg-slate-800/90 text-slate-300 font-semibold sticky top-0 border-b border-slate-700 z-10 backdrop-blur-sm">
+              <tr><th class="p-4">Select a table to load data</th></tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-slate-800/80 text-slate-300 font-mono">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VIEW 2: RAW SQL CONSOLE -->
+      <div id="viewSql" class="flex-1 flex flex-col p-6 overflow-hidden hidden space-y-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col">
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-bold text-slate-300 flex items-center gap-2">
+              <i class="fa-solid fa-code text-indigo-400"></i> Write & Execute SQL Query
+            </label>
+            <div class="flex items-center gap-2">
+              <button onclick="setSqlPreset('SELECT * FROM users LIMIT 10;')" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded">Preset 1: Users</button>
+              <button onclick="setSqlPreset('SELECT name, current_stock FROM relief_centers LIMIT 10;')" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded">Preset 2: Relief Stock</button>
+              <button onclick="setSqlPreset('SELECT * FROM sensor_nodes WHERE type = \'WATER\' LIMIT 10;')" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded">Preset 3: Water Sensors</button>
+            </div>
+          </div>
+          <textarea id="sqlQueryInput" rows="5" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs font-mono text-indigo-200 focus:outline-none focus:border-indigo-500 mb-3" placeholder="SELECT * FROM users WHERE role = 'COORDINATOR';"></textarea>
+          <div class="flex justify-end">
+            <button onclick="executeSQLQuery()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-5 py-2 rounded-lg transition shadow flex items-center gap-2">
+              <i class="fa-solid fa-play"></i> Execute SQL
+            </button>
+          </div>
+        </div>
+
+        <!-- SQL RESULT OUTPUT -->
+        <div class="flex-1 bg-slate-900 border border-slate-800 rounded-xl overflow-auto custom-scrollbar p-4 font-mono text-xs">
+          <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Query Output Result</h3>
+          <pre id="sqlOutputResult" class="text-emerald-400 whitespace-pre-wrap">-- Execute a query above to see JSON / Tabular result output.</pre>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- CREATE / EDIT ROW MODAL -->
+  <div id="crudModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <h3 id="modalTitle" class="text-sm font-bold text-white">Add Record</h3>
+        <button onclick="closeCrudModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+      <div id="modalFormContainer" class="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4 text-xs">
+        <!-- Dynamic Inputs -->
+      </div>
+      <div class="px-6 py-4 border-t border-slate-800 flex justify-end space-x-3">
+        <button onclick="closeCrudModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold">Cancel</button>
+        <button onclick="saveRecord()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow">Save Record</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT CONTROLLER -->
+  <script>
+    let currentTable = 'users';
+    let loadedData = [];
+    let editingRowId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchDatabaseStats();
+      loadTableData();
+    });
+
+    // 1. Fetch System Table Record Counts
+    async function fetchDatabaseStats() {
+      try {
+        const res = await fetch('/api/db-admin/tables');
+        if (!res.ok) return;
+        const stats = await res.json();
+        if (stats.users !== undefined) document.getElementById('stat-users').innerText = stats.users;
+        if (stats.administrative_nodes !== undefined) document.getElementById('stat-nodes').innerText = stats.administrative_nodes;
+        if (stats.sensor_nodes !== undefined) document.getElementById('stat-sensors').innerText = stats.sensor_nodes;
+        if (stats.relief_centers !== undefined) document.getElementById('stat-relief').innerText = stats.relief_centers;
+      } catch (err) {
+        console.warn('Stats fetch error:', err);
+      }
+    }
+
+    // 2. Load Selected Table Data
+    async function loadTableData() {
+      currentTable = document.getElementById('tableSelect').value;
+      const thead = document.getElementById('tableHeader');
+      const tbody = document.getElementById('tableBody');
+
+      tbody.innerHTML = `<tr><td class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading ${currentTable}...</td></tr>`;
+
+      try {
+        const res = await fetch(`/api/db-admin/table/${currentTable}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        loadedData = await res.json();
+
+        document.getElementById('recordCount').innerText = loadedData.length;
+
+        if (loadedData.length === 0) {
+          thead.innerHTML = `<tr><th class="p-4">No columns</th></tr>`;
+          tbody.innerHTML = `<tr><td class="p-6 text-center text-slate-500">Table is empty. Click "Add Record" to insert data.</td></tr>`;
+          return;
+        }
+
+        // Render Table Headers
+        const cols = Object.keys(loadedData[0]);
+        thead.innerHTML = `
+          <tr>
+            ${cols.map(c => `<th class="p-3 text-left tracking-wider">${c}</th>`).join('')}
+            <th class="p-3 text-right">Actions</th>
+          </tr>
+        `;
+
+        // Render Table Rows
+        renderTableRows(loadedData);
+      } catch (err) {
+        tbody.innerHTML = `<tr><td class="p-6 text-center text-rose-400">Failed to load data for ${currentTable}: ${err.message}</td></tr>`;
+      }
+    }
+
+    // Render Rows Helper
+    function renderTableRows(data) {
+      const tbody = document.getElementById('tableBody');
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td class="p-6 text-center text-slate-500">No matching records found.</td></tr>`;
+        return;
+      }
+
+      const cols = Object.keys(data[0]);
+      tbody.innerHTML = data.map((row) => {
+        const rowId = row.id || row.code || row.username;
+        return `
+          <tr class="hover:bg-slate-800/50 transition border-b border-slate-800/60">
+            ${cols.map(c => {
+              let val = row[c];
+              if (typeof val === 'object' && val !== null) {
+                val = `<span class="text-indigo-300 font-mono bg-indigo-950/60 px-1.5 py-0.5 rounded border border-indigo-800/50">${JSON.stringify(val).substring(0, 35)}...</span>`;
+              } else if (typeof val === 'boolean') {
+                val = val ? `<span class="text-emerald-400">true</span>` : `<span class="text-rose-400">false</span>`;
+              }
+              return `<td class="p-3 max-w-xs truncate">${val !== undefined && val !== null ? val : '<span class="text-slate-600">null</span>'}</td>`;
+            }).join('')}
+            <td class="p-3 text-right space-x-2 whitespace-nowrap">
+              <button onclick='editRecord("${rowId}")' class="text-indigo-400 hover:text-indigo-300 px-2 py-1 bg-indigo-950/60 rounded border border-indigo-800/50"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick='deleteRecord("${rowId}")' class="text-rose-400 hover:text-rose-300 px-2 py-1 bg-rose-950/60 rounded border border-rose-800/50"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Filter Table Rows
+    function filterTableRows() {
+      const q = document.getElementById('searchTableInput').value.toLowerCase();
+      if (!q) {
+        renderTableRows(loadedData);
+        return;
+      }
+      const filtered = loadedData.filter(row => JSON.stringify(row).toLowerCase().includes(q));
+      renderTableRows(filtered);
+    }
+
+    // 3. User Impersonation & Fast Login
+    function fillImpersonate(name) {
+      document.getElementById('impersonateInput').value = name;
+    }
+
+    async function loginAndOpenNewTab() {
+      const query = document.getElementById('impersonateInput').value.trim();
+      if (!query) {
+        alert('Please enter a username, email, or select a preset.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/db-admin/impersonate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          alert(`Impersonation Failed: ${err.message || 'User not found'}`);
+          return;
+        }
+
+        const data = await res.json();
+        // Save auth token in local storage
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+
+        // Redirect URL logic depending on role
+        let targetUrl = '/citizen/';
+        if (data.user.role === 'COORDINATOR') {
+          targetUrl = `/coordinators/?tier=${data.user.districtNode?.tier || 'UPAZILA'}`;
+        } else if (data.user.role === 'PLANNER') {
+          targetUrl = '/planners/';
+        } else if (data.user.role === 'ADMIN') {
+          targetUrl = '/coordinators/?tier=COUNTRY';
+        }
+
+        // Open view in a NEW TAB
+        window.open(targetUrl, '_blank');
+      } catch (err) {
+        alert(`Error: ${err.message}`);
+      }
+    }
+
+    // 4. Feature Testers (Inject Chat & Alerts)
+    async function injectChatMessage() {
+      const text = document.getElementById('msgTextInput').value.trim();
+      if (!text) return alert('Enter message body');
+
+      const res = await fetch('/api/db-admin/table/chat_messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          channel: 'upazila-general',
+          text: text,
+          senderId: loadedData[0]?.id || 'admin-id'
+        })
+      });
+
+      if (res.ok) {
+        alert('Message injected into chat_messages table!');
+        document.getElementById('msgTextInput').value = '';
+        if (currentTable === 'chat_messages') loadTableData();
+      } else {
+        alert('Failed to inject message.');
+      }
+    }
+
+    async function broadcastAlert() {
+      const title = document.getElementById('alertTitleInput').value.trim();
+      const severity = document.getElementById('alertSeveritySelect').value;
+      if (!title) return alert('Enter alert title');
+
+      const res = await fetch('/api/db-admin/table/disaster_alerts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          description: 'Emergency automated hazard alert triggered via Dev Studio.',
+          district: 'NATIONWIDE',
+          severity,
+          isActive: true
+        })
+      });
+
+      if (res.ok) {
+        alert('Alert inserted into disaster_alerts!');
+        document.getElementById('alertTitleInput').value = '';
+        if (currentTable === 'disaster_alerts') loadTableData();
+      } else {
+        alert('Failed to broadcast alert.');
+      }
+    }
+
+    // 5. Raw SQL Query Execution
+    function setSqlPreset(sql) {
+      document.getElementById('sqlQueryInput').value = sql;
+    }
+
+    async function executeSQLQuery() {
+      const sql = document.getElementById('sqlQueryInput').value.trim();
+      if (!sql) return alert('Please enter a valid SQL query.');
+
+      const out = document.getElementById('sqlOutputResult');
+      out.innerText = '-- Running SQL query...';
+
+      try {
+        const res = await fetch('/api/db-admin/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: sql })
+        });
+
+        const data = await res.json();
+        out.innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        out.innerText = `SQL Execution Error: ${err.message}`;
+      }
+    }
+
+    // 6. Export Database to .sql File
+    function exportDatabaseSQL() {
+      window.location.href = '/api/db-admin/export-sql';
+    }
+
+    // 7. Modal CRUD Handlers
+    function switchMainTab(tab) {
+      if (tab === 'explorer') {
+        document.getElementById('viewExplorer').classList.remove('hidden');
+        document.getElementById('viewSql').classList.add('hidden');
+        document.getElementById('tabBtnExplorer').className = 'px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition flex items-center gap-2';
+        document.getElementById('tabBtnSql').className = 'px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-2';
+        document.getElementById('tableSelectorContainer').classList.remove('hidden');
+      } else {
+        document.getElementById('viewExplorer').classList.add('hidden');
+        document.getElementById('viewSql').classList.remove('hidden');
+        document.getElementById('tabBtnExplorer').className = 'px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-2';
+        document.getElementById('tabBtnSql').className = 'px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition flex items-center gap-2';
+        document.getElementById('tableSelectorContainer').classList.add('hidden');
+      }
+    }
+
+    function openCreateModal() {
+      editingRowId = null;
+      document.getElementById('modalTitle').innerText = `Add Record to ${currentTable}`;
+      
+      if (!loadedData || loadedData.length === 0) {
+        alert('Cannot infer schema for empty table. Insert data via SQL query.');
+        return;
+      }
+
+      const sample = loadedData[0];
+      const keys = Object.keys(sample).filter(k => k !== 'id' && k !== 'createdAt' && k !== 'updatedAt');
+
+      const container = document.getElementById('modalFormContainer');
+      container.innerHTML = keys.map(k => {
+        const val = sample[k];
+        const isJson = typeof val === 'object' && val !== null;
+        return `
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">${k}</label>
+            ${isJson 
+              ? `<textarea data-key="${k}" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-xs font-mono text-indigo-300">${JSON.stringify(val, null, 2)}</textarea>`
+              : `<input type="text" data-key="${k}" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-xs text-white">`
+            }
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('crudModal').classList.remove('hidden');
+    }
+
+    function editRecord(id) {
+      editingRowId = id;
+      const row = loadedData.find(r => (r.id || r.code || r.username) === id);
+      if (!row) return;
+
+      document.getElementById('modalTitle').innerText = `Edit Record in ${currentTable}`;
+      const keys = Object.keys(row).filter(k => k !== 'id' && k !== 'createdAt' && k !== 'updatedAt');
+
+      const container = document.getElementById('modalFormContainer');
+      container.innerHTML = keys.map(k => {
+        const val = row[k];
+        const isJson = typeof val === 'object' && val !== null;
+        return `
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">${k}</label>
+            ${isJson 
+              ? `<textarea data-key="${k}" rows="4" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-xs font-mono text-indigo-300">${JSON.stringify(val, null, 2)}</textarea>`
+              : `<input type="text" data-key="${k}" value="${val !== undefined && val !== null ? val : ''}" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-xs text-white">`
+            }
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('crudModal').classList.remove('hidden');
+    }
+
+    async function saveRecord() {
+      const inputs = document.querySelectorAll('#modalFormContainer [data-key]');
+      const payload = {};
+
+      for (let input of inputs) {
+        const key = input.getAttribute('data-key');
+        let val = input.value.trim();
+        if (input.tagName === 'TEXTAREA') {
+          try { val = JSON.parse(val); } catch(e) {}
+        }
+        payload[key] = val;
+      }
+
+      const url = editingRowId 
+        ? `/api/db-admin/table/${currentTable}/${editingRowId}`
+        : `/api/db-admin/table/${currentTable}`;
+      
+      const method = editingRowId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        closeCrudModal();
+        loadTableData();
+      } else {
+        alert('Failed to save record.');
+      }
+    }
+
+    async function deleteRecord(id) {
+      if (!confirm(`Are you sure you want to delete record ${id}?`)) return;
+
+      const res = await fetch(`/api/db-admin/table/${currentTable}/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        loadTableData();
+      } else {
+        alert('Failed to delete record.');
+      }
+    }
+
+    function closeCrudModal() {
+      document.getElementById('crudModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
