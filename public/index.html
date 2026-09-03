@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GreenSignalAI - Adaptive Disaster Response Hub</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Leaflet GIS Mapping -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Socket.io Client -->
+  <script src="/socket.io/socket.io.js"></script>
+
+  <style>
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    @media print {
+      body * { visibility: hidden; }
+      #boqPrintContainer, #boqPrintContainer * { visibility: visible; }
+      #boqPrintContainer { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; }
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans bg-slate-950 text-slate-100 overflow-x-hidden">
+
+  <!-- TOP APP BAR -->
+  <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 shadow-lg sticky top-0 z-30">
+    <div class="flex items-center space-x-3">
+      <div class="bg-emerald-600 p-2 rounded-lg shadow-md shadow-emerald-500/20">
+        <i class="fa-solid fa-tower-broadcast text-white text-lg"></i>
+      </div>
+      <div>
+        <h1 class="text-base font-bold text-white flex items-center gap-2">
+          GreenSignalAI
+          <span id="roleBadge" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700 font-mono">GUEST</span>
+        </h1>
+        <p id="userScopeText" class="text-[11px] text-slate-400">Adaptive Disaster Preparedness Platform</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2">
+      <!-- Messenger Toggle Button (Worker & Coordinator Only) -->
+      <button id="messengerToggleBtn" onclick="toggleMessengerDrawer()" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow flex items-center gap-1.5">
+        <i class="fa-solid fa-comments"></i> Messenger
+      </button>
+
+      <!-- Account / Switch User Button -->
+      <button onclick="openLoginModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-user-gear"></i> Switch User
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN ADAPTIVE LAYOUT CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
+
+    <!-- 1. ALERT BANNER SECTION (Top of Phone & PC) -->
+    <section class="w-full">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-triangle-exclamation animate-pulse"></i> Active Crisis Alerts
+        </h2>
+        <span class="text-[10px] text-slate-500">Updated Live</span>
+      </div>
+      <div id="alertBannerList" class="space-y-2">
+        <!-- Dynamically Populated Alerts -->
+        <div class="bg-rose-950/40 border border-rose-800/60 p-3 rounded-xl flex items-start gap-3">
+          <i class="fa-solid fa-bell text-rose-400 text-base mt-0.5"></i>
+          <div>
+            <h3 class="text-xs font-bold text-rose-200">System Monitoring Active</h3>
+            <p class="text-[11px] text-rose-300/80">No critical flash flood warnings detected in your upazila at this time.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. NEAREST RELIEF CENTER ADDRESS & CONTACT -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 md:p-5 shadow-lg">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/60 uppercase">Nearest Relief Center</span>
+          <h3 id="centerNameText" class="text-base md:text-lg font-bold text-white mt-1">Adamdighi Primary Shelter</h3>
+          <p id="centerAddressText" class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+            <i class="fa-solid fa-location-dot text-slate-500"></i> Upazila Parishad Complex, Adamdighi, Bogura
+          </p>
+        </div>
+        <div class="text-right">
+          <span class="text-[10px] text-slate-400 block">Capacity Status</span>
+          <span id="centerOccupancyText" class="text-xs font-mono font-bold text-indigo-300">150 / 1000 Occupied</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. CURRENT UPAZILA SENSOR DATA -->
+    <section>
+      <h2 class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+        <i class="fa-solid fa-microchip"></i> Upazila Sensor Telemetry
+      </h2>
+      <div id="sensorCardsGrid" class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <!-- Sensor Cards Populated Dynamically -->
+        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
+          <div class="text-slate-400 text-[10px] flex items-center justify-between">WATER LEVEL <i class="fa-solid fa-water text-blue-400"></i></div>
+          <div class="text-base font-bold font-mono text-white mt-1">2.1m</div>
+          <div class="text-[10px] text-emerald-400">Normal Threshold</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
+          <div class="text-slate-400 text-[10px] flex items-center justify-between">WIND SPEED <i class="fa-solid fa-wind text-teal-400"></i></div>
+          <div class="text-base font-bold font-mono text-white mt-1">18 km/h</div>
+          <div class="text-[10px] text-emerald-400">Moderate Breeze</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
+          <div class="text-slate-400 text-[10px] flex items-center justify-between">SALINITY <i class="fa-solid fa-flask text-amber-400"></i></div>
+          <div class="text-base font-bold font-mono text-white mt-1">2.4 ppt</div>
+          <div class="text-[10px] text-emerald-400">Potable</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
+          <div class="text-slate-400 text-[10px] flex items-center justify-between">SEISMOGRAPH <i class="fa-solid fa-wave-square text-rose-400"></i></div>
+          <div class="text-base font-bold font-mono text-white mt-1">1.2 M</div>
+          <div class="text-[10px] text-emerald-400">Stable</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. CALL UPAZILA COORDINATOR BUTTON -->
+    <section class="w-full">
+      <a id="callCoordinatorBtn" href="tel:+8801700000000" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs md:text-sm">
+        <i class="fa-solid fa-phone-volume text-base"></i>
+        <span>Call Upazila Disaster Coordinator (<span id="coordNameText">Adamdighi Officer</span>)</span>
+      </a>
+    </section>
+
+    <!-- 5. COORDINATOR STOCK TABLES & BOQ PRINT (Coordinator Role Only) -->
+    <section id="coordinatorStockSection" class="hidden bg-slate-900 border border-indigo-500/40 rounded-2xl p-5 shadow-xl space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="text-sm font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-boxes-stacked text-indigo-400"></i> Relief Center Stock & Resource Management
+          </h2>
+          <p class="text-xs text-slate-400">Check and update Stock Policy, Current Stock, Emergency Requirements & Restocking Deltas.</p>
+        </div>
+        <button onclick="printBOQ()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow flex items-center gap-2">
+          <i class="fa-solid fa-file-invoice-dollar"></i> Print BOQ (Bill of Quantities)
+        </button>
+      </div>
+
+      <!-- Editable Stock Table -->
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-800 text-slate-300 font-semibold border-b border-slate-700">
+              <th class="p-3">Resource Item</th>
+              <th class="p-3 text-center">1) Stock Policy</th>
+              <th class="p-3 text-center">2) Current Stock</th>
+              <th class="p-3 text-center">3) Emergency Req.</th>
+              <th class="p-3 text-center">4) Restocking Delta</th>
+            </tr>
+          </thead>
+          <tbody id="stockTableBody" class="divide-y divide-slate-800 font-mono text-slate-200">
+            <!-- Dynamically populated stock rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-end">
+        <button onclick="saveStockTableChanges()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-5 py-2 rounded-lg transition shadow flex items-center gap-2">
+          <i class="fa-solid fa-floppy-disk"></i> Save Stock Updates
+        </button>
+      </div>
+    </section>
+
+    <!-- 6. DISTRICT / REGIONAL MAP (Relief Centers & Sensors Marked) -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 id="mapTitleText" class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-map-location-dot text-emerald-400"></i> District Relief & Sensor Map
+        </h2>
+        <span class="text-[10px] text-slate-500">Interactive GIS View</span>
+      </div>
+      <div id="gisMap" class="w-full h-80 md:h-96 rounded-xl border border-slate-800 z-10"></div>
+    </section>
+
+  </main>
+
+  <!-- SLIDE-IN MESSENGER DRAWER (Worker & Coordinator Only) -->
+  <div id="messengerDrawer" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-slate-900 border-l border-slate-800 shadow-2xl z-40 transform translate-x-full transition-transform duration-300 flex flex-col">
+    <!-- Drawer Header -->
+    <div class="bg-slate-850 p-4 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i class="fa-solid fa-[#6366f1] fa-comments text-indigo-400 text-lg"></i>
+        <h3 class="text-xs font-bold text-white uppercase tracking-wider">Field Messenger</h3>
+      </div>
+      <button onclick="toggleMessengerDrawer()" class="text-slate-400 hover:text-white p-1">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <!-- User Search Bar -->
+    <div class="p-3 border-b border-slate-800 bg-slate-950/60">
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+        <input type="text" id="userSearchInput" onkeyup="handleUserSearch()" placeholder="Search workers or coordinators..." 
+               class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+      </div>
+      <!-- User Search Results Container -->
+      <div id="searchResultsList" class="hidden mt-2 bg-slate-900 border border-slate-700 rounded-lg max-h-40 overflow-y-auto custom-scrollbar"></div>
+    </div>
+
+    <!-- Active Chat Channel Bar -->
+    <div class="px-4 py-2 bg-indigo-950/40 border-b border-indigo-900/50 flex items-center justify-between">
+      <span class="text-[11px] font-semibold text-indigo-300 flex items-center gap-1.5">
+        <i class="fa-solid fa-hashtag text-indigo-400"></i> <span id="activeChannelName">upazila-general</span>
+      </span>
+      <span class="text-[10px] text-emerald-400 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Live</span>
+    </div>
+
+    <!-- Messages Container -->
+    <div id="messagesList" class="flex-1 p-4 overflow-y-auto custom-scrollbar space-y-3 font-sans text-xs">
+      <!-- Chat bubbles inserted dynamically -->
+    </div>
+
+    <!-- Input Box -->
+    <div class="p-3 border-t border-slate-800 bg-slate-950 flex items-center space-x-2">
+      <input type="text" id="chatMessageInput" onkeypress="if(event.key==='Enter') sendChatMessage()" placeholder="Type a message..." 
+             class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+      <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-lg transition">
+        <i class="fa-solid fa-paper-plane text-xs"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- LOGIN / ACCOUNT IMPERSONATION MODAL -->
+  <div id="loginModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-user-gear text-indigo-400"></i> Select Active User Account
+        </h3>
+        <button onclick="closeLoginModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300 block mb-1">Enter Username / Email</label>
+          <input type="text" id="loginUsernameInput" placeholder="e.g. Adamdighi Citizen or Bogura Coordinator" 
+                 class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+        </div>
+
+        <div>
+          <label class="text-[11px] font-semibold text-slate-400 block mb-1">Select Role Presets</label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <button onclick="quickSelect('Adamdighi Citizen')" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-left truncate">
+              👤 Adamdighi Citizen
+            </button>
+            <button onclick="quickSelect('Adamdighi Coordinator')" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-left truncate">
+              🏢 Upazila Coordinator
+            </button>
+            <button onclick="quickSelect('Bogura Coordinator')" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-left truncate">
+              🏛️ District Coordinator
+            </button>
+            <button onclick="quickSelect('Rajshahi Coordinator')" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-left truncate">
+              🗺️ Division Coordinator
+            </button>
+          </div>
+        </div>
+
+        <button onclick="performLogin()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-lg transition shadow text-xs">
+          Sign In & Switch View
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRINT BOQ CONTAINER (Hidden on Screen, Visible on Print) -->
+  <div id="boqPrintContainer" class="hidden p-8 font-sans">
+    <div id="boqPrintContent"></div>
+  </div>
+
+  <!-- CLIENT APP SCRIPT -->
+  <script>
+    let currentUser = null;
+    let socket = null;
+    let map = null;
+    let activeChannel = 'upazila-general';
+    let currentReliefCenterId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+      loadDefaultContext();
+      initSocket();
+    });
+
+    // 1. Initialize Leaflet Map
+    function initMap() {
+      map = L.map('gisMap').setView([23.8103, 90.4125], 7);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
+    }
+
+    // 2. Initialize Socket.io
+    function initSocket() {
+      socket = io();
+      socket.emit('join_channel', activeChannel);
+
+      socket.on('new_message', (msg) => {
+        appendChatMessage(msg);
+      });
+    }
+
+    // 3. Load Upazila Dashboard Context
+    async function loadDefaultContext(nodeId = '') {
+      try {
+        const res = await fetch(`/api/upazila-context/${nodeId}`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Populate Nearest Relief Center
+        if (data.nearestReliefCenter) {
+          currentReliefCenterId = data.nearestReliefCenter.id;
+          document.getElementById('centerNameText').innerText = data.nearestReliefCenter.name;
+          document.getElementById('centerOccupancyText').innerText = `${data.nearestReliefCenter.occupancy} / ${data.nearestReliefCenter.capacity} Occupied`;
+        }
+
+        // Populate Sensors
+        if (data.sensors && data.sensors.length > 0) {
+          renderSensors(data.sensors);
+        }
+
+        // Populate Coordinator Contact
+        if (data.coordinatorContact) {
+          document.getElementById('coordNameText').innerText = data.coordinatorContact.fullName;
+          document.getElementById('callCoordinatorBtn').href = `tel:${data.coordinatorContact.phone || '+8801700000000'}`;
+        }
+
+        // Populate Map Markers
+        renderMapMarkers(data.districtReliefCenters || [], data.districtSensors || []);
+      } catch (err) {
+        console.warn('Failed to load upazila context:', err);
+      }
+    }
+
+    // Render Sensors Cards
+    function renderSensors(sensors) {
+      const grid = document.getElementById('sensorCardsGrid');
+      grid.innerHTML = sensors.map(s => `
+        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl shadow">
+          <div class="text-slate-400 text-[10px] font-bold flex items-center justify-between">
+            ${s.type} SENSOR
+            <i class="fa-solid ${getSensorIcon(s.type)} text-indigo-400"></i>
+          </div>
+          <div class="text-base font-bold font-mono text-white mt-1">${s.metricValue}</div>
+          <div class="text-[10px] text-emerald-400">${s.status}</div>
+        </div>
+      `).join('');
+    }
+
+    function getSensorIcon(type) {
+      if (type === 'WATER') return 'fa-water';
+      if (type === 'WIND') return 'fa-wind';
+      if (type === 'SALINITY') return 'fa-flask';
+      return 'fa-wave-square';
+    }
+
+    // Render GIS Map Markers
+    function renderMapMarkers(centers, sensors) {
+      if (!map) return;
+      
+      const bounds = [];
+
+      centers.forEach(c => {
+        if (c.latitude && c.longitude) {
+          L.marker([c.latitude, c.longitude])
+            .addTo(map)
+            .bindPopup(`<b>${c.name}</b><br>Code: ${c.centerCode}<br>Capacity: ${c.capacity}`);
+          bounds.push([c.latitude, c.longitude]);
+        }
+      });
+
+      sensors.forEach(s => {
+        if (s.latitude && s.longitude) {
+          L.circleMarker([s.latitude, s.longitude], { color: 'orange', radius: 6 })
+            .addTo(map)
+            .bindPopup(`<b>${s.type} Sensor</b><br>Reading: ${s.metricValue}`);
+          bounds.push([s.latitude, s.longitude]);
+        }
+      });
+
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [20, 20] });
+      }
+    }
+
+    // 4. Adapt UI based on Role
+    function adaptUIForUser(user) {
+      currentUser = user;
+      document.getElementById('roleBadge').innerText = user.role;
+      document.getElementById('userScopeText').innerText = `Active Account: ${user.fullName} (${user.organization || 'GreenSignalAI User'})`;
+
+      const messengerBtn = document.getElementById('messengerToggleBtn');
+      const coordinatorStockSec = document.getElementById('coordinatorStockSection');
+
+      if (user.role === 'CITIZEN') {
+        messengerBtn.classList.add('hidden');
+        coordinatorStockSec.classList.add('hidden');
+      } else if (user.role === 'WORKER') {
+        messengerBtn.classList.remove('hidden');
+        coordinatorStockSec.classList.add('hidden');
+      } else if (user.role === 'COORDINATOR' || user.role === 'ADMIN') {
+        messengerBtn.classList.remove('hidden');
+        coordinatorStockSec.classList.remove('hidden');
+        loadCoordinatorStockData(user.districtNodeId || '');
+      }
+    }
+
+    // Load Coordinator Stock Data
+    async function loadCoordinatorStockData(nodeId) {
+      try {
+        const res = await fetch(`/api/coordinator/scope/${nodeId}`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (data.reliefCenters && data.reliefCenters.length > 0) {
+          const center = data.reliefCenters[0];
+          currentReliefCenterId = center.id;
+          renderStockTable(center);
+        }
+      } catch (err) {
+        console.warn('Stock load error:', err);
+      }
+    }
+
+    function renderStockTable(center) {
+      const tbody = document.getElementById('stockTableBody');
+      const policy = center.stockPolicy || {};
+      const current = center.currentStock || {};
+      const emergency = center.emergencyRequirement || {};
+      const restock = center.restockingRequirement || {};
+
+      const items = ['beds', 'food_packs', 'medical_kits', 'vehicles', 'tents'];
+
+      tbody.innerHTML = items.map(item => `
+        <tr class="border-b border-slate-800/80">
+          <td class="p-3 font-semibold uppercase text-slate-300">${item.replace('_', ' ')}</td>
+          <td class="p-3 text-center">
+            <input type="number" data-type="policy" data-item="${item}" value="${policy[item] || 0}" class="w-20 bg-slate-950 border border-slate-700 rounded text-center p-1 text-xs text-white">
+          </td>
+          <td class="p-3 text-center">
+            <input type="number" data-type="current" data-item="${item}" value="${current[item] || 0}" class="w-20 bg-slate-950 border border-slate-700 rounded text-center p-1 text-xs text-white">
+          </td>
+          <td class="p-3 text-center">
+            <input type="number" data-type="emergency" data-item="${item}" value="${emergency[item] || 0}" class="w-20 bg-slate-950 border border-slate-700 rounded text-center p-1 text-xs text-white">
+          </td>
+          <td class="p-3 text-center text-indigo-400 font-bold">
+            ${restock[item] || Math.max(0, (policy[item] || 0) - (current[item] || 0))}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Save Stock Table Changes
+    async function saveStockTableChanges() {
+      if (!currentReliefCenterId) return;
+
+      const inputs = document.querySelectorAll('#stockTableBody input');
+      const stockPolicy = {}, currentStock = {}, emergencyRequirement = {};
+
+      inputs.forEach(input => {
+        const type = input.getAttribute('data-type');
+        const item = input.getAttribute('data-item');
+        const val = parseInt(input.value) || 0;
+
+        if (type === 'policy') stockPolicy[item] = val;
+        if (type === 'current') currentStock[item] = val;
+        if (type === 'emergency') emergencyRequirement[item] = val;
+      });
+
+      const res = await fetch(`/api/coordinator/stock/${currentReliefCenterId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stockPolicy, currentStock, emergencyRequirement })
+      });
+
+      if (res.ok) {
+        alert('Relief Center Stock updated successfully!');
+        const updated = await res.json();
+        renderStockTable(updated);
+      }
+    }
+
+    // Print BOQ Report
+    async function printBOQ() {
+      if (!currentReliefCenterId) return;
+
+      const res = await fetch(`/api/coordinator/boq/${currentReliefCenterId}`);
+      if (!res.ok) return alert('Failed to generate BOQ');
+      const boq = await res.json();
+
+      const printContainer = document.getElementById('boqPrintContent');
+      printContainer.innerHTML = `
+        <div class="border-b-2 border-black pb-4 mb-4">
+          <h1 class="text-xl font-bold uppercase">GreenSignalAI - Bill of Quantities (BOQ)</h1>
+          <p class="text-sm">Relief Center: <b>${boq.centerName}</b> (${boq.centerCode})</p>
+          <p class="text-xs text-gray-600">Generated Date: ${new Date(boq.generatedAt).toLocaleString()}</p>
+        </div>
+
+        <table class="w-full border-collapse text-xs mb-6" border="1" cellpadding="6">
+          <thead>
+            <tr style="background-color: #f3f4f6;">
+              <th align="left">Resource Item</th>
+              <th>Unit</th>
+              <th>Stock Policy</th>
+              <th>Current Stock</th>
+              <th>Emergency Needed</th>
+              <th>Restocking Req.</th>
+              <th>Est. Unit Price (BDT)</th>
+              <th>Total Cost (BDT)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${boq.items.map(i => `
+              <tr>
+                <td><b>${i.itemName}</b></td>
+                <td align="center">${i.unit}</td>
+                <td align="center">${i.policyQty}</td>
+                <td align="center">${i.currentQty}</td>
+                <td align="center">${i.emergencyQty}</td>
+                <td align="center"><b>${i.restockingQty}</b></td>
+                <td align="right">৳ ${i.estimatedUnitPriceBDT.toLocaleString()}</td>
+                <td align="right"><b>৳ ${i.totalRestockCostBDT.toLocaleString()}</b></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="text-right font-bold text-sm">
+          <p>Total Estimated Procurement Cost: ৳ ${boq.totalProjectedCostBDT.toLocaleString()} BDT</p>
+        </div>
+      `;
+
+      window.print();
+    }
+
+    // 5. Messenger Functions
+    function toggleMessengerDrawer() {
+      const drawer = document.getElementById('messengerDrawer');
+      drawer.classList.toggle('translate-x-full');
+    }
+
+    async function handleUserSearch() {
+      const q = document.getElementById('userSearchInput').value.trim();
+      const resultsContainer = document.getElementById('searchResultsList');
+
+      if (!q) {
+        resultsContainer.classList.add('hidden');
+        return;
+      }
+
+      const res = await fetch(`/api/messages/search-users?q=${encodeURIComponent(q)}&userId=${currentUser?.id || ''}`);
+      if (!res.ok) return;
+      const users = await res.json();
+
+      if (users.length === 0) {
+        resultsContainer.innerHTML = `<div class="p-2 text-[11px] text-slate-500">No users found</div>`;
+      } else {
+        resultsContainer.innerHTML = users.map(u => `
+          <div onclick="startDirectChat('${u.id}', '${u.fullName}')" class="p-2 hover:bg-slate-800 cursor-pointer flex items-center justify-between border-b border-slate-800">
+            <div>
+              <div class="text-xs font-semibold text-white">${u.fullName}</div>
+              <div class="text-[10px] text-slate-400">@${u.username} • ${u.role}</div>
+            </div>
+            <i class="fa-solid fa-comment-dots text-indigo-400 text-xs"></i>
+          </div>
+        `).join('');
+      }
+
+      resultsContainer.classList.remove('hidden');
+    }
+
+    function startDirectChat(userId, fullName) {
+      activeChannel = `direct-${userId}`;
+      document.getElementById('activeChannelName').innerText = `Chat: ${fullName}`;
+      document.getElementById('searchResultsList').classList.add('hidden');
+      socket.emit('join_channel', activeChannel);
+      document.getElementById('messagesList').innerHTML = '';
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chatMessageInput');
+      const text = input.value.trim();
+      if (!text || !currentUser) return;
+
+      socket.emit('send_message', {
+        senderId: currentUser.id,
+        channel: activeChannel,
+        text
+      });
+
+      input.value = '';
+    }
+
+    function appendChatMessage(msg) {
+      const list = document.getElementById('messagesList');
+      const isMe = msg.senderId === currentUser?.id;
+
+      const div = document.createElement('div');
+      div.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+      div.innerHTML = `
+        <span class="text-[10px] text-slate-400 mb-0.5">${msg.sender?.fullName || 'User'}</span>
+        <div class="max-w-[80%] p-2.5 rounded-xl ${isMe ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-200'}">
+          ${msg.text}
+        </div>
+      `;
+
+      list.appendChild(div);
+      list.scrollTop = list.scrollHeight;
+    }
+
+    // 6. User Login & Switch Modal
+    function openLoginModal() {
+      document.getElementById('loginModal').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.add('hidden');
+    }
+
+    function quickSelect(username) {
+      document.getElementById('loginUsernameInput').value = username;
+    }
+
+    async function performLogin() {
+      const username = document.getElementById('loginUsernameInput').value.trim();
+      if (!username) return alert('Enter username');
+
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password: username })
+      });
+
+      if (!res.ok) return alert('User account not found');
+
+      const data = await res.json();
+      closeLoginModal();
+      adaptUIForUser(data.user);
+      loadDefaultContext(data.user.districtNodeId || '');
+    }
+  </script>
+</body>
+</html>
