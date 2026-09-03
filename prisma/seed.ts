@@ -114,17 +114,16 @@ function parseCSVs(): CSVRow[] {
 async function main() {
   console.log('🌱 Starting Database Seeding Process...');
 
-  // Clear existing database records in safe sequence
+  // Clear existing database records in safe sequence (except users, which we upsert)
   await prisma.simulationRun.deleteMany();
   await prisma.responsePolicy.deleteMany();
   await prisma.chatMessage.deleteMany();
   await prisma.disasterAlert.deleteMany();
   await prisma.sensorNode.deleteMany();
   await prisma.reliefCenter.deleteMany();
-  await prisma.user.deleteMany();
   await prisma.administrativeNode.deleteMany();
 
-  console.log('🧹 Cleaned existing database tables.');
+  console.log('🧹 Cleaned existing database tables (excluding users).');
 
   // 1. Create National HQ Node
   const countryNode = await prisma.administrativeNode.create({
@@ -170,10 +169,12 @@ async function main() {
       });
       divisionMap.set(row.division, divNode.id);
 
-      // Seed Division Coordinator Account
+      // Seed Division Coordinator Account using upsert
       const divUsername = `${row.division} Coordinator`;
-      await prisma.user.create({
-        data: {
+      await prisma.user.upsert({
+        where: { username: divUsername },
+        update: { districtNodeId: divNode.id }, 
+        create: {
           username: divUsername,
           email: `${row.division.toLowerCase().replace(/\s+/g, '')}.coordinator@bndrss.gov.bd`,
           passwordHash: getPasswordHash(divUsername),
@@ -202,10 +203,12 @@ async function main() {
       });
       districtMap.set(distKey, distNode.id);
 
-      // Seed District Coordinator Account
+      // Seed District Coordinator Account using upsert
       const distCoordUsername = `${row.district} Coordinator`;
-      await prisma.user.create({
-        data: {
+      await prisma.user.upsert({
+        where: { username: distCoordUsername },
+        update: { districtNodeId: distNode.id },
+        create: {
           username: distCoordUsername,
           email: `${row.district.toLowerCase().replace(/\s+/g, '')}.coordinator@bndrss.gov.bd`,
           passwordHash: getPasswordHash(distCoordUsername),
@@ -216,10 +219,12 @@ async function main() {
         }
       });
 
-      // Seed District Planner Account
+      // Seed District Planner Account using upsert
       const distPlannerUsername = `${row.district} Planner`;
-      await prisma.user.create({
-        data: {
+      await prisma.user.upsert({
+        where: { username: distPlannerUsername },
+        update: { districtNodeId: distNode.id },
+        create: {
           username: distPlannerUsername,
           email: `${row.district.toLowerCase().replace(/\s+/g, '')}.planner@bndrss.gov.bd`,
           passwordHash: getPasswordHash(distPlannerUsername),
@@ -252,10 +257,12 @@ async function main() {
       division: row.division
     });
 
-    // Seed Upazila Citizen Account ([upazilla][citizen])
+    // Seed Upazila Citizen Account using upsert
     const citizenUsername = `${row.upazila} Citizen`;
-    await prisma.user.create({
-      data: {
+    await prisma.user.upsert({
+      where: { username: citizenUsername },
+      update: { districtNodeId: upzNode.id },
+      create: {
         username: citizenUsername,
         email: `${row.upazila.toLowerCase().replace(/\s+/g, '')}.citizen@bndrss.gov.bd`,
         passwordHash: getPasswordHash(citizenUsername),
@@ -265,10 +272,12 @@ async function main() {
       }
     });
 
-    // Seed Upazila Coordinator Account ([upazilla][coordinator])
+    // Seed Upazila Coordinator Account using upsert
     const upzCoordUsername = `${row.upazila} Coordinator`;
-    await prisma.user.create({
-      data: {
+    await prisma.user.upsert({
+      where: { username: upzCoordUsername },
+      update: { districtNodeId: upzNode.id },
+      create: {
         username: upzCoordUsername,
         email: `${row.upazila.toLowerCase().replace(/\s+/g, '')}.coordinator@bndrss.gov.bd`,
         passwordHash: getPasswordHash(upzCoordUsername),
@@ -321,7 +330,6 @@ async function main() {
         contactNum: '+8801700000000',
         isOperational: true,
         
-        // 1) stockPolicy
         stockPolicy: {
           beds: 600,
           food_packs: 1200,
@@ -329,8 +337,6 @@ async function main() {
           vehicles: 6,
           tents: 80
         },
-
-        // 2) currentStock
         currentStock: {
           beds: 420,
           food_packs: 850,
@@ -338,8 +344,6 @@ async function main() {
           vehicles: 4,
           tents: 50
         },
-
-        // 3) emergencyRequirement
         emergencyRequirement: {
           beds: 80,
           food_packs: 200,
@@ -347,8 +351,6 @@ async function main() {
           vehicles: 2,
           tents: 20
         },
-
-        // 4) restockingRequirement (Policy - CurrentStock)
         restockingRequirement: {
           beds: 180,
           food_packs: 350,
@@ -360,10 +362,12 @@ async function main() {
     });
   }
 
-  // 5. Seed System Master Admin Account
+  // 5. Seed System Master Admin Account using upsert
   const adminUsername = 'Admin';
-  await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { username: adminUsername },
+    update: { districtNodeId: countryNode.id },
+    create: {
       username: adminUsername,
       email: 'admin@bndrss.gov.bd',
       passwordHash: getPasswordHash(adminUsername),
@@ -409,7 +413,7 @@ async function main() {
   console.log(`   • ${csvData.length} Upazilas, 64 Districts, 8 Divisions created.`);
   console.log(`   • ${csvData.length * 4} Sensors seeded (4 per Upazila).`);
   console.log(`   • ${csvData.length} Relief Centers seeded with 4 JSON stock columns.`);
-  console.log(`   • Users created: ${csvData.length} Citizens, ${csvData.length} Upazila Coords, 64 Dist Coords, 64 Dist Planners, 8 Div Coords, 1 Admin.`);
+  console.log(`   • Users ensured (via upsert): ${csvData.length} Citizens, ${csvData.length} Upazila Coords, 64 Dist Coords, 64 Dist Planners, 8 Div Coords, 1 Admin.`);
 }
 
 main()
