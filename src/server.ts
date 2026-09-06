@@ -24,6 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static frontend from public/
 app.use(express.static(path.join(__dirname, '../public')));
+// new line
+app.use('/dev', express.static(path.join(__dirname, '../public/dev')));
 
 // Mount API routes
 app.use('/api', apiRoutes);
