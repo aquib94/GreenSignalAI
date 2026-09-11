@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { MessagingService } from '../services/messaging';
 import { AlertsService } from '../services/alerts';
 import { CoordinatorDbService } from '../services/coordinatorDb';
+import { DbAdminService } from '../services/dbAdmin';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'greensignal_ai_secure_jwt_secret_key_2026';
@@ -65,23 +66,19 @@ router.get('/upazila-context/:nodeId', async (req, res) => {
 
     if (!targetNode) return res.status(404).json({ message: 'Administrative node not found' });
 
-    // Find nearest/upazila relief center
     const reliefCenter = await prisma.reliefCenter.findFirst({
       where: { districtNodeId: targetNode.id }
     });
 
-    // Find sensors in this Upazila
     const sensors = await prisma.sensorNode.findMany({
       where: { districtNodeId: targetNode.id }
     });
 
-    // Find Upazila Coordinator user for contact button
     const coordinator = await prisma.user.findFirst({
       where: { districtNodeId: targetNode.id, role: 'COORDINATOR' },
       select: { fullName: true, phone: true, username: true }
     });
 
-    // Find parent district node to get all district relief centers for mapping
     const districtNodeId = targetNode.parentId || targetNode.id;
     const districtReliefCenters = await prisma.reliefCenter.findMany({
       where: {
@@ -164,6 +161,68 @@ router.get('/messages/:channel', async (req, res) => {
     return res.json(history);
   } catch (err: any) {
     return res.status(500).json({ message: err.message });
+  }
+});
+
+// ==========================================
+// 6. DB Manager Developer Routes
+// ==========================================
+
+router.get('/db-admin/tables', async (req, res) => {
+  try {
+    const stats = await DbAdminService.getTableStats();
+    res.json(stats);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/db-admin/table/:tableName', async (req, res) => {
+  try {
+    const data = await DbAdminService.getTableData(req.params.tableName);
+    res.json(data);
+  } catch (err: any) {
+    const status = err.message.includes('not found') ? 404 : 500;
+    res.status(status).json({ error: err.message });
+  }
+});
+
+router.post('/db-admin/table/:tableName', async (req, res) => {
+  try {
+    const newRecord = await DbAdminService.createRecord(req.params.tableName, req.body);
+    res.json(newRecord);
+  } catch (err: any) {
+    const status = err.message.includes('not found') ? 404 : 500;
+    res.status(status).json({ error: err.message });
+  }
+});
+
+router.put('/db-admin/table/:tableName/:id', async (req, res) => {
+  try {
+    const updated = await DbAdminService.updateRecord(req.params.tableName, req.params.id, req.body);
+    res.json(updated);
+  } catch (err: any) {
+    const status = err.message.includes('not found') ? 404 : 500;
+    res.status(status).json({ error: err.message });
+  }
+});
+
+router.delete('/db-admin/table/:tableName/:id', async (req, res) => {
+  try {
+    const result = await DbAdminService.deleteRecord(req.params.tableName, req.params.id);
+    res.json(result);
+  } catch (err: any) {
+    const status = err.message.includes('not found') ? 404 : 500;
+    res.status(status).json({ error: err.message });
+  }
+});
+
+router.post('/db-admin/query', async (req, res) => {
+  try {
+    const result = await DbAdminService.executeQuery(req.body.query);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
   }
 });
 
