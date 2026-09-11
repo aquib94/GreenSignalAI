@@ -22,10 +22,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static frontend from public/
+// Serve static frontend from public/ (automatically covers public/dev)
 app.use(express.static(path.join(__dirname, '../public')));
-// new line
-app.use('/dev', express.static(path.join(__dirname, '../public/dev')));
 
 // Mount API routes
 app.use('/api', apiRoutes);
@@ -33,8 +31,14 @@ app.use('/api', apiRoutes);
 // WebSocket messaging setup
 MessagingService.setupSocketMessaging(io);
 
-// SPA Fallback to public/index.html
+// SPA Fallback
 app.get('*', (req, res) => {
+  // Prevent missing API or Dev routes from returning index.html
+  if (req.path.startsWith('/api') || req.path.startsWith('/dev')) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  
+  // Otherwise, serve the SPA for standard frontend routes
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
