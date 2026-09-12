@@ -129,6 +129,122 @@ router.get(['/upazila-context', '/upazila-context/:nodeId'], async (req, res) =>
   }
 });
 
+// 3b. Interactive GIS Telemetry & Map Features API
+router.get(['/gis/features', '/gis/map-data'], async (req, res) => {
+  try {
+    const { nodeId, district, type } = req.query as { nodeId?: string; district?: string; type?: string };
+
+    let targetNodeId = nodeId;
+    if (!targetNodeId) {
+      // Default to first division (Rajshahi Division) or first district
+      const defaultDiv = await prisma.administrativeNode.findFirst({
+        where: { tier: 'DIVISION', code: 'DIV-RAJSHAHI' }
+      }) || await prisma.administrativeNode.findFirst({
+        where: { tier: 'DIVISION' }
+      });
+      targetNodeId = defaultDiv?.id;
+    }
+
+    const scopeData = await CoordinatorDbService.getCoordinatorScopeData(targetNodeId);
+
+    let centers = scopeData.reliefCenters || [];
+    let sensors = scopeData.sensors || [];
+
+    // Filter by district if requested
+    if (district && district !== 'ALL') {
+      centers = centers.filter((c: any) => 
+        c.districtNode?.parentId === district || 
+        c.districtNode?.id === district ||
+        c.districtNode?.parent?.name?.toLowerCase().includes(district.toLowerCase()) ||
+        c.districtNode?.name?.toLowerCase().includes(district.toLowerCase())
+      );
+      sensors = sensors.filter((s: any) => 
+        s.districtNode?.parentId === district || 
+        s.districtNode?.id === district ||
+        s.districtNode?.parent?.name?.toLowerCase().includes(district.toLowerCase()) ||
+        s.districtNode?.name?.toLowerCase().includes(district.toLowerCase())
+      );
+    }
+
+    // Filter by type if requested
+    if (type && type !== 'ALL') {
+      if (type === 'RELIEF_CENTER') {
+        sensors = [];
+      } else if (type === 'SENSOR') {
+        centers = [];
+      } else {
+        // Specific sensor type: WATER, WIND, SALINITY, SEISMOGRAPH
+        centers = [];
+        sensors = sensors.filter((s: any) => s.type === type.toUpperCase());
+      }
+    }
+
+    // Format for clean client GIS consumption
+    const formattedCenters = centers.map((c: any) => {
+      const upzName = c.districtNode?.name || 'Upazila Center';
+      const distName = c.districtNode?.parent?.name || 'District HQ';
+      return {
+        id: c.id,
+        name: c.name,
+        centerCode: c.centerCode,
+        latitude: c.latitude,
+        longitude: c.longitude,
+        capacity: c.capacity || 1000,
+        occupancy: c.occupancy || 0,
+        contactNum: c.contactNum || '+8801700000000',
+        isOperational: c.isOperational ?? true,
+        stockPolicy: c.stockPolicy || {},
+        currentStock: c.currentStock || {},
+        emergencyRequirement: c.emergencyRequirement || {},
+        restockingRequirement: c.restockingRequirement || {},
+        upazilaName: upzName,
+        districtName: distName,
+        districtNodeId: c.districtNodeId
+      };
+    });
+
+    const formattedSensors = sensors.map((s: any) => {
+      const upzName = s.districtNode?.name || 'Local Area';
+      const distName = s.districtNode?.parent?.name || 'District';
+      return {
+        id: s.id,
+        sensorCode: s.sensorCode,
+        type: s.type,
+        latitude: s.latitude,
+        longitude: s.longitude,
+        metricValue: s.metricValue,
+        status: s.status || 'ACTIVE',
+        lastPing: s.lastPing || new Date(),
+        upazilaName: upzName,
+        districtName: distName,
+        districtNodeId: s.districtNodeId
+      };
+    });
+
+    const sensorCounts = {
+      WATER: (scopeData.sensors || []).filter((s: any) => s.type === 'WATER').length,
+      WIND: (scopeData.sensors || []).filter((s: any) => s.type === 'WIND').length,
+      SALINITY: (scopeData.sensors || []).filter((s: any) => s.type === 'SALINITY').length,
+      SEISMOGRAPH: (scopeData.sensors || []).filter((s: any) => s.type === 'SEISMOGRAPH').length,
+    };
+
+    return res.json({
+      scopeTier: scopeData.tier,
+      scopeName: scopeData.scopeNode?.name || 'Regional',
+      scopeId: scopeData.scopeNode?.id,
+      districts: (scopeData.districts || []).map((d: any) => ({ id: d.id, name: d.name, centersCount: d.centersCount })),
+      upazilas: (scopeData.upazilas || []).map((u: any) => ({ id: u.id, name: u.name, districtId: u.districtId, districtName: u.districtName })),
+      centers: formattedCenters,
+      sensors: formattedSensors,
+      totalCenters: formattedCenters.length,
+      totalSensors: formattedSensors.length,
+      sensorCounts
+    });
+  } catch (err: any) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
 // 4. Coordinator Stock Management & Scope Data
 router.get(['/coordinator/scope', '/coordinator/scope/:userNodeId'], async (req, res) => {
   try {
@@ -163,7 +279,26 @@ router.get(['/coordinator/boq/:centerId', '/coordinator/work-order/:centerId'], 
   }
 });
 
+router.get(['/coordinator/scope-boq/:type/:id', '/coordinator/work-order/scope/:type/:id'], async (req, res) => {
+  try {
+    const boq = await CoordinatorDbService.generateScopeBOQ(req.params.type.toUpperCase() as any, req.params.id);
+    return res.json(boq);
+  } catch (err: any) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
 // 5. Messaging & User Search Routes
+router.get(['/messages/conversations', '/messages/senders'], async (req, res) => {
+  try {
+    const userId = (req.query.userId as string) || '';
+    const conversations = await MessagingService.getRecentConversations(userId);
+    return res.json(conversations);
+  } catch (err: any) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
 router.get('/messages/search-users', async (req, res) => {
   try {
     const q = (req.query.q as string) || '';
@@ -178,6 +313,15 @@ router.get('/messages/search-users', async (req, res) => {
 router.get(['/messages/:channel', '/messages/channel/:channel'], async (req, res) => {
   try {
     const channel = req.params.channel;
+    const userId = (req.query.userId as string) || '';
+
+    // If channel is direct message, verify user belongs to it
+    if (channel.startsWith('direct-') && userId) {
+      if (!channel.includes(userId)) {
+        return res.status(403).json({ message: 'Forbidden: You are not a participant in this conversation' });
+      }
+    }
+
     const history = await MessagingService.getChannelHistory(channel);
     return res.json(history);
   } catch (err: any) {
@@ -228,7 +372,19 @@ router.post('/db-admin/table/:tableName', async (req, res) => {
     if (req.params.tableName === 'disaster_alerts' || req.params.tableName === 'disasterAlert') {
       io?.emit('new_alert', newRecord);
     } else if (req.params.tableName === 'chat_messages' || req.params.tableName === 'chatMessage') {
-      io?.to(payload.channel || 'upazila-general').emit('new_message', newRecord);
+      const channel = payload.channel || 'upazila-general';
+      io?.to(channel).emit('new_message', newRecord);
+      if (channel === 'upazila-general') {
+        io?.emit('conversation_updated', {
+          channel,
+          latestMessage: newRecord
+        });
+      } else {
+        io?.to(channel).emit('conversation_updated', {
+          channel,
+          latestMessage: newRecord
+        });
+      }
     }
 
     res.json(newRecord);

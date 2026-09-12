@@ -25,6 +25,29 @@
     .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+    /* Leaflet Dark Theme Overrides */
+    .leaflet-popup-content-wrapper {
+      background: #0f172a !important;
+      color: #f1f5f9 !important;
+      border: 1px solid #334155 !important;
+      border-radius: 12px !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6) !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
+    .leaflet-popup-content {
+      margin: 0 !important;
+      line-height: 1.4 !important;
+    }
+    .leaflet-popup-tip {
+      background: #0f172a !important;
+      border: 1px solid #334155 !important;
+    }
+    .leaflet-container {
+      font-family: inherit !important;
+      background: #090d16 !important;
+    }
     @media print {
       @page {
         margin: 10mm 15mm 10mm 15mm;
@@ -124,7 +147,7 @@
 
     <!-- 2. NEAREST RELIEF CENTER ADDRESS & CONTACT -->
     <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 md:p-5 shadow-lg">
-      <div class="flex items-start justify-between">
+      <div class="flex items-start justify-between flex-wrap gap-2">
         <div>
           <span class="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/60 uppercase">Nearest Relief Center</span>
           <h3 id="centerNameText" class="text-base md:text-lg font-bold text-white mt-1">Adamdighi Primary Shelter</h3>
@@ -132,9 +155,14 @@
             <i class="fa-solid fa-location-dot text-slate-500"></i> Upazila Parishad Complex, Adamdighi, Bogura
           </p>
         </div>
-        <div class="text-right">
-          <span class="text-[10px] text-slate-400 block">Capacity Status</span>
-          <span id="centerOccupancyText" class="text-xs font-mono font-bold text-indigo-300">150 / 1000 Occupied</span>
+        <div class="text-right flex flex-col items-end gap-1.5">
+          <div>
+            <span class="text-[10px] text-slate-400 block">Capacity Status</span>
+            <span id="centerOccupancyText" class="text-xs font-mono font-bold text-indigo-300">150 / 1000 Occupied</span>
+          </div>
+          <button onclick="focusNearestShelterOnMap()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg transition flex items-center gap-1 shadow">
+            <i class="fa-solid fa-map-location-dot"></i> View on GIS Map
+          </button>
         </div>
       </div>
     </section>
@@ -177,107 +205,325 @@
       </a>
     </section>
 
-    <!-- 5. COORDINATOR STOCK TABLES & BOQ PRINT (Coordinator Role Only) -->
+    <!-- 5. COORDINATOR STOCK TABLES & BOQ PRINT (Coordinator Role) -->
     <section id="coordinatorStockSection" class="hidden bg-slate-900 border border-indigo-500/40 rounded-2xl p-5 shadow-xl space-y-4">
+      <!-- Header with Role & Scope Information -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
         <div>
-          <h2 class="text-sm font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-2">
+          <div class="flex items-center gap-2 mb-1">
+            <span id="coordTierBadge" class="bg-indigo-950/80 border border-indigo-500/60 text-indigo-300 font-bold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+              Coordinator Console
+            </span>
+            <span id="coordScopeName" class="text-xs font-semibold text-slate-300">Scope</span>
+          </div>
+          <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
             <i class="fa-solid fa-boxes-stacked text-indigo-400"></i> Relief Center Stock & Resource Management
           </h2>
-          <p class="text-xs text-slate-400">Check and update Stock Policy, Current Stock, Emergency Requirements & Restocking Deltas.</p>
+          <p id="coordScopeSubtitle" class="text-xs text-slate-400">Manage buffer policies, current in-shelter stocks, emergency quotas, and restocking requirements.</p>
         </div>
-        <button onclick="printWorkOrder()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow flex items-center gap-2">
-          <i class="fa-solid fa-file-signature text-emerald-300"></i> Print Work Order
-        </button>
+
+        <div class="flex items-center flex-wrap gap-2">
+          <button onclick="printActiveWorkOrder()" id="printActiveBOQBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-file-signature text-emerald-300"></i> <span id="printBtnLabel">Print Work Order / BOQ</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Editable Stock Table -->
-      <div class="overflow-x-auto custom-scrollbar">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr class="bg-slate-800 text-slate-300 font-semibold border-b border-slate-700">
-              <th class="p-3">Resource Item</th>
-              <th class="p-3 text-center">1) Stock Policy</th>
-              <th class="p-3 text-center">2) Current Stock</th>
-              <th class="p-3 text-center">3) Emergency Req.</th>
-              <th class="p-3 text-center">4) Restocking Delta</th>
-            </tr>
-          </thead>
-          <tbody id="stockTableBody" class="divide-y divide-slate-800 font-mono text-slate-200">
-            <!-- Dynamically populated stock rows -->
-          </tbody>
-        </table>
+      <!-- Metric Overview Strip -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl">
+          <div class="text-[10px] font-semibold text-slate-400 uppercase">Tracked Shelters</div>
+          <div id="coordMetricShelters" class="text-base font-bold text-white font-mono mt-0.5">0</div>
+        </div>
+        <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl">
+          <div class="text-[10px] font-semibold text-emerald-400 uppercase">Available Inventory</div>
+          <div id="coordMetricCurrent" class="text-base font-bold text-emerald-300 font-mono mt-0.5">0 units</div>
+        </div>
+        <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl">
+          <div class="text-[10px] font-semibold text-amber-400 uppercase">Restock Deficit</div>
+          <div id="coordMetricDeficit" class="text-base font-bold text-amber-300 font-mono mt-0.5">0 units</div>
+        </div>
+        <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl">
+          <div class="text-[10px] font-semibold text-indigo-400 uppercase">Supply Readiness</div>
+          <div id="coordMetricReadiness" class="text-base font-bold text-indigo-300 font-mono mt-0.5">0%</div>
+        </div>
       </div>
 
-      <div class="flex justify-end">
-        <button onclick="saveStockTableChanges()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-5 py-2 rounded-lg transition shadow flex items-center gap-2">
-          <i class="fa-solid fa-floppy-disk"></i> Save Stock Updates
-        </button>
+      <!-- View Selector Tabs & Filter Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950 p-2 rounded-xl border border-slate-800">
+        <div id="coordStockViewTabs" class="flex items-center flex-wrap gap-1.5">
+          <!-- Populated dynamically based on Coordinator Tier -->
+        </div>
+
+        <div id="coordStockFilters" class="flex items-center gap-2">
+          <!-- District Dropdown Filter for Division view -->
+          <select id="coordDistrictFilterSelect" onchange="applyCoordinatorStockFilters()" class="hidden bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500">
+            <option value="ALL">All Districts</option>
+          </select>
+          <!-- Upazila / Shelter live search -->
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2 text-slate-500 text-[10px]"></i>
+            <input type="text" id="coordUpazilaSearchInput" onkeyup="applyCoordinatorStockFilters()" placeholder="Filter upazila / shelter..."
+                   class="bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-2.5 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-44 sm:w-52">
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW PANELS -->
+      <!-- Panel A: Separate Tables for Each Upazila -->
+      <div id="coordUpazilasSeparateContainer" class="space-y-4">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Panel B: Separate Tables for Each District (Division Coordinator Only) -->
+      <div id="coordDistrictsSeparateContainer" class="hidden space-y-4">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Panel C: Consolidated Stock Table (District Total or Division Total) -->
+      <div id="coordConsolidatedContainer" class="hidden space-y-4">
+        <!-- Rendered dynamically -->
       </div>
     </section>
 
-    <!-- 6. DISTRICT / REGIONAL MAP (Relief Centers & Sensors Marked) -->
-    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
-      <div class="flex items-center justify-between">
-        <h2 id="mapTitleText" class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-map-location-dot text-emerald-400"></i> District Relief & Sensor Map
-        </h2>
-        <span class="text-[10px] text-slate-500">Interactive GIS View</span>
+    <!-- 6. DISTRICT / REGIONAL MAP (Interactive Relief Centers & Sensors Marked) -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 md:p-5 shadow-xl space-y-4">
+      <!-- Section Header -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg shrink-0">
+            <i class="fa-solid fa-map-location-dot"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 id="mapTitleText" class="text-sm font-bold text-white uppercase tracking-wider">
+                Interactive Disaster GIS & Telemetry Map
+              </h2>
+              <span id="mapScopeBadge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">
+                Rajshahi Division (68 Shelters, 272 Sensors)
+              </span>
+              <span class="inline-flex items-center gap-1.5 text-[10px] font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Live Telemetry
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Click any Relief Center or Sensor marker on the map to inspect live capacity, stocks, and real-time telemetry readings.
+            </p>
+          </div>
+        </div>
+
+        <!-- Controls Toolbar -->
+        <div class="flex items-center gap-2 flex-wrap shrink-0">
+          <!-- District Filter -->
+          <div class="flex items-center gap-1.5">
+            <label for="gisDistrictFilterSelect" class="text-[11px] text-slate-400 font-medium hidden sm:inline">District:</label>
+            <select id="gisDistrictFilterSelect" onchange="onGisDistrictFilterChange()" class="bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500">
+              <option value="ALL">All Districts (Division Scope)</option>
+            </select>
+          </div>
+
+          <!-- Quick Search -->
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2 text-slate-500 text-xs"></i>
+            <input type="text" id="gisSearchInput" oninput="onGisSearchInput()" placeholder="Search shelter or sensor..." 
+                   class="bg-slate-950 border border-slate-700 rounded-lg pl-7 pr-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-36 sm:w-48">
+          </div>
+
+          <!-- Fit Bounds Reset -->
+          <button onclick="resetGisMapView()" title="Fit all markers in view" class="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700 flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-compress text-indigo-400"></i>
+            <span class="hidden md:inline">Fit View</span>
+          </button>
+        </div>
       </div>
-      <div id="gisMap" class="w-full h-80 md:h-96 rounded-xl border border-slate-800 z-10"></div>
+
+      <!-- Layer / Filter Pills Bar -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+        <button id="gisFilterBtn-ALL" onclick="setGisLayerFilter('ALL')" class="gis-layer-btn px-3 py-1.5 rounded-lg font-semibold border transition text-xs flex items-center gap-1.5 bg-indigo-600 text-white border-indigo-500 shadow">
+          <i class="fa-solid fa-layer-group"></i> All Features (<span id="gisCountAll">340</span>)
+        </button>
+        <button id="gisFilterBtn-RELIEF_CENTER" onclick="setGisLayerFilter('RELIEF_CENTER')" class="gis-layer-btn px-3 py-1.5 rounded-lg font-semibold border transition text-xs flex items-center gap-1.5 bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700">
+          <i class="fa-solid fa-house-chimney-medical text-emerald-400"></i> Relief Shelters (<span id="gisCountShelters">68</span>)
+        </button>
+        <button id="gisFilterBtn-SENSOR" onclick="setGisLayerFilter('SENSOR')" class="gis-layer-btn px-3 py-1.5 rounded-lg font-semibold border transition text-xs flex items-center gap-1.5 bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700">
+          <i class="fa-solid fa-tower-broadcast text-cyan-400"></i> All Sensors (<span id="gisCountSensors">272</span>)
+        </button>
+        <div class="h-4 w-px bg-slate-800 mx-1"></div>
+        <button id="gisFilterBtn-WATER" onclick="setGisLayerFilter('WATER')" class="gis-layer-btn px-2.5 py-1.5 rounded-lg font-medium border transition text-xs flex items-center gap-1 bg-slate-800/80 text-slate-400 border-slate-700 hover:text-cyan-300">
+          <i class="fa-solid fa-water text-cyan-400"></i> Water (<span id="gisCountWater">68</span>)
+        </button>
+        <button id="gisFilterBtn-WIND" onclick="setGisLayerFilter('WIND')" class="gis-layer-btn px-2.5 py-1.5 rounded-lg font-medium border transition text-xs flex items-center gap-1 bg-slate-800/80 text-slate-400 border-slate-700 hover:text-teal-300">
+          <i class="fa-solid fa-wind text-teal-400"></i> Wind (<span id="gisCountWind">68</span>)
+        </button>
+        <button id="gisFilterBtn-SALINITY" onclick="setGisLayerFilter('SALINITY')" class="gis-layer-btn px-2.5 py-1.5 rounded-lg font-medium border transition text-xs flex items-center gap-1 bg-slate-800/80 text-slate-400 border-slate-700 hover:text-purple-300">
+          <i class="fa-solid fa-flask text-purple-400"></i> Salinity (<span id="gisCountSalinity">68</span>)
+        </button>
+        <button id="gisFilterBtn-SEISMOGRAPH" onclick="setGisLayerFilter('SEISMOGRAPH')" class="gis-layer-btn px-2.5 py-1.5 rounded-lg font-medium border transition text-xs flex items-center gap-1 bg-slate-800/80 text-slate-400 border-slate-700 hover:text-orange-300">
+          <i class="fa-solid fa-wave-square text-orange-400"></i> Seismo (<span id="gisCountSeismo">68</span>)
+        </button>
+      </div>
+
+      <!-- Map Viewport -->
+      <div class="relative w-full">
+        <div id="gisMap" class="w-full h-80 md:h-[420px] rounded-xl border border-slate-800 z-10 shadow-inner"></div>
+
+        <!-- Legend Overlay (Bottom Left) -->
+        <div class="absolute bottom-3 left-3 z-[400] bg-slate-950/85 backdrop-blur-sm border border-slate-800 rounded-lg px-3 py-2 text-[10px] text-slate-300 shadow-xl hidden sm:flex items-center gap-3">
+          <span class="font-bold text-white uppercase text-[9px] tracking-wider">Legend:</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-slate-900"></span> Shelter (Normal)</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 border border-slate-900"></span> Shelter (>80%)</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 border border-slate-900"></span> Water</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-teal-400 border border-slate-900"></span> Wind</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-purple-400 border border-slate-900"></span> Salinity</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 border border-slate-900"></span> Seismo</span>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE DATA INSPECTOR PANEL -->
+      <div id="gisInspectorContainer" class="rounded-xl border border-slate-800 bg-slate-950/70 p-4 transition-all shadow-lg">
+        <!-- Rendered dynamically by inspectGisFeature() or renderDefaultInspector() -->
+      </div>
     </section>
 
   </main>
 
-  <!-- SLIDE-IN MESSENGER DRAWER (Worker & Coordinator Only) -->
-  <div id="messengerDrawer" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-slate-900 border-l border-slate-800 shadow-2xl z-40 transform translate-x-full transition-transform duration-300 flex flex-col">
-    <!-- Drawer Header -->
-    <div class="bg-slate-850 p-4 border-b border-slate-800 flex items-center justify-between">
-      <div class="flex items-center space-x-2">
-        <i class="fa-solid fa-[#6366f1] fa-comments text-indigo-400 text-lg"></i>
-        <h3 class="text-xs font-bold text-white uppercase tracking-wider">Field Messenger</h3>
+  <!-- SLIDE-IN MESSENGER DRAWER (WhatsApp & Facebook Messenger Style) -->
+  <div id="messengerDrawer" class="fixed inset-y-0 right-0 w-full sm:w-[460px] md:w-[500px] bg-slate-900 border-l border-slate-800 shadow-2xl z-40 transform translate-x-full transition-transform duration-300 flex flex-col">
+    <!-- Top Drawer Header -->
+    <div class="bg-slate-850 px-4 py-3 border-b border-slate-800 flex items-center justify-between shrink-0">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+          <i class="fa-solid fa-comments text-sm"></i>
+        </div>
+        <div>
+          <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+            Field Messenger
+            <span class="inline-flex items-center px-1.5 py-0.2 text-[9px] font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 rounded">LIVE</span>
+          </h3>
+          <p id="messengerCurrentAccountText" class="text-[10px] text-slate-400 truncate max-w-[200px] sm:max-w-[260px]">Connected</p>
+        </div>
       </div>
-      <button onclick="toggleMessengerDrawer()" class="text-slate-400 hover:text-white p-1">
-        <i class="fa-solid fa-xmark text-lg"></i>
-      </button>
-    </div>
-
-    <!-- User Search Bar -->
-    <div class="p-3 border-b border-slate-800 bg-slate-950/60">
-      <div class="relative">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
-        <input type="text" id="userSearchInput" onkeyup="handleUserSearch()" placeholder="Search workers or coordinators..." 
-               class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
-      </div>
-      <!-- User Search Results Container -->
-      <div id="searchResultsList" class="hidden mt-2 bg-slate-900 border border-slate-700 rounded-lg max-h-40 overflow-y-auto custom-scrollbar"></div>
-    </div>
-
-    <!-- Active Chat Channel Bar -->
-    <div class="px-4 py-2 bg-indigo-950/40 border-b border-indigo-900/50 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <span class="text-[11px] font-semibold text-indigo-300 flex items-center gap-1.5">
-          <i class="fa-solid fa-hashtag text-indigo-400"></i> <span id="activeChannelName">upazila-general</span>
-        </span>
-        <button id="resetGeneralChatBtn" onclick="switchToGeneralChat()" class="hidden text-[10px] text-indigo-300 hover:text-white underline">
-          Back to General
+      <div class="flex items-center space-x-1.5">
+        <button id="messengerInboxTabBtn" onclick="showMessengerView('INBOX')" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600/30 border border-indigo-500/30 transition flex items-center gap-1" title="View all message senders">
+          <i class="fa-solid fa-list-ul"></i> Chats
+        </button>
+        <button onclick="toggleMessengerDrawer()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition" title="Close Messenger">
+          <i class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
-      <span class="text-[10px] text-emerald-400 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Live</span>
     </div>
 
-    <!-- Messages Container -->
-    <div id="messagesList" class="flex-1 p-4 overflow-y-auto custom-scrollbar space-y-3 font-sans text-xs">
-      <!-- Chat bubbles inserted dynamically -->
+    <!-- VIEW 1: SCROLLABLE LIST OF LATEST MESSAGE SENDERS (INBOX VIEW) -->
+    <div id="messengerInboxView" class="flex-1 flex flex-col overflow-hidden">
+      <!-- Search & Filter Controls -->
+      <div class="p-3 border-b border-slate-800 bg-slate-950/70 space-y-2 shrink-0">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+          <input type="text" id="messengerSenderSearchInput" oninput="filterMessageSenders()" placeholder="Search senders, contacts, or messages..." 
+                 class="w-full bg-slate-900 border border-slate-700/80 rounded-lg pl-8 pr-8 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+          <button id="clearSenderSearchBtn" onclick="clearSenderSearch()" class="hidden absolute right-2.5 top-2 text-slate-500 hover:text-white text-xs">
+            <i class="fa-solid fa-circle-xmark"></i>
+          </button>
+        </div>
+        
+        <!-- Filter Tabs: All, Coordinators, Workers, Citizens -->
+        <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-0.5 text-[10px]">
+          <button onclick="setSenderCategoryFilter('ALL')" id="filterBtn-ALL" class="px-2.5 py-1 rounded-full bg-indigo-600 text-white font-semibold whitespace-nowrap transition">
+            All (<span id="count-ALL">0</span>)
+          </button>
+          <button onclick="setSenderCategoryFilter('COORDINATOR')" id="filterBtn-COORDINATOR" class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-semibold whitespace-nowrap transition">
+            Coordinators
+          </button>
+          <button onclick="setSenderCategoryFilter('WORKER')" id="filterBtn-WORKER" class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-semibold whitespace-nowrap transition">
+            Field Workers
+          </button>
+          <button onclick="setSenderCategoryFilter('CITIZEN')" id="filterBtn-CITIZEN" class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-semibold whitespace-nowrap transition">
+            Citizens
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Subheader -->
+      <div class="px-3.5 py-1.5 bg-slate-950/40 border-b border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 shrink-0">
+        <span class="flex items-center gap-1.5">
+          <i class="fa-regular fa-clock text-indigo-400"></i> Latest Message Senders
+        </span>
+        <button onclick="loadRecentSendersList(true)" class="text-slate-400 hover:text-indigo-300 text-[10px] flex items-center gap-1">
+          <i class="fa-solid fa-arrows-rotate"></i> Refresh
+        </button>
+      </div>
+
+      <!-- SCROLLABLE LIST OF LATEST MESSAGE SENDERS -->
+      <div id="conversationSendersList" class="flex-1 overflow-y-auto custom-scrollbar divide-y divide-slate-800/50">
+        <div class="p-8 text-center text-slate-500 text-xs">
+          <i class="fa-solid fa-spinner fa-spin text-lg text-indigo-400 mb-2"></i>
+          <p>Loading recent message senders...</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Input Box -->
-    <div class="p-3 border-t border-slate-800 bg-slate-950 flex items-center space-x-2">
-      <input type="text" id="chatMessageInput" onkeypress="if(event.key==='Enter') sendChatMessage()" placeholder="Type a message..." 
-             class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
-      <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-lg transition">
-        <i class="fa-solid fa-paper-plane text-xs"></i>
-      </button>
+    <!-- VIEW 2: ACTIVE CHAT VIEW (WHATSAPP / MESSENGER CONVERSATION) -->
+    <div id="messengerChatView" class="hidden flex-1 flex flex-col overflow-hidden">
+      <!-- Active Chat Header -->
+      <div class="px-3 py-2.5 bg-slate-850 border-b border-slate-800 flex items-center justify-between shadow-sm shrink-0">
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <button onclick="showMessengerView('INBOX')" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-1 text-xs font-semibold" title="Back to Senders List">
+            <i class="fa-solid fa-chevron-left text-sm text-indigo-400"></i>
+            <span class="hidden sm:inline">Chats</span>
+          </button>
+
+          <div id="activeChatAvatarBox" class="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0 relative">
+            <i id="activeChatAvatarIcon" class="fa-solid fa-user"></i>
+            <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
+          </div>
+
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <h4 id="activeChatTitle" class="text-xs font-bold text-white truncate max-w-[160px] sm:max-w-[220px]">Active Chat</h4>
+              <span id="activeChatRoleBadge" class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-indigo-900/60 text-indigo-300 border border-indigo-700/50">ROLE</span>
+            </div>
+            <p id="activeChatSubtitle" class="text-[10px] text-slate-400 truncate">🟢 Active now • GreenSignalAI Network</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-1">
+          <a id="activeChatCallBtn" href="#" class="hidden p-1.5 text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-slate-800 transition" title="Direct Phone Call">
+            <i class="fa-solid fa-phone text-xs"></i>
+          </a>
+          <button onclick="reloadCurrentChatMessages()" class="p-1.5 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-800 transition" title="Refresh Chat History">
+            <i class="fa-solid fa-arrows-rotate text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Disaster Action Dispatch Chips -->
+      <div class="px-3 py-1.5 bg-slate-950/70 border-b border-slate-800/70 flex items-center gap-1.5 overflow-x-auto custom-scrollbar text-[10px] shrink-0">
+        <span class="text-slate-500 font-semibold uppercase text-[9px] shrink-0">Quick Dispatch:</span>
+        <button onclick="insertQuickMessage('🚨 Water level danger alert updated. Please verify embankment coordinates.')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 whitespace-nowrap transition">
+          🚨 Embankment Alert
+        </button>
+        <button onclick="insertQuickMessage('📦 Relief inventory dispatched. Emergency food packs and water arriving shortly.')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 whitespace-nowrap transition">
+          📦 Relief Dispatch
+        </button>
+        <button onclick="insertQuickMessage('👥 Evacuation transport boats on standby at shelter location.')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 whitespace-nowrap transition">
+          👥 Shelter Standby
+        </button>
+      </div>
+
+      <!-- Messages Thread Scroll Area -->
+      <div id="messagesList" class="flex-1 p-3.5 overflow-y-auto custom-scrollbar space-y-2.5 font-sans text-xs bg-slate-950/40">
+        <!-- Chat bubbles rendered dynamically -->
+      </div>
+
+      <!-- Input Composer Bar -->
+      <div class="p-2.5 border-t border-slate-800 bg-slate-950 flex items-center space-x-2 shrink-0">
+        <input type="text" id="chatMessageInput" onkeypress="if(event.key==='Enter') sendChatMessage()" placeholder="Type a message..." 
+               class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+        <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg transition font-semibold text-xs flex items-center gap-1.5 shadow">
+          <span>Send</span>
+          <i class="fa-solid fa-paper-plane text-xs"></i>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -365,24 +611,54 @@
       }
     });
 
-    // 1. Initialize Leaflet Map
+    // 1. Initialize Leaflet Map & GIS Interactive State
+    let gisState = {
+      centers: [],
+      sensors: [],
+      districts: [],
+      upazilas: [],
+      activeLayer: 'ALL', // 'ALL' | 'RELIEF_CENTER' | 'SENSOR' | 'WATER' | 'WIND' | 'SALINITY' | 'SEISMOGRAPH'
+      activeDistrict: 'ALL',
+      searchQuery: '',
+      selectedFeature: null,
+      markersLayer: null,
+      markerLookup: {},
+      scopeName: 'Rajshahi Division',
+      scopeTier: 'DIVISION',
+      initialFitDone: false
+    };
+
     function initMap() {
-      map = L.map('gisMap').setView([23.8103, 90.4125], 7);
+      if (map) return;
+      map = L.map('gisMap', {
+        zoomControl: true,
+        scrollWheelZoom: true
+      }).setView([24.6, 89.2], 8);
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '© OpenStreetMap'
       }).addTo(map);
+
+      gisState.markersLayer = L.layerGroup().addTo(map);
     }
 
     // 2. Initialize Socket.io
     function initSocket() {
       socket = io();
       socket.on('connect', () => {
+        if (currentUser?.id) {
+          socket.emit('join_user', currentUser.id);
+        }
         socket.emit('join_channel', activeChannel);
       });
 
       socket.on('new_message', (msg) => {
-        appendChatMessage(msg);
+        handleIncomingChatMessage(msg);
+      });
+
+      socket.on('conversation_updated', (data) => {
+        handleConversationUpdated(data);
       });
 
       socket.on('new_alert', (alert) => {
@@ -432,49 +708,924 @@
       }
     }
 
-    // 3. Load Upazila Dashboard Context
+    // 3. Load Upazila Dashboard Context & GIS Features
     async function loadDefaultContext(nodeId = '') {
       try {
         const res = await fetch(`/api/upazila-context/${nodeId}`);
-        if (!res.ok) return;
-        const data = await res.json();
+        if (res.ok) {
+          const data = await res.json();
 
-        // Populate Nearest Relief Center
-        if (data.nearestReliefCenter) {
-          currentReliefCenterId = data.nearestReliefCenter.id;
-          document.getElementById('centerNameText').innerText = data.nearestReliefCenter.name;
-          document.getElementById('centerOccupancyText').innerText = `${data.nearestReliefCenter.occupancy} / ${data.nearestReliefCenter.capacity} Occupied`;
+          // Populate Nearest Relief Center
+          if (data.nearestReliefCenter) {
+            currentReliefCenterId = data.nearestReliefCenter.id;
+            document.getElementById('centerNameText').innerText = data.nearestReliefCenter.name;
+            document.getElementById('centerOccupancyText').innerText = `${data.nearestReliefCenter.occupancy} / ${data.nearestReliefCenter.capacity} Occupied`;
+          }
+
+          // Populate Sensors in Upazila view
+          if (data.sensors && data.sensors.length > 0) {
+            renderSensors(data.sensors);
+          }
+
+          // Populate Coordinator Contact
+          if (data.coordinatorContact) {
+            document.getElementById('coordNameText').innerText = data.coordinatorContact.fullName;
+            document.getElementById('callCoordinatorBtn').href = `tel:${data.coordinatorContact.phone || '+8801700000000'}`;
+          }
         }
 
-        // Populate Sensors
-        if (data.sensors && data.sensors.length > 0) {
-          renderSensors(data.sensors);
-        }
-
-        // Populate Coordinator Contact
-        if (data.coordinatorContact) {
-          document.getElementById('coordNameText').innerText = data.coordinatorContact.fullName;
-          document.getElementById('callCoordinatorBtn').href = `tel:${data.coordinatorContact.phone || '+8801700000000'}`;
-        }
-
-        // Populate Map Markers
-        renderMapMarkers(data.districtReliefCenters || [], data.districtSensors || []);
+        // Load complete GIS features for interactive map
+        await loadGisFeatures(nodeId);
       } catch (err) {
         console.warn('Failed to load upazila context:', err);
       }
     }
 
-    // Render Sensors Cards
+    // Load GIS Layer Data from Backend
+    async function loadGisFeatures(nodeId = '') {
+      try {
+        const queryParams = new URLSearchParams();
+        if (nodeId) queryParams.set('nodeId', nodeId);
+
+        const res = await fetch(`/api/gis/features?${queryParams.toString()}`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        gisState.centers = data.centers || [];
+        gisState.sensors = data.sensors || [];
+        gisState.districts = data.districts || [];
+        gisState.upazilas = data.upazilas || [];
+        gisState.scopeName = data.scopeName || 'Regional Scope';
+        gisState.scopeTier = data.scopeTier || 'DIVISION';
+
+        // Update Scope Badge
+        const badge = document.getElementById('mapScopeBadge');
+        if (badge) {
+          badge.innerText = `${gisState.scopeName} (${gisState.centers.length} Shelters, ${gisState.sensors.length} Sensors)`;
+        }
+
+        // Update district filter dropdown
+        const distSelect = document.getElementById('gisDistrictFilterSelect');
+        if (distSelect) {
+          const currentVal = distSelect.value;
+          distSelect.innerHTML = `<option value="ALL">All Districts (${gisState.scopeName})</option>` +
+            gisState.districts.map(d => `<option value="${d.id}">${d.name} (${d.centersCount || 0} Shelters)</option>`).join('');
+          if (gisState.districts.some(d => d.id === currentVal)) {
+            distSelect.value = currentVal;
+            gisState.activeDistrict = currentVal;
+          } else {
+            distSelect.value = 'ALL';
+            gisState.activeDistrict = 'ALL';
+          }
+        }
+
+        // Update Counts on Layer Buttons
+        updateGisCounts();
+
+        // Render markers & default inspector
+        renderGisMarkers(!gisState.initialFitDone);
+        gisState.initialFitDone = true;
+
+        if (!gisState.selectedFeature) {
+          renderDefaultInspector();
+        } else {
+          // Refresh existing inspector with updated data if still present
+          const curId = gisState.selectedFeature.id;
+          const curType = gisState.selectedFeature.type;
+          if (curType === 'RELIEF_CENTER') {
+            const found = gisState.centers.find(c => c.id === curId);
+            if (found) renderReliefCenterInspector(found);
+            else renderDefaultInspector();
+          } else {
+            const found = gisState.sensors.find(s => s.id === curId);
+            if (found) renderSensorInspector(found);
+            else renderDefaultInspector();
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load GIS features:', err);
+      }
+    }
+
+    // Update Counts on Filter Pills
+    function updateGisCounts() {
+      const allCount = gisState.centers.length + gisState.sensors.length;
+      const sheltersCount = gisState.centers.length;
+      const sensorsCount = gisState.sensors.length;
+      const waterCount = gisState.sensors.filter(s => s.type === 'WATER').length;
+      const windCount = gisState.sensors.filter(s => s.type === 'WIND').length;
+      const salinityCount = gisState.sensors.filter(s => s.type === 'SALINITY').length;
+      const seismoCount = gisState.sensors.filter(s => s.type === 'SEISMOGRAPH').length;
+
+      const setTxt = (id, txt) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = txt;
+      };
+
+      setTxt('gisCountAll', allCount);
+      setTxt('gisCountShelters', sheltersCount);
+      setTxt('gisCountSensors', sensorsCount);
+      setTxt('gisCountWater', waterCount);
+      setTxt('gisCountWind', windCount);
+      setTxt('gisCountSalinity', salinityCount);
+      setTxt('gisCountSeismo', seismoCount);
+    }
+
+    // Set Active Layer Filter
+    function setGisLayerFilter(layer) {
+      gisState.activeLayer = layer;
+      
+      // Update UI button styles
+      const layerBtns = document.querySelectorAll('.gis-layer-btn');
+      layerBtns.forEach(btn => {
+        const btnId = btn.id;
+        if (btnId === `gisFilterBtn-${layer}`) {
+          btn.className = 'gis-layer-btn px-3 py-1.5 rounded-lg font-semibold border transition text-xs flex items-center gap-1.5 bg-indigo-600 text-white border-indigo-500 shadow';
+        } else {
+          btn.className = 'gis-layer-btn px-2.5 py-1.5 rounded-lg font-medium border transition text-xs flex items-center gap-1 bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700';
+        }
+      });
+
+      renderGisMarkers(true);
+    }
+
+    // District Filter Dropdown Change
+    function onGisDistrictFilterChange() {
+      const select = document.getElementById('gisDistrictFilterSelect');
+      if (!select) return;
+      gisState.activeDistrict = select.value;
+      renderGisMarkers(true);
+    }
+
+    // Search Input Filter
+    function onGisSearchInput() {
+      const input = document.getElementById('gisSearchInput');
+      if (!input) return;
+      gisState.searchQuery = input.value.trim().toLowerCase();
+      renderGisMarkers(false);
+    }
+
+    // Reset View Button
+    function resetGisMapView() {
+      gisState.activeLayer = 'ALL';
+      gisState.activeDistrict = 'ALL';
+      gisState.searchQuery = '';
+      const input = document.getElementById('gisSearchInput');
+      if (input) input.value = '';
+      const select = document.getElementById('gisDistrictFilterSelect');
+      if (select) select.value = 'ALL';
+
+      setGisLayerFilter('ALL');
+      renderGisMarkers(true);
+      renderDefaultInspector();
+    }
+
+    // Render GIS Markers onto Leaflet Map
+    function renderGisMarkers(shouldFitBounds = false) {
+      if (!map || !gisState.markersLayer) return;
+
+      gisState.markersLayer.clearLayers();
+      gisState.markerLookup = {};
+      const bounds = [];
+
+      const query = gisState.searchQuery;
+      const district = gisState.activeDistrict;
+      const layer = gisState.activeLayer;
+
+      // Filter Relief Centers
+      const showShelters = (layer === 'ALL' || layer === 'RELIEF_CENTER');
+      let filteredCenters = showShelters ? gisState.centers : [];
+
+      if (district !== 'ALL') {
+        filteredCenters = filteredCenters.filter(c => 
+          c.districtNodeId === district || 
+          c.districtName?.toLowerCase().includes(district.toLowerCase())
+        );
+      }
+
+      if (query) {
+        filteredCenters = filteredCenters.filter(c => 
+          c.name?.toLowerCase().includes(query) ||
+          c.centerCode?.toLowerCase().includes(query) ||
+          c.upazilaName?.toLowerCase().includes(query) ||
+          c.districtName?.toLowerCase().includes(query)
+        );
+      }
+
+      // Filter Sensors
+      const showSensors = (layer === 'ALL' || layer === 'SENSOR' || ['WATER', 'WIND', 'SALINITY', 'SEISMOGRAPH'].includes(layer));
+      let filteredSensors = showSensors ? gisState.sensors : [];
+
+      if (['WATER', 'WIND', 'SALINITY', 'SEISMOGRAPH'].includes(layer)) {
+        filteredSensors = filteredSensors.filter(s => s.type === layer);
+      }
+
+      if (district !== 'ALL') {
+        filteredSensors = filteredSensors.filter(s => 
+          s.districtNodeId === district || 
+          s.districtName?.toLowerCase().includes(district.toLowerCase())
+        );
+      }
+
+      if (query) {
+        filteredSensors = filteredSensors.filter(s => 
+          s.sensorCode?.toLowerCase().includes(query) ||
+          s.type?.toLowerCase().includes(query) ||
+          s.upazilaName?.toLowerCase().includes(query) ||
+          s.districtName?.toLowerCase().includes(query)
+        );
+      }
+
+      // Render Filtered Relief Centers
+      filteredCenters.forEach(c => {
+        if (!c.latitude || !c.longitude) return;
+
+        const capacity = c.capacity || 1000;
+        const occupancy = c.occupancy || 0;
+        const occPct = Math.round((occupancy / capacity) * 100);
+        const isFull = occPct >= 100;
+        const isBusy = occPct >= 80;
+        const bgClass = isFull ? 'bg-rose-600' : isBusy ? 'bg-amber-500' : 'bg-emerald-600';
+
+        const iconHtml = `
+          <div class="relative cursor-pointer group" style="transform: translate(-50%, -50%);">
+            <div class="w-8 h-8 rounded-xl ${bgClass} text-white flex items-center justify-center shadow-lg border-2 border-slate-900 transition-transform transform group-hover:scale-125">
+              <i class="fa-solid fa-house-chimney-medical text-xs"></i>
+            </div>
+            <div class="absolute -bottom-1 -right-1 px-1 py-0.2 bg-slate-950 text-[8px] font-mono font-bold text-slate-200 rounded border border-slate-700 shadow">
+              ${occPct}%
+            </div>
+          </div>
+        `;
+
+        const customIcon = L.divIcon({
+          html: iconHtml,
+          className: 'custom-gis-shelter-marker',
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
+          popupAnchor: [0, -18]
+        });
+
+        const popupHtml = `
+          <div class="p-3 bg-slate-900 text-slate-100 rounded-xl border border-slate-800 text-xs w-64">
+            <div class="flex items-center justify-between gap-2 mb-1.5 pb-1.5 border-b border-slate-800">
+              <span class="font-bold text-white text-xs truncate">${c.name}</span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">SHELTER</span>
+            </div>
+            <div class="text-[10px] text-slate-400 mb-2">
+              <i class="fa-solid fa-location-dot text-slate-500 mr-1"></i>${c.upazilaName}, ${c.districtName}
+            </div>
+            <div class="space-y-1 text-[11px] mb-2.5">
+              <div class="flex justify-between text-slate-300">
+                <span>Occupancy:</span>
+                <span class="font-mono font-bold text-white">${occupancy} / ${capacity} (${occPct}%)</span>
+              </div>
+              <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div class="h-full ${isFull ? 'bg-rose-500' : isBusy ? 'bg-amber-500' : 'bg-emerald-500'}" style="width: ${Math.min(100, occPct)}%"></div>
+              </div>
+              <div class="flex justify-between text-slate-400 text-[10px] pt-1">
+                <span>Food: <b class="text-slate-200 font-mono">${c.currentStock?.food_packs || 0}</b></span>
+                <span>Medical: <b class="text-slate-200 font-mono">${c.currentStock?.medical_kits || 0}</b></span>
+              </div>
+            </div>
+            <button onclick="inspectGisFeature('RELIEF_CENTER', '${c.id}')" class="w-full py-1.5 px-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1.5 shadow transition">
+              <i class="fa-solid fa-circle-info"></i> Inspect Full Shelter Data & Stocks
+            </button>
+          </div>
+        `;
+
+        const marker = L.marker([c.latitude, c.longitude], { icon: customIcon })
+          .bindPopup(popupHtml)
+          .on('click', () => {
+            inspectGisFeature('RELIEF_CENTER', c.id, false);
+          });
+
+        gisState.markersLayer.addLayer(marker);
+        gisState.markerLookup[c.id] = marker;
+        bounds.push([c.latitude, c.longitude]);
+      });
+
+      // Render Filtered Sensors
+      filteredSensors.forEach(s => {
+        if (!s.latitude || !s.longitude) return;
+
+        const sensorColor = s.type === 'WATER' ? '#0ea5e9' :
+                            s.type === 'WIND' ? '#14b8a6' :
+                            s.type === 'SALINITY' ? '#a855f7' : '#f97316';
+        const icon = getSensorIcon(s.type);
+
+        const iconHtml = `
+          <div class="relative cursor-pointer group" style="transform: translate(-50%, -50%);">
+            <div class="w-7 h-7 rounded-full text-white flex items-center justify-center shadow-lg border-2 border-slate-900 transition-transform transform group-hover:scale-125" style="background-color: ${sensorColor};">
+              <i class="fa-solid ${icon} text-[10px]"></i>
+            </div>
+            <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background-color: ${sensorColor};"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5" style="background-color: ${sensorColor};"></span>
+            </span>
+          </div>
+        `;
+
+        const customIcon = L.divIcon({
+          html: iconHtml,
+          className: 'custom-gis-sensor-marker',
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+          popupAnchor: [0, -16]
+        });
+
+        const popupHtml = `
+          <div class="p-3 bg-slate-900 text-slate-100 rounded-xl border border-slate-800 text-xs w-64">
+            <div class="flex items-center justify-between gap-2 mb-1.5 pb-1.5 border-b border-slate-800">
+              <span class="font-bold text-white text-xs">${s.type} Sensor</span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">${s.status}</span>
+            </div>
+            <div class="text-[10px] text-slate-400 mb-2">
+              <i class="fa-solid fa-location-dot text-slate-500 mr-1"></i>${s.upazilaName}, ${s.districtName}
+            </div>
+            <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 mb-2.5 flex items-center justify-between">
+              <span class="text-[10px] text-slate-400">Live Reading</span>
+              <span class="text-sm font-mono font-bold" style="color: ${sensorColor};">${s.metricValue}</span>
+            </div>
+            <button onclick="inspectGisFeature('SENSOR', '${s.id}')" class="w-full py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1.5 border border-slate-700 transition">
+              <i class="fa-solid fa-chart-line"></i> Inspect Sensor Telemetry
+            </button>
+          </div>
+        `;
+
+        const marker = L.marker([s.latitude, s.longitude], { icon: customIcon })
+          .bindPopup(popupHtml)
+          .on('click', () => {
+            inspectGisFeature('SENSOR', s.id, false);
+          });
+
+        gisState.markersLayer.addLayer(marker);
+        gisState.markerLookup[s.id] = marker;
+        bounds.push([s.latitude, s.longitude]);
+      });
+
+      // Fit bounds if requested and markers exist
+      if (shouldFitBounds && bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 13 });
+      }
+    }
+
+    // Inspect Feature: Click Handler for Map Markers
+    function inspectGisFeature(type, id, panTo = true) {
+      if (type === 'RELIEF_CENTER') {
+        const center = gisState.centers.find(c => c.id === id);
+        if (!center) return;
+        gisState.selectedFeature = { type: 'RELIEF_CENTER', id, data: center };
+
+        // Open popup if marker is on map
+        const marker = gisState.markerLookup[id];
+        if (marker) marker.openPopup();
+
+        if (panTo && center.latitude && center.longitude) {
+          map.flyTo([center.latitude, center.longitude], Math.max(map.getZoom(), 12), { duration: 0.8 });
+        }
+
+        renderReliefCenterInspector(center);
+      } else if (type === 'SENSOR') {
+        const sensor = gisState.sensors.find(s => s.id === id);
+        if (!sensor) return;
+        gisState.selectedFeature = { type: 'SENSOR', id, data: sensor };
+
+        const marker = gisState.markerLookup[id];
+        if (marker) marker.openPopup();
+
+        if (panTo && sensor.latitude && sensor.longitude) {
+          map.flyTo([sensor.latitude, sensor.longitude], Math.max(map.getZoom(), 12), { duration: 0.8 });
+        }
+
+        renderSensorInspector(sensor);
+      }
+    }
+
+    // Close Feature Inspector
+    function closeGisInspector() {
+      gisState.selectedFeature = null;
+      if (map) map.closePopup();
+      renderDefaultInspector();
+    }
+
+    // Render Default / Regional Summary Inspector
+    function renderDefaultInspector() {
+      const container = document.getElementById('gisInspectorContainer');
+      if (!container) return;
+
+      const totalCenters = gisState.centers.length;
+      const totalCapacity = gisState.centers.reduce((acc, c) => acc + (c.capacity || 0), 0);
+      const totalOccupancy = gisState.centers.reduce((acc, c) => acc + (c.occupancy || 0), 0);
+      const occupancyPct = totalCapacity > 0 ? Math.round((totalOccupancy / totalCapacity) * 100) : 0;
+      const totalSensors = gisState.sensors.length;
+      const waterSensors = gisState.sensors.filter(s => s.type === 'WATER').length;
+      const windSensors = gisState.sensors.filter(s => s.type === 'WIND').length;
+      const salinitySensors = gisState.sensors.filter(s => s.type === 'SALINITY').length;
+      const seismoSensors = gisState.sensors.filter(s => s.type === 'SEISMOGRAPH').length;
+
+      const sampleShelters = gisState.centers.slice(0, 4);
+      const sampleSensors = gisState.sensors.slice(0, 4);
+
+      container.innerHTML = `
+        <div class="space-y-4">
+          <!-- Overview Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+            <div>
+              <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-indigo-400"></i>
+                Regional Telemetry & Facility Overview (${gisState.scopeName})
+              </h3>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Click any marker on the map above or select from the quick-inspection list below to view live data.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-mono px-2 py-0.5 bg-slate-900 text-slate-300 rounded border border-slate-800">
+                ${totalCenters} Shelters Active
+              </span>
+              <span class="text-[10px] font-mono px-2 py-0.5 bg-slate-900 text-slate-300 rounded border border-slate-800">
+                ${totalSensors} Sensors Online
+              </span>
+            </div>
+          </div>
+
+          <!-- Quick Metrics Bar -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl">
+              <div class="text-[10px] font-bold text-slate-400 uppercase flex items-center justify-between">
+                Total Shelters
+                <i class="fa-solid fa-house-chimney-medical text-emerald-400"></i>
+              </div>
+              <div class="text-xl font-bold font-mono text-white mt-1">${totalCenters}</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Across ${gisState.districts.length || 8} districts</div>
+            </div>
+
+            <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl">
+              <div class="text-[10px] font-bold text-slate-400 uppercase flex items-center justify-between">
+                Shelter Capacity
+                <i class="fa-solid fa-bed text-indigo-400"></i>
+              </div>
+              <div class="text-xl font-bold font-mono text-white mt-1">${totalOccupancy.toLocaleString()} <span class="text-xs text-slate-400 font-normal">/ ${totalCapacity.toLocaleString()}</span></div>
+              <div class="text-[10px] text-emerald-400 mt-0.5">${occupancyPct}% utilized • ${(totalCapacity - totalOccupancy).toLocaleString()} beds open</div>
+            </div>
+
+            <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl">
+              <div class="text-[10px] font-bold text-slate-400 uppercase flex items-center justify-between">
+                Active Sensors
+                <i class="fa-solid fa-tower-broadcast text-cyan-400"></i>
+              </div>
+              <div class="text-xl font-bold font-mono text-white mt-1">${totalSensors}</div>
+              <div class="text-[10px] text-cyan-400 mt-0.5">100% telemetry online</div>
+            </div>
+
+            <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl">
+              <div class="text-[10px] font-bold text-slate-400 uppercase flex items-center justify-between">
+                Sensor Network
+                <i class="fa-solid fa-satellite-dish text-teal-400"></i>
+              </div>
+              <div class="text-xs font-mono text-slate-200 mt-1 flex items-center justify-between">
+                <span>🌊 ${waterSensors} Water</span>
+                <span>💨 ${windSensors} Wind</span>
+              </div>
+              <div class="text-xs font-mono text-slate-200 mt-1 flex items-center justify-between">
+                <span>🧪 ${salinitySensors} Salinity</span>
+                <span>📊 ${seismoSensors} Seismo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Inspection Jump Cards -->
+          <div>
+            <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between">
+              <span>Quick Select Facilities to Inspect:</span>
+              <span class="text-[10px] text-slate-500 font-normal">Click any facility to center & open live telemetry</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <!-- Shelters Preview -->
+              <div class="space-y-2">
+                <div class="text-[10px] font-semibold text-emerald-400 uppercase flex items-center gap-1">
+                  <i class="fa-solid fa-house-chimney-medical"></i> Relief Centers
+                </div>
+                ${sampleShelters.map(c => `
+                  <div onclick="focusGisFeatureOnMap('RELIEF_CENTER', '${c.id}')" class="bg-slate-900/80 hover:bg-slate-850 border border-slate-800 hover:border-emerald-500/50 p-2.5 rounded-xl cursor-pointer transition flex items-center justify-between group">
+                    <div class="truncate mr-2">
+                      <div class="text-xs font-bold text-white group-hover:text-emerald-300 truncate">${c.name}</div>
+                      <div class="text-[10px] text-slate-400">${c.upazilaName}, ${c.districtName}</div>
+                    </div>
+                    <div class="text-right shrink-0">
+                      <div class="text-xs font-mono font-bold text-emerald-400">${c.occupancy} / ${c.capacity}</div>
+                      <div class="text-[9px] text-slate-500">Inspect <i class="fa-solid fa-arrow-right text-[8px] ml-0.5"></i></div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+
+              <!-- Sensors Preview -->
+              <div class="space-y-2">
+                <div class="text-[10px] font-semibold text-cyan-400 uppercase flex items-center gap-1">
+                  <i class="fa-solid fa-tower-broadcast"></i> Field Telemetry Sensors
+                </div>
+                ${sampleSensors.map(s => `
+                  <div onclick="focusGisFeatureOnMap('SENSOR', '${s.id}')" class="bg-slate-900/80 hover:bg-slate-850 border border-slate-800 hover:border-cyan-500/50 p-2.5 rounded-xl cursor-pointer transition flex items-center justify-between group">
+                    <div class="truncate mr-2">
+                      <div class="text-xs font-bold text-white group-hover:text-cyan-300 truncate">${s.type} Sensor (${s.sensorCode})</div>
+                      <div class="text-[10px] text-slate-400">${s.upazilaName}, ${s.districtName}</div>
+                    </div>
+                    <div class="text-right shrink-0">
+                      <div class="text-xs font-mono font-bold text-cyan-400">${s.metricValue}</div>
+                      <div class="text-[9px] text-slate-500">Inspect <i class="fa-solid fa-arrow-right text-[8px] ml-0.5"></i></div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render Relief Center Data in Inspector
+    function renderReliefCenterInspector(c) {
+      const container = document.getElementById('gisInspectorContainer');
+      if (!container) return;
+
+      const capacity = c.capacity || 1000;
+      const occupancy = c.occupancy || 0;
+      const pct = Math.round((occupancy / capacity) * 100);
+      const isFull = pct >= 100;
+      const isBusy = pct >= 80;
+      const vacancies = Math.max(0, capacity - occupancy);
+
+      const barColor = isFull ? 'bg-rose-500' : isBusy ? 'bg-amber-500' : 'bg-emerald-500';
+      const statusText = isFull ? 'AT MAXIMUM CAPACITY' : isBusy ? 'HIGH CONGESTION' : 'OPERATIONAL (Intake Ready)';
+      const statusBadgeClass = isFull ? 'bg-rose-950 text-rose-300 border-rose-800' : isBusy ? 'bg-amber-950 text-amber-300 border-amber-800' : 'bg-emerald-950 text-emerald-300 border-emerald-800';
+
+      const stock = c.currentStock || {};
+      const policy = c.stockPolicy || {};
+
+      const items = [
+        { key: 'emergency_beds', label: 'Emergency Beds', unit: 'Units', icon: 'fa-bed', current: stock.emergency_beds || 0, policy: policy.emergency_beds || 500, deficit: Math.max(0, (policy.emergency_beds || 500) - (stock.emergency_beds || 0)) },
+        { key: 'food_packs', label: 'Food Ration Packs', unit: 'Packs', icon: 'fa-box-open', current: stock.food_packs || 0, policy: policy.food_packs || 1000, deficit: Math.max(0, (policy.food_packs || 1000) - (stock.food_packs || 0)) },
+        { key: 'medical_kits', label: 'Medical Supply Kits', unit: 'Kits', icon: 'fa-kit-medical', current: stock.medical_kits || 0, policy: policy.medical_kits || 300, deficit: Math.max(0, (policy.medical_kits || 300) - (stock.medical_kits || 0)) },
+        { key: 'rescue_vehicles', label: 'Evacuation Vehicles', unit: 'Vehicles', icon: 'fa-truck-medical', current: stock.rescue_vehicles || 0, policy: policy.rescue_vehicles || 5, deficit: Math.max(0, (policy.rescue_vehicles || 5) - (stock.rescue_vehicles || 0)) },
+        { key: 'emergency_tents', label: 'Emergency Tents', unit: 'Units', icon: 'fa-campground', current: stock.emergency_tents || 0, policy: policy.emergency_tents || 80, deficit: Math.max(0, (policy.emergency_tents || 80) - (stock.emergency_tents || 0)) }
+      ];
+
+      container.innerHTML = `
+        <div class="space-y-4">
+          <!-- Card Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-lg shrink-0">
+                <i class="fa-solid fa-house-chimney-medical"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-sm font-bold text-white">${c.name}</h3>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${statusBadgeClass}">${statusText}</span>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-900 border border-slate-800">${c.centerCode}</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                  <span><i class="fa-solid fa-location-dot text-slate-500 mr-1"></i>${c.upazilaName} Upazila, ${c.districtName} District</span>
+                  <span>•</span>
+                  <span><i class="fa-solid fa-compass text-slate-500 mr-1"></i>${c.latitude.toFixed(4)}, ${c.longitude.toFixed(4)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="printWorkOrderForCenter('${c.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow transition">
+                <i class="fa-solid fa-file-invoice"></i> Print BOQ / Work Order
+              </button>
+              <button onclick="zoomToGisCoords(${c.latitude}, ${c.longitude})" title="Center on map" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white p-2 rounded-lg text-xs border border-slate-700 transition">
+                <i class="fa-solid fa-crosshairs text-emerald-400"></i>
+              </button>
+              <button onclick="closeGisInspector()" title="Close inspector" class="bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white p-2 rounded-lg text-xs border border-slate-700 transition">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Core Data Grid: Capacity & Stock -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Capacity & Intake Column -->
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-between">
+              <div>
+                <div class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between mb-3">
+                  <span>Shelter Occupancy & Capacity</span>
+                  <i class="fa-solid fa-users text-indigo-400"></i>
+                </div>
+                <div class="flex items-baseline justify-between mb-1.5">
+                  <span class="text-2xl font-mono font-bold text-white">${occupancy} <span class="text-sm font-normal text-slate-400">/ ${capacity}</span></span>
+                  <span class="text-xs font-bold font-mono ${isFull ? 'text-rose-400' : isBusy ? 'text-amber-400' : 'text-emerald-400'}">${pct}% Occupied</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden mb-3">
+                  <div class="h-full ${barColor} transition-all duration-500" style="width: ${Math.min(100, pct)}%"></div>
+                </div>
+                <div class="text-xs text-slate-400 space-y-1">
+                  <div class="flex justify-between">
+                    <span>Available Intake Spaces:</span>
+                    <b class="text-emerald-400 font-mono">${vacancies} beds available</b>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Operational Status:</span>
+                    <b class="text-white">${c.isOperational ? 'Fully Active' : 'Restricted'}</b>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action button: Hotline Call -->
+              <div class="pt-4 border-t border-slate-800/80 mt-4">
+                <a href="tel:${c.contactNum || '+8801700000000'}" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-2 shadow transition">
+                  <i class="fa-solid fa-phone-volume"></i> Call Shelter Hotline (${c.contactNum || '+8801700000000'})
+                </a>
+              </div>
+            </div>
+
+            <!-- Stocks Status Table (Spans 2 columns) -->
+            <div class="lg:col-span-2 bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-between">
+              <div>
+                <div class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between mb-3">
+                  <span>Critical Relief Material Reserves & Deficits</span>
+                  <span class="text-[10px] text-slate-500 font-normal">Real-Time Logistics Telemetry</span>
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead>
+                      <tr class="text-slate-400 border-b border-slate-800 pb-1.5 text-[10px] uppercase font-bold tracking-wider">
+                        <th class="pb-2">Inventory Item</th>
+                        <th class="pb-2 text-right">In-Stock</th>
+                        <th class="pb-2 text-right">Standard Quota</th>
+                        <th class="pb-2 text-right">Restock Deficit</th>
+                        <th class="pb-2 text-center">Fulfillment</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60 font-mono">
+                      ${items.map(it => {
+                        const itPct = it.policy > 0 ? Math.round((it.current / it.policy) * 100) : 100;
+                        const itDeficit = it.deficit;
+                        const itStatusColor = itPct >= 100 ? 'text-emerald-400' : itPct >= 70 ? 'text-amber-400' : 'text-rose-400';
+                        return `
+                          <tr class="hover:bg-slate-850/50 transition">
+                            <td class="py-2 text-slate-200 font-sans font-medium flex items-center gap-2">
+                              <i class="fa-solid ${it.icon} text-slate-500 text-xs w-4"></i>
+                              ${it.label}
+                            </td>
+                            <td class="py-2 text-right font-bold text-white">${it.current} <span class="text-[9px] text-slate-500">${it.unit}</span></td>
+                            <td class="py-2 text-right text-slate-400">${it.policy}</td>
+                            <td class="py-2 text-right font-bold ${itDeficit > 0 ? 'text-amber-400' : 'text-emerald-400'}">
+                              ${itDeficit > 0 ? `-${itDeficit}` : 'Optimal'}
+                            </td>
+                            <td class="py-2 text-center font-bold ${itStatusColor}">${itPct}%</td>
+                          </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400 mt-3">
+                <span class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-circle-check text-emerald-400"></i> Stock policies synchronized with Upazila Disaster Response Plan
+                </span>
+                <button onclick="toggleMessengerDrawer()" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-comments"></i> Dispatch Field Message
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render Sensor Data in Inspector
+    function renderSensorInspector(s) {
+      const container = document.getElementById('gisInspectorContainer');
+      if (!container) return;
+
+      const sensorColor = s.type === 'WATER' ? 'text-cyan-400' :
+                          s.type === 'WIND' ? 'text-teal-400' :
+                          s.type === 'SALINITY' ? 'text-purple-400' : 'text-orange-400';
+      const sensorBg = s.type === 'WATER' ? 'bg-cyan-500/10 border-cyan-500/30' :
+                       s.type === 'WIND' ? 'bg-teal-500/10 border-teal-500/30' :
+                       s.type === 'SALINITY' ? 'bg-purple-500/10 border-purple-500/30' : 'bg-orange-500/10 border-orange-500/30';
+      const icon = getSensorIcon(s.type);
+
+      let assessmentTitle = 'Hydrological Flow Assessment';
+      let assessmentNote = 'Normal river stage reading. Current levels are safely below warning thresholds.';
+      let thresholds = [
+        { label: 'Normal Flow', val: '< 3.0 m', status: 'Safe', color: 'text-emerald-400' },
+        { label: 'Early Warning', val: '3.5 m', status: 'Elevated', color: 'text-amber-400' },
+        { label: 'Danger Breach', val: '4.5 m', status: 'Critical Evac', color: 'text-rose-400' }
+      ];
+
+      if (s.type === 'WIND') {
+        assessmentTitle = 'Atmospheric & Wind Speed Telemetry';
+        assessmentNote = 'Surface anemometer recording safe moderate breezes. No squalls or storm cells detected.';
+        thresholds = [
+          { label: 'Light/Moderate', val: '< 30 km/h', status: 'Safe', color: 'text-emerald-400' },
+          { label: 'Gale Warning', val: '45 km/h', status: 'Caution', color: 'text-amber-400' },
+          { label: 'Severe Cyclonic', val: '62 km/h', status: 'High Alert', color: 'text-rose-400' }
+        ];
+      } else if (s.type === 'SALINITY') {
+        assessmentTitle = 'River & Delta Salinity Intrusion';
+        assessmentNote = 'Conductivity meter indicates freshwater buffer is preserved. Safe for municipal water supply.';
+        thresholds = [
+          { label: 'Freshwater Safe', val: '< 1.0 ppt', status: 'Potable', color: 'text-emerald-400' },
+          { label: 'Irrigation Limit', val: '2.0 ppt', status: 'Agri Caution', color: 'text-amber-400' },
+          { label: 'Severe Intrusion', val: '5.0 ppt', status: 'Brackish Water', color: 'text-rose-400' }
+        ];
+      } else if (s.type === 'SEISMOGRAPH') {
+        assessmentTitle = 'Tectonic Vibration & Seismic Activity';
+        assessmentNote = 'Digital ground seismometer reports standard geological background activity with zero tremor anomaly.';
+        thresholds = [
+          { label: 'Baseline Tremor', val: '< 2.0 M', status: 'Imperceptible', color: 'text-emerald-400' },
+          { label: 'Minor Quake', val: '3.5 M', status: 'Perceptible', color: 'text-amber-400' },
+          { label: 'Severe Seismic', val: '> 5.0 M', status: 'Structural Risk', color: 'text-rose-400' }
+        ];
+      }
+
+      container.innerHTML = `
+        <div class="space-y-4">
+          <!-- Sensor Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl ${sensorBg} ${sensorColor} flex items-center justify-center text-lg shrink-0 border">
+                <i class="fa-solid ${icon}"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-sm font-bold text-white">${s.type} Sensor Station</h3>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ACTIVE (Online)
+                  </span>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-900 border border-slate-800">${s.sensorCode}</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                  <span><i class="fa-solid fa-location-dot text-slate-500 mr-1"></i>${s.upazilaName} Upazila, ${s.districtName} District</span>
+                  <span>•</span>
+                  <span><i class="fa-solid fa-satellite text-slate-500 mr-1"></i>GPS: ${s.latitude.toFixed(4)}, ${s.longitude.toFixed(4)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="copySensorCoordinates(${s.latitude}, ${s.longitude})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 flex items-center gap-1.5 transition">
+                <i class="fa-regular fa-copy"></i> Copy GPS
+              </button>
+              <button onclick="zoomToGisCoords(${s.latitude}, ${s.longitude})" title="Center on map" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white p-2 rounded-lg text-xs border border-slate-700 transition">
+                <i class="fa-solid fa-crosshairs text-cyan-400"></i>
+              </button>
+              <button onclick="closeGisInspector()" title="Close inspector" class="bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white p-2 rounded-lg text-xs border border-slate-700 transition">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sensor Metrics Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Col 1: Big Telemetry Readout -->
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-between">
+              <div>
+                <div class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between mb-3">
+                  <span>Real-Time Reading</span>
+                  <i class="fa-solid fa-wave-square ${sensorColor}"></i>
+                </div>
+                <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 text-center my-2">
+                  <div class="text-[11px] text-slate-400 font-mono uppercase">Current Telemetry Value</div>
+                  <div class="text-4xl font-mono font-bold mt-1 ${sensorColor}">${s.metricValue}</div>
+                  <div class="text-[10px] text-emerald-400 font-semibold mt-1">Normal Sensor Calibration</div>
+                </div>
+                <div class="text-xs text-slate-400 space-y-1 mt-3">
+                  <div class="flex justify-between">
+                    <span>Last Telemetry Ping:</span>
+                    <b class="text-slate-200 font-mono">${new Date(s.lastPing).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</b>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Sampling Frequency:</span>
+                    <b class="text-slate-200">Continuous (Every 15s)</b>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Signal Status -->
+              <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400 mt-4">
+                <span class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span> 100% LoRaWAN / GSM Uplink
+                </span>
+                <span class="font-mono text-slate-400">Battery: 98% (Solar)</span>
+              </div>
+            </div>
+
+            <!-- Col 2: Domain Assessment & Thresholds (Spans 2 columns) -->
+            <div class="lg:col-span-2 bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-between">
+              <div>
+                <div class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between mb-3">
+                  <span>${assessmentTitle}</span>
+                  <span class="text-[10px] text-slate-500 font-normal">Disaster Early Warning Thresholds</span>
+                </div>
+
+                <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl mb-3 text-xs text-slate-300 leading-relaxed">
+                  <i class="fa-solid fa-shield-halved text-indigo-400 mr-1.5"></i>
+                  ${assessmentNote}
+                </div>
+
+                <!-- Thresholds Cards -->
+                <div class="grid grid-cols-3 gap-2 mt-2">
+                  ${thresholds.map(th => `
+                    <div class="bg-slate-950 border border-slate-800/80 p-3 rounded-xl text-center">
+                      <div class="text-[10px] text-slate-400 font-medium">${th.label}</div>
+                      <div class="text-base font-mono font-bold text-white mt-0.5">${th.val}</div>
+                      <div class="text-[10px] font-semibold mt-0.5 ${th.color}">${th.status}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400 mt-4">
+                <span class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-triangle-exclamation text-indigo-400"></i> Automated AI Flood Early-Warning model active
+                </span>
+                <button onclick="copySensorCoordinates(${s.latitude}, ${s.longitude})" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-clipboard-check"></i> Export Telemetry JSON
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Helper: Copy Sensor Coordinates
+    function copySensorCoordinates(lat, lng) {
+      navigator.clipboard.writeText(`${lat}, ${lng}`);
+      alertUserFeedback(`Coordinates copied: ${lat}, ${lng}`);
+    }
+
+    // Helper: Toast Alert Feedback
+    function alertUserFeedback(msg) {
+      const banner = document.createElement('div');
+      banner.className = 'fixed bottom-6 right-6 bg-indigo-600 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold z-50 flex items-center gap-2 border border-indigo-400';
+      banner.innerHTML = `<i class="fa-solid fa-check"></i> ${msg}`;
+      document.body.appendChild(banner);
+      setTimeout(() => banner.remove(), 2500);
+    }
+
+    // Helper: Smooth Zoom to Map Coordinates
+    function zoomToGisCoords(lat, lng) {
+      if (!map) return;
+      map.flyTo([lat, lng], 13, { duration: 1.0 });
+      const mapEl = document.getElementById('gisMap');
+      if (mapEl) {
+        mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    // Helper: Focus Feature from Any UI Link (Card, Table, etc.)
+    function focusGisFeatureOnMap(type, id) {
+      if (type === 'RELIEF_CENTER' && gisState.activeLayer !== 'ALL' && gisState.activeLayer !== 'RELIEF_CENTER') {
+        setGisLayerFilter('ALL');
+      } else if (type === 'SENSOR' && gisState.activeLayer !== 'ALL' && gisState.activeLayer !== 'SENSOR') {
+        const s = gisState.sensors.find(item => item.id === id);
+        if (s && gisState.activeLayer !== s.type) {
+          setGisLayerFilter('ALL');
+        }
+      }
+
+      const mapEl = document.getElementById('gisMap');
+      if (mapEl) {
+        mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      inspectGisFeature(type, id, true);
+    }
+
+    // Helper: Focus Nearest Shelter on Map
+    function focusNearestShelterOnMap() {
+      if (currentReliefCenterId) {
+        focusGisFeatureOnMap('RELIEF_CENTER', currentReliefCenterId);
+      }
+    }
+
+    // Render Sensors Cards (Upazila citizen dashboard) - Clickable to map
     function renderSensors(sensors) {
       const grid = document.getElementById('sensorCardsGrid');
+      if (!grid) return;
       grid.innerHTML = sensors.map(s => `
-        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl shadow">
+        <div onclick="focusGisFeatureOnMap('SENSOR', '${s.id}')" class="bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-indigo-500 p-3 rounded-xl shadow cursor-pointer transition transform hover:-translate-y-0.5 group">
           <div class="text-slate-400 text-[10px] font-bold flex items-center justify-between">
-            ${s.type} SENSOR
+            <span class="group-hover:text-indigo-300 transition">${s.type} SENSOR</span>
             <i class="fa-solid ${getSensorIcon(s.type)} text-indigo-400"></i>
           </div>
           <div class="text-base font-bold font-mono text-white mt-1">${s.metricValue}</div>
-          <div class="text-[10px] text-emerald-400">${s.status}</div>
+          <div class="flex items-center justify-between mt-1 text-[10px]">
+            <span class="text-emerald-400 font-medium">${s.status}</span>
+            <span class="text-indigo-400 font-semibold group-hover:underline flex items-center gap-1">
+              <i class="fa-solid fa-map-pin text-[9px]"></i> Map
+            </span>
+          </div>
         </div>
       `).join('');
     }
@@ -486,33 +1637,11 @@
       return 'fa-wave-square';
     }
 
-    // Render GIS Map Markers
+    // Backwards-compatible bridge for renderMapMarkers
     function renderMapMarkers(centers, sensors) {
-      if (!map) return;
-      
-      const bounds = [];
-
-      centers.forEach(c => {
-        if (c.latitude && c.longitude) {
-          L.marker([c.latitude, c.longitude])
-            .addTo(map)
-            .bindPopup(`<b>${c.name}</b><br>Code: ${c.centerCode}<br>Capacity: ${c.capacity}`);
-          bounds.push([c.latitude, c.longitude]);
-        }
-      });
-
-      sensors.forEach(s => {
-        if (s.latitude && s.longitude) {
-          L.circleMarker([s.latitude, s.longitude], { color: 'orange', radius: 6 })
-            .addTo(map)
-            .bindPopup(`<b>${s.type} Sensor</b><br>Reading: ${s.metricValue}`);
-          bounds.push([s.latitude, s.longitude]);
-        }
-      });
-
-      if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [20, 20] });
-      }
+      if (centers && centers.length > 0) gisState.centers = centers;
+      if (sensors && sensors.length > 0) gisState.sensors = sensors;
+      renderGisMarkers(true);
     }
 
     // 4. Adapt UI based on Role
@@ -525,8 +1654,34 @@
       const messengerBtn = document.getElementById('messengerToggleBtn');
       const coordinatorStockSec = document.getElementById('coordinatorStockSection');
 
+      // Reset messenger channel and clear prior messages so user never sees other users' chats
+      activeChannel = 'upazila-general';
+      activeSenderInfo = {
+        id: 'upazila-general',
+        channel: 'upazila-general',
+        name: 'Upazila General Emergency Channel',
+        role: 'BROADCAST',
+        avatarIcon: 'fa-bullhorn',
+        avatarColor: 'bg-indigo-600',
+        phone: '',
+        organization: 'Emergency Operations Command'
+      };
+
+      const messagesList = document.getElementById('messagesList');
+      if (messagesList) messagesList.innerHTML = '';
+      showMessengerView('INBOX');
+
+      if (socket) {
+        socket.emit('join_user', user.id);
+        socket.emit('join_channel', 'upazila-general');
+      }
+
       // Keep messenger accessible for all roles
       messengerBtn.classList.remove('hidden');
+      updateMessengerAccountInfo();
+      allMessageSenders = [];
+      clearSenderSearch();
+      loadRecentSendersList(true);
 
       if (user.role === 'COORDINATOR' || user.role === 'ADMIN') {
         coordinatorStockSec.classList.remove('hidden');
@@ -536,56 +1691,733 @@
       }
     }
 
-    // Load Coordinator Stock Data
+    // State for Coordinator Stock Management
+    let currentCoordinatorScopeData = null;
+    let activeStockViewMode = 'upazilas'; // 'upazilas' | 'districts' | 'district_total' | 'division_total'
+    const expandedDistricts = new Set();
+
+    // Price catalog for BDT estimations
+    const stockPriceCatalog = {
+      beds: { unit: 'Units', price: 3500 },
+      food_packs: { unit: 'Packs', price: 1200 },
+      medical_kits: { unit: 'Kits', price: 4500 },
+      vehicles: { unit: 'Rental/Day', price: 15000 },
+      tents: { unit: 'Units', price: 8500 }
+    };
+
+    // Load Coordinator Stock Data from Server
     async function loadCoordinatorStockData(nodeId) {
       try {
-        const res = await fetch(`/api/coordinator/scope/${nodeId}`);
+        const res = await fetch(`/api/coordinator/scope/${nodeId || ''}`);
         if (!res.ok) return;
         const data = await res.json();
+        currentCoordinatorScopeData = data;
 
-        if (data.reliefCenters && data.reliefCenters.length > 0) {
-          const center = data.reliefCenters[0];
-          currentReliefCenterId = center.id;
-          renderStockTable(center);
+        const tier = data.tier || 'DISTRICT';
+        const scopeNode = data.scopeNode || {};
+
+        // Update Header Badges & Scope Name
+        const tierBadge = document.getElementById('coordTierBadge');
+        const scopeNameEl = document.getElementById('coordScopeName');
+        const subtitleEl = document.getElementById('coordScopeSubtitle');
+
+        if (tier === 'DIVISION') {
+          tierBadge.innerHTML = '<i class="fa-solid fa-globe mr-1"></i> Division Coordinator Console';
+          scopeNameEl.textContent = scopeNode.name || 'Division Scope';
+          subtitleEl.textContent = `Managing all ${data.districts?.length || 0} Districts and ${data.upazilas?.length || 0} Upazila Relief Shelters across ${scopeNode.name}.`;
+        } else if (tier === 'DISTRICT') {
+          tierBadge.innerHTML = '<i class="fa-solid fa-building-columns mr-1"></i> District Coordinator Console';
+          scopeNameEl.textContent = scopeNode.name || 'District Scope';
+          subtitleEl.textContent = `Managing all ${data.upazilas?.length || 0} Upazila Relief Shelters within ${scopeNode.name}.`;
+        } else {
+          tierBadge.innerHTML = '<i class="fa-solid fa-shield-halved mr-1"></i> Upazila Coordinator Console';
+          scopeNameEl.textContent = scopeNode.name || 'Upazila Scope';
+          subtitleEl.textContent = `Managing Relief Shelter operations for ${scopeNode.name}.`;
         }
+
+        // Update Overview Metric Cards
+        const totalShelters = data.reliefCenters?.length || 0;
+        const totalCurrent = data.totalStock?.totals?.totalCurrent || 0;
+        const totalDeficit = data.totalStock?.totals?.totalRestock || 0;
+        const readiness = data.totalStock?.totals?.fulfillmentRate || 0;
+
+        document.getElementById('coordMetricShelters').textContent = totalShelters.toLocaleString();
+        document.getElementById('coordMetricCurrent').textContent = `${totalCurrent.toLocaleString()} units`;
+        document.getElementById('coordMetricDeficit').textContent = `${totalDeficit.toLocaleString()} units`;
+        document.getElementById('coordMetricReadiness').textContent = `${readiness}%`;
+
+        // Configure District Filter Dropdown (for Division View)
+        const distFilterSelect = document.getElementById('coordDistrictFilterSelect');
+        if (tier === 'DIVISION' && data.districts && data.districts.length > 0) {
+          distFilterSelect.classList.remove('hidden');
+          distFilterSelect.innerHTML = `<option value="ALL">All Districts (${data.districts.length})</option>` +
+            data.districts.map(d => `<option value="${d.id}">${d.name} (${d.upazilasCount} Upz)</option>`).join('');
+        } else {
+          distFilterSelect.classList.add('hidden');
+        }
+
+        // Render Navigation Tabs based on Role/Tier
+        const tabsContainer = document.getElementById('coordStockViewTabs');
+        if (tier === 'DISTRICT') {
+          // District Coordinator: 1) Each Upazila (Separate Tables) OR 2) District Total (One Table)
+          tabsContainer.innerHTML = `
+            <button onclick="switchStockView('upazilas')" id="stockTab-upazilas" class="stock-tab-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-table-cells"></i> Each Upazila (Separate Tables)
+            </button>
+            <button onclick="switchStockView('district_total')" id="stockTab-district_total" class="stock-tab-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-chart-pie"></i> District Total (One Table)
+            </button>
+          `;
+          switchStockView('upazilas');
+        } else if (tier === 'DIVISION') {
+          // Division Coordinator: 1) Each Upazila (Separate Tables) OR 2) Each District (Separate Tables) OR 3) Division Total (One Table)
+          tabsContainer.innerHTML = `
+            <button onclick="switchStockView('upazilas')" id="stockTab-upazilas" class="stock-tab-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-table-cells"></i> Each Upazila (Separate Tables)
+            </button>
+            <button onclick="switchStockView('districts')" id="stockTab-districts" class="stock-tab-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-building-columns"></i> Each District (Separate Tables)
+            </button>
+            <button onclick="switchStockView('division_total')" id="stockTab-division_total" class="stock-tab-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-globe"></i> Division Total (One Table)
+            </button>
+          `;
+          switchStockView('districts');
+        } else {
+          // Upazila Coordinator
+          tabsContainer.innerHTML = `
+            <button onclick="switchStockView('upazilas')" id="stockTab-upazilas" class="stock-tab-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-boxes-stacked"></i> Upazila Relief Shelter
+            </button>
+          `;
+          switchStockView('upazilas');
+        }
+
       } catch (err) {
-        console.warn('Stock load error:', err);
+        console.error('Coordinator stock load error:', err);
       }
     }
 
-    function renderStockTable(center) {
-      const tbody = document.getElementById('stockTableBody');
-      const policy = center.stockPolicy || {};
-      const current = center.currentStock || {};
-      const emergency = center.emergencyRequirement || {};
-      const restock = center.restockingRequirement || {};
+    // Switch View Mode Tabs
+    function switchStockView(mode) {
+      activeStockViewMode = mode;
+
+      // Update Tab Buttons Styling
+      document.querySelectorAll('.stock-tab-btn').forEach(btn => {
+        btn.className = 'stock-tab-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800';
+      });
+      const activeBtn = document.getElementById(`stockTab-${mode}`);
+      if (activeBtn) {
+        activeBtn.className = 'stock-tab-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 bg-indigo-600 text-white shadow-md shadow-indigo-600/30';
+      }
+
+      // Hide all panels
+      const upazilasContainer = document.getElementById('coordUpazilasSeparateContainer');
+      const districtsContainer = document.getElementById('coordDistrictsSeparateContainer');
+      const consolidatedContainer = document.getElementById('coordConsolidatedContainer');
+      const filtersBar = document.getElementById('coordStockFilters');
+      const printBtnLabel = document.getElementById('printBtnLabel');
+
+      upazilasContainer.classList.add('hidden');
+      districtsContainer.classList.add('hidden');
+      consolidatedContainer.classList.add('hidden');
+
+      if (mode === 'upazilas') {
+        upazilasContainer.classList.remove('hidden');
+        filtersBar.classList.remove('opacity-40', 'pointer-events-none');
+        printBtnLabel.textContent = currentCoordinatorScopeData?.tier === 'DIVISION' 
+          ? 'Print Division Work Order' 
+          : 'Print District Work Order';
+        renderUpazilasSeparateTables();
+      } else if (mode === 'districts') {
+        districtsContainer.classList.remove('hidden');
+        filtersBar.classList.remove('opacity-40', 'pointer-events-none');
+        printBtnLabel.textContent = 'Print Division Work Order';
+        renderDistrictsSeparateTables();
+      } else if (mode === 'district_total' || mode === 'division_total') {
+        consolidatedContainer.classList.remove('hidden');
+        filtersBar.classList.add('opacity-40', 'pointer-events-none');
+        printBtnLabel.textContent = mode === 'district_total'
+          ? 'Print District Consolidated BOQ'
+          : 'Print Division Consolidated BOQ';
+        renderConsolidatedStockTable();
+      }
+    }
+
+    // Filter trigger
+    function applyCoordinatorStockFilters() {
+      if (activeStockViewMode === 'upazilas') {
+        renderUpazilasSeparateTables();
+      } else if (activeStockViewMode === 'districts') {
+        renderDistrictsSeparateTables();
+      }
+    }
+
+    // 1. RENDER EACH UPAZILA IN A SEPARATE TABLE
+    function renderUpazilasSeparateTables() {
+      const container = document.getElementById('coordUpazilasSeparateContainer');
+      if (!currentCoordinatorScopeData || !currentCoordinatorScopeData.upazilas) {
+        container.innerHTML = '<div class="text-xs text-slate-500 p-4 text-center">No upazila data loaded.</div>';
+        return;
+      }
+
+      const distFilter = document.getElementById('coordDistrictFilterSelect')?.value || 'ALL';
+      const search = (document.getElementById('coordUpazilaSearchInput')?.value || '').toLowerCase().trim();
+
+      let upazilas = currentCoordinatorScopeData.upazilas;
+
+      if (distFilter !== 'ALL') {
+        upazilas = upazilas.filter(u => u.districtId === distFilter);
+      }
+
+      if (search) {
+        upazilas = upazilas.filter(u => 
+          u.name.toLowerCase().includes(search) || 
+          u.districtName.toLowerCase().includes(search) ||
+          u.reliefCenters.some(c => c.name.toLowerCase().includes(search))
+        );
+      }
+
+      if (upazilas.length === 0) {
+        container.innerHTML = `
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-8 text-center text-slate-400 text-xs">
+            <i class="fa-solid fa-filter-circle-xmark text-2xl text-slate-600 mb-2"></i>
+            <p>No Upazilas match the filter criteria "${search}".</p>
+          </div>
+        `;
+        return;
+      }
 
       const items = ['beds', 'food_packs', 'medical_kits', 'vehicles', 'tents'];
 
-      tbody.innerHTML = items.map(item => `
-        <tr class="border-b border-slate-800/80">
-          <td class="p-3 font-semibold uppercase text-slate-300">${item.replace('_', ' ')}</td>
-          <td class="p-3 text-center">
-            <input type="number" data-type="policy" data-item="${item}" value="${policy[item] || 0}" class="w-20 bg-slate-950 border border-slate-700 rounded text-center p-1 text-xs text-white">
-          </td>
-          <td class="p-3 text-center">
-            <input type="number" data-type="current" data-item="${item}" value="${current[item] || 0}" class="w-20 bg-slate-950 border border-slate-700 rounded text-center p-1 text-xs text-white">
-          </td>
-          <td class="p-3 text-center">
-            <input type="number" data-type="emergency" data-item="${item}" value="${emergency[item] || 0}" class="w-20 bg-slate-950 border border-slate-700 rounded text-center p-1 text-xs text-white">
-          </td>
-          <td class="p-3 text-center text-indigo-400 font-bold">
-            ${restock[item] || Math.max(0, (policy[item] || 0) - (current[item] || 0))}
-          </td>
-        </tr>
-      `).join('');
+      container.innerHTML = upazilas.map(upz => {
+        const center = upz.reliefCenters[0] || { id: 'temp', name: `${upz.name} Primary Center`, stockPolicy: {}, currentStock: {}, emergencyRequirement: {}, restockingRequirement: {} };
+        const policy = center.stockPolicy || {};
+        const current = center.currentStock || {};
+        const emergency = center.emergencyRequirement || {};
+        const restock = center.restockingRequirement || {};
+
+        // Calculate upazila stats
+        let totalP = 0, totalC = 0, totalR = 0;
+        items.forEach(it => {
+          const p = policy[it] || 0;
+          const c = current[it] || 0;
+          const r = restock[it] || Math.max(0, p - c);
+          totalP += p;
+          totalC += c;
+          totalR += r;
+        });
+        const fulfillment = totalP > 0 ? Math.min(100, Math.round((totalC / totalP) * 100)) : 100;
+        const statusBadge = fulfillment >= 90 
+          ? '<span class="bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 text-[10px] font-semibold px-2 py-0.5 rounded-full"><i class="fa-solid fa-check mr-1"></i>Adequate</span>'
+          : fulfillment >= 60
+          ? '<span class="bg-amber-950/80 text-amber-300 border border-amber-700/60 text-[10px] font-semibold px-2 py-0.5 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Low Stock</span>'
+          : '<span class="bg-rose-950/80 text-rose-300 border border-rose-700/60 text-[10px] font-semibold px-2 py-0.5 rounded-full"><i class="fa-solid fa-circle-exclamation mr-1"></i>Critical Deficit</span>';
+
+        return `
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 shadow space-y-3 transition hover:border-slate-700">
+            <!-- Table Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full ${fulfillment >= 80 ? 'bg-emerald-400' : 'bg-amber-400'}"></span>
+                <div>
+                  <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    ${upz.name}
+                    <span class="text-[11px] font-normal text-slate-400">(${upz.districtName})</span>
+                  </h3>
+                  <div class="text-[11px] text-slate-400 flex items-center gap-2">
+                    <span><i class="fa-solid fa-warehouse text-indigo-400 mr-1"></i>${center.name}</span>
+                    <span class="text-slate-600">•</span>
+                    <span class="font-mono text-slate-500">${center.centerCode || 'RC-01'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                ${statusBadge}
+                <span class="text-xs font-mono font-bold text-indigo-300 bg-indigo-950/60 border border-indigo-800/60 px-2 py-0.5 rounded">
+                  ${fulfillment}% Readiness
+                </span>
+              </div>
+            </div>
+
+            <!-- Individual Upazila Stock Table -->
+            <div class="overflow-x-auto custom-scrollbar">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-900 text-slate-400 font-semibold border-b border-slate-800">
+                    <th class="p-2.5">Resource Description</th>
+                    <th class="p-2.5 text-center">1) Policy Quota</th>
+                    <th class="p-2.5 text-center">2) Current In-Stock</th>
+                    <th class="p-2.5 text-center">3) Emergency Req.</th>
+                    <th class="p-2.5 text-center">4) Restock Delta</th>
+                    <th class="p-2.5 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60 font-mono text-slate-200">
+                  ${items.map(item => {
+                    const pVal = policy[item] || 0;
+                    const cVal = current[item] || 0;
+                    const eVal = emergency[item] || 0;
+                    const rVal = restock[item] || Math.max(0, pVal - cVal);
+                    const itemFulfillment = pVal > 0 ? Math.round((cVal / pVal) * 100) : 100;
+                    const itemStatus = itemFulfillment >= 90
+                      ? '<span class="text-[10px] text-emerald-400">Adequate</span>'
+                      : itemFulfillment >= 60
+                      ? '<span class="text-[10px] text-amber-400">Restock</span>'
+                      : '<span class="text-[10px] text-rose-400 font-bold">Critical</span>';
+
+                    return `
+                      <tr class="hover:bg-slate-900/40">
+                        <td class="p-2.5 font-sans font-medium text-slate-300 capitalize">
+                          <span class="inline-block w-2 h-2 rounded-full ${itemFulfillment >= 70 ? 'bg-emerald-500' : 'bg-amber-500'} mr-2"></span>
+                          ${item.replace('_', ' ')}
+                        </td>
+                        <td class="p-2 text-center">
+                          <input type="number" min="0" data-center-id="${center.id}" data-item="${item}" data-type="policy" value="${pVal}"
+                                 oninput="onStockInputChange('${center.id}', '${item}')"
+                                 class="w-20 bg-slate-900 border border-slate-700 rounded text-center py-1 px-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                        </td>
+                        <td class="p-2 text-center">
+                          <input type="number" min="0" data-center-id="${center.id}" data-item="${item}" data-type="current" value="${cVal}"
+                                 oninput="onStockInputChange('${center.id}', '${item}')"
+                                 class="w-20 bg-slate-900 border border-slate-700 rounded text-center py-1 px-1.5 text-xs text-emerald-300 font-bold focus:outline-none focus:border-emerald-500">
+                        </td>
+                        <td class="p-2 text-center">
+                          <input type="number" min="0" data-center-id="${center.id}" data-item="${item}" data-type="emergency" value="${eVal}"
+                                 oninput="onStockInputChange('${center.id}', '${item}')"
+                                 class="w-20 bg-slate-900 border border-slate-700 rounded text-center py-1 px-1.5 text-xs text-amber-300 focus:outline-none focus:border-amber-500">
+                        </td>
+                        <td class="p-2 text-center">
+                          <span id="restock-delta-${center.id}-${item}" class="font-bold ${rVal > 0 ? 'text-amber-400' : 'text-emerald-400'}">
+                            ${rVal}
+                          </span>
+                        </td>
+                        <td class="p-2 text-center font-sans">
+                          ${itemStatus}
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Footer Actions -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-slate-800/80 text-xs">
+              <div class="text-slate-400 font-mono flex items-center gap-3 text-[11px]">
+                <span>Policy Target: <b class="text-slate-200">${totalP.toLocaleString()}</b></span>
+                <span>•</span>
+                <span>In Stock: <b class="text-emerald-300">${totalC.toLocaleString()}</b></span>
+                <span>•</span>
+                <span>Deficit: <b class="text-amber-300">${totalR.toLocaleString()}</b></span>
+              </div>
+
+              <div class="flex items-center gap-2 self-end sm:self-auto flex-wrap">
+                <button onclick="focusGisFeatureOnMap('RELIEF_CENTER', '${center.id}')" class="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5" title="Inspect on GIS Map">
+                  <i class="fa-solid fa-map-location-dot text-indigo-400"></i> Map
+                </button>
+                <button onclick="printWorkOrderForCenter('${center.id}')" class="bg-slate-900 hover:bg-slate-800 text-indigo-300 text-xs font-semibold px-3 py-1.5 rounded-lg border border-indigo-700/50 transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-file-invoice text-emerald-400"></i> Print Upazila BOQ
+                </button>
+                <button onclick="saveSingleUpazilaStock('${center.id}')" id="save-btn-${center.id}" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow flex items-center gap-1.5">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Upazila
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
-    // Save Stock Table Changes
-    async function saveStockTableChanges() {
-      if (!currentReliefCenterId) return;
+    // 2. RENDER EACH DISTRICT IN A SEPARATE TABLE (Division Coordinator)
+    function renderDistrictsSeparateTables() {
+      const container = document.getElementById('coordDistrictsSeparateContainer');
+      if (!currentCoordinatorScopeData || !currentCoordinatorScopeData.districts) {
+        container.innerHTML = '<div class="text-xs text-slate-500 p-4 text-center">No district data loaded.</div>';
+        return;
+      }
 
-      const inputs = document.querySelectorAll('#stockTableBody input');
+      const search = (document.getElementById('coordUpazilaSearchInput')?.value || '').toLowerCase().trim();
+      let districts = currentCoordinatorScopeData.districts;
+
+      if (search) {
+        districts = districts.filter(d => 
+          d.name.toLowerCase().includes(search) || 
+          d.upazilas.some(u => u.name.toLowerCase().includes(search))
+        );
+      }
+
+      const items = ['beds', 'food_packs', 'medical_kits', 'vehicles', 'tents'];
+
+      container.innerHTML = districts.map(d => {
+        const stock = d.stock;
+        const totals = stock.totals;
+        const isExpanded = expandedDistricts.has(d.id);
+
+        return `
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 shadow space-y-3 transition hover:border-slate-700">
+            <!-- District Table Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-indigo-950 border border-indigo-700/60 flex items-center justify-center text-indigo-400 text-sm">
+                  <i class="fa-solid fa-building-columns"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    ${d.name} Total Stocks
+                  </h3>
+                  <div class="text-[11px] text-slate-400">
+                    <span>${d.upazilasCount} Upazilas</span> • <span>${d.centersCount} Relief Shelters</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2.5">
+                <span class="text-xs font-mono font-bold text-indigo-300 bg-indigo-950/80 border border-indigo-800/80 px-2.5 py-1 rounded-lg">
+                  Readiness: ${totals.fulfillmentRate}%
+                </span>
+                <button onclick="toggleDistrictAccordion('${d.id}')" class="text-xs text-slate-300 bg-slate-900 hover:bg-slate-800 border border-slate-700 px-3 py-1 rounded-lg transition flex items-center gap-1.5">
+                  <i class="fa-solid ${isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'} text-[10px]"></i>
+                  ${isExpanded ? 'Hide Upazilas' : `View Upazilas (${d.upazilasCount})`}
+                </button>
+              </div>
+            </div>
+
+            <!-- District Separate Table (Consolidated for this District) -->
+            <div class="overflow-x-auto custom-scrollbar">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-900 text-slate-400 font-semibold border-b border-slate-800">
+                    <th class="p-2.5">Resource Description</th>
+                    <th class="p-2.5 text-center">District Policy Target</th>
+                    <th class="p-2.5 text-center">Total In-Stock</th>
+                    <th class="p-2.5 text-center">Emergency Threshold</th>
+                    <th class="p-2.5 text-center">Restocking Delta</th>
+                    <th class="p-2.5 text-center">Est. Restock Cost (BDT)</th>
+                    <th class="p-2.5 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60 font-mono text-slate-200">
+                  ${items.map(item => {
+                    const row = stock[item] || { policy: 0, current: 0, emergency: 0, restock: 0 };
+                    const rate = row.policy > 0 ? Math.round((row.current / row.policy) * 100) : 100;
+                    const unitPrice = stockPriceCatalog[item]?.price || 0;
+                    const itemCost = row.restock * unitPrice;
+
+                    return `
+                      <tr class="hover:bg-slate-900/40">
+                        <td class="p-2.5 font-sans font-medium text-slate-300 capitalize">
+                          <span class="inline-block w-2 h-2 rounded-full ${rate >= 70 ? 'bg-emerald-500' : 'bg-amber-500'} mr-2"></span>
+                          ${item.replace('_', ' ')}
+                        </td>
+                        <td class="p-2 text-center text-slate-300 font-semibold">${row.policy.toLocaleString()}</td>
+                        <td class="p-2 text-center text-emerald-300 font-bold">${row.current.toLocaleString()}</td>
+                        <td class="p-2 text-center text-amber-300">${row.emergency.toLocaleString()}</td>
+                        <td class="p-2 text-center font-bold ${row.restock > 0 ? 'text-amber-400' : 'text-emerald-400'}">${row.restock.toLocaleString()}</td>
+                        <td class="p-2 text-center text-slate-300">৳ ${itemCost.toLocaleString()}</td>
+                        <td class="p-2 text-center font-sans">
+                          ${rate >= 80 
+                            ? '<span class="text-emerald-400 text-[10px]">Optimal</span>' 
+                            : '<span class="text-amber-400 text-[10px]">Restock Needed</span>'}
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+                <tfoot>
+                  <tr class="bg-slate-900/90 font-bold border-t border-slate-700 text-slate-200">
+                    <td class="p-2.5 font-sans uppercase">District Subtotal</td>
+                    <td class="p-2 text-center font-mono">${totals.totalPolicy.toLocaleString()}</td>
+                    <td class="p-2 text-center font-mono text-emerald-300">${totals.totalCurrent.toLocaleString()}</td>
+                    <td class="p-2 text-center font-mono text-amber-300">${totals.totalEmergency.toLocaleString()}</td>
+                    <td class="p-2 text-center font-mono text-amber-400">${totals.totalRestock.toLocaleString()}</td>
+                    <td class="p-2 text-center font-mono text-indigo-300">
+                      ৳ ${(items.reduce((s, it) => s + (stock[it]?.restock || 0) * (stockPriceCatalog[it]?.price || 0), 0)).toLocaleString()}
+                    </td>
+                    <td class="p-2 text-center font-sans text-xs text-indigo-400">${totals.fulfillmentRate}%</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <!-- Actions row -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-slate-800/80 text-xs">
+              <div class="text-[11px] text-slate-400 font-mono">
+                Total Restock Needed: <b class="text-amber-300">${totals.totalRestock.toLocaleString()} units</b> across ${d.upazilasCount} upazilas
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="printWorkOrderForScope('DISTRICT', '${d.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow flex items-center gap-1.5">
+                  <i class="fa-solid fa-file-signature text-emerald-300"></i> Print ${d.name} BOQ
+                </button>
+              </div>
+            </div>
+
+            <!-- Accordion Sub-Table: Upazilas inside this district -->
+            ${isExpanded ? `
+              <div class="mt-3 pt-3 border-t border-slate-800 bg-slate-900/60 p-3 rounded-lg space-y-2">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  Upazila Breakdown for ${d.name} (${d.upazilas.length} Upazilas)
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-[11px] border-collapse">
+                    <thead>
+                      <tr class="text-slate-400 border-b border-slate-800">
+                        <th class="p-1.5">Upazila Name</th>
+                        <th class="p-1.5 text-center">Shelter</th>
+                        <th class="p-1.5 text-center">Policy</th>
+                        <th class="p-1.5 text-center">Current</th>
+                        <th class="p-1.5 text-center">Restock</th>
+                        <th class="p-1.5 text-center">Readiness</th>
+                        <th class="p-1.5 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/40 font-mono">
+                      ${d.upazilas.map(u => {
+                        const uT = u.stock.totals;
+                        return `
+                          <tr class="hover:bg-slate-800/30">
+                            <td class="p-1.5 font-sans font-medium text-white">${u.name}</td>
+                            <td class="p-1.5 text-center text-slate-400 font-sans">${u.reliefCenters[0]?.name || 'Depot'}</td>
+                            <td class="p-1.5 text-center text-slate-300">${uT.totalPolicy.toLocaleString()}</td>
+                            <td class="p-1.5 text-center text-emerald-300 font-bold">${uT.totalCurrent.toLocaleString()}</td>
+                            <td class="p-1.5 text-center text-amber-300">${uT.totalRestock.toLocaleString()}</td>
+                            <td class="p-1.5 text-center">
+                              <span class="px-1.5 py-0.5 rounded text-[10px] ${uT.fulfillmentRate >= 80 ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'}">
+                                ${uT.fulfillmentRate}%
+                              </span>
+                            </td>
+                            <td class="p-1.5 text-right">
+                              <button onclick="printWorkOrderForCenter('${u.reliefCenters[0]?.id}')" class="text-indigo-400 hover:text-indigo-300 text-[10px] font-semibold underline">
+                                Print BOQ
+                              </button>
+                            </td>
+                          </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Toggle District Accordion
+    function toggleDistrictAccordion(districtId) {
+      if (expandedDistricts.has(districtId)) {
+        expandedDistricts.delete(districtId);
+      } else {
+        expandedDistricts.add(districtId);
+      }
+      renderDistrictsSeparateTables();
+    }
+
+    // 3. RENDER CONSOLIDATED TOTAL TABLE (District Total OR Division Total)
+    function renderConsolidatedStockTable() {
+      const container = document.getElementById('coordConsolidatedContainer');
+      if (!currentCoordinatorScopeData || !currentCoordinatorScopeData.totalStock) {
+        container.innerHTML = '<div class="text-xs text-slate-500 p-4 text-center">No consolidated data loaded.</div>';
+        return;
+      }
+
+      const scope = currentCoordinatorScopeData.scopeNode || {};
+      const tier = currentCoordinatorScopeData.tier;
+      const stock = currentCoordinatorScopeData.totalStock;
+      const totals = stock.totals;
+      const items = ['beds', 'food_packs', 'medical_kits', 'vehicles', 'tents'];
+
+      // Calculate grand BDT cost
+      const totalCostBDT = items.reduce((sum, item) => {
+        const r = stock[item]?.restock || 0;
+        const p = stockPriceCatalog[item]?.price || 0;
+        return sum + (r * p);
+      }, 0);
+
+      const title = tier === 'DIVISION'
+        ? `Consolidated Logistics Stock: ${scope.name} (Entire Division)`
+        : `Consolidated Logistics Stock: ${scope.name} (Entire District)`;
+
+      const subtitle = tier === 'DIVISION'
+        ? `Aggregated grand total across all 8 Districts and 68 Upazila Relief Shelters`
+        : `Aggregated total across all ${currentCoordinatorScopeData.upazilas?.length || 0} Upazila Relief Shelters`;
+
+      container.innerHTML = `
+        <div class="bg-slate-950 border border-indigo-500/30 rounded-xl p-5 shadow-xl space-y-5">
+          <!-- Executive Header -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+            <div>
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+                  ${tier === 'DIVISION' ? 'Division-Wide Master View' : 'District-Wide Master View'}
+                </span>
+                <span class="text-xs text-slate-400">${subtitle}</span>
+              </div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-chart-line text-indigo-400"></i> ${title}
+              </h3>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="printWorkOrderForScope('${tier}', '${scope.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-emerald-300"></i> Print Official Restocking BOQ
+              </button>
+            </div>
+          </div>
+
+          <!-- Master Executive Table -->
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-900 text-slate-300 font-semibold border-b border-slate-700">
+                  <th class="p-3">Resource Item</th>
+                  <th class="p-3 text-center">Consolidated Buffer Policy</th>
+                  <th class="p-3 text-center">Total Current Stock</th>
+                  <th class="p-3 text-center">Emergency Crisis Demand</th>
+                  <th class="p-3 text-center">Total Restocking Delta</th>
+                  <th class="p-3 text-center">Fulfillment Bar</th>
+                  <th class="p-3 text-right">Est. Replenishment Cost (BDT)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800 font-mono text-slate-200">
+                ${items.map(item => {
+                  const row = stock[item] || { policy: 0, current: 0, emergency: 0, restock: 0 };
+                  const rate = row.policy > 0 ? Math.min(100, Math.round((row.current / row.policy) * 100)) : 100;
+                  const unitPrice = stockPriceCatalog[item]?.price || 0;
+                  const itemCost = row.restock * unitPrice;
+
+                  return `
+                    <tr class="hover:bg-slate-900/60">
+                      <td class="p-3 font-sans font-semibold text-slate-200 uppercase tracking-wide">
+                        <i class="fa-solid fa-cube text-indigo-400 mr-2"></i>${item.replace('_', ' ')}
+                      </td>
+                      <td class="p-3 text-center text-slate-300 font-semibold">${row.policy.toLocaleString()}</td>
+                      <td class="p-3 text-center text-emerald-300 font-bold text-sm">${row.current.toLocaleString()}</td>
+                      <td class="p-3 text-center text-amber-300">${row.emergency.toLocaleString()}</td>
+                      <td class="p-3 text-center font-bold text-sm ${row.restock > 0 ? 'text-amber-400' : 'text-emerald-400'}">${row.restock.toLocaleString()}</td>
+                      <td class="p-3 text-center font-sans">
+                        <div class="flex items-center justify-center gap-2">
+                          <div class="w-20 bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div class="h-2 ${rate >= 80 ? 'bg-emerald-500' : rate >= 50 ? 'bg-amber-500' : 'bg-rose-500'}" style="width: ${rate}%"></div>
+                          </div>
+                          <span class="text-[11px] font-mono text-slate-300">${rate}%</span>
+                        </div>
+                      </td>
+                      <td class="p-3 text-right text-indigo-300 font-bold font-mono">
+                        ৳ ${itemCost.toLocaleString()}
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+              <tfoot>
+                <tr class="bg-slate-900 font-bold border-t-2 border-indigo-500/50 text-white text-xs">
+                  <td class="p-3 font-sans uppercase">GRAND TOTAL ALLOCATION</td>
+                  <td class="p-3 text-center font-mono">${totals.totalPolicy.toLocaleString()}</td>
+                  <td class="p-3 text-center font-mono text-emerald-300 text-sm">${totals.totalCurrent.toLocaleString()}</td>
+                  <td class="p-3 text-center font-mono text-amber-300">${totals.totalEmergency.toLocaleString()}</td>
+                  <td class="p-3 text-center font-mono text-amber-400 text-sm">${totals.totalRestock.toLocaleString()}</td>
+                  <td class="p-3 text-center font-sans text-indigo-300 font-bold">${totals.fulfillmentRate}% Total Readiness</td>
+                  <td class="p-3 text-right font-mono text-emerald-400 text-sm">৳ ${totalCostBDT.toLocaleString()} BDT</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Comparative Matrix: Contribution by Sub-units -->
+          <div class="pt-4 border-t border-slate-800 space-y-3">
+            <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-emerald-400"></i>
+              ${tier === 'DIVISION' ? 'District-by-District Distribution Matrix' : 'Upazila-by-Upazila Distribution Matrix'}
+            </h4>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-900/80 text-slate-400 border-b border-slate-800">
+                    <th class="p-2.5">Administrative Entity</th>
+                    <th class="p-2.5 text-center">Shelters</th>
+                    <th class="p-2.5 text-center">Policy Target</th>
+                    <th class="p-2.5 text-center">Current In-Stock</th>
+                    <th class="p-2.5 text-center">Restock Deficit</th>
+                    <th class="p-2.5 text-center">Readiness Status</th>
+                    <th class="p-2.5 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60 font-mono">
+                  ${tier === 'DIVISION' ? currentCoordinatorScopeData.districts.map(d => {
+                    const dT = d.stock.totals;
+                    return `
+                      <tr class="hover:bg-slate-900/40">
+                        <td class="p-2.5 font-sans font-medium text-white">${d.name}</td>
+                        <td class="p-2.5 text-center text-slate-400 font-sans">${d.upazilasCount} Upz (${d.centersCount} Shelters)</td>
+                        <td class="p-2.5 text-center text-slate-300">${dT.totalPolicy.toLocaleString()}</td>
+                        <td class="p-2.5 text-center text-emerald-300 font-bold">${dT.totalCurrent.toLocaleString()}</td>
+                        <td class="p-2.5 text-center text-amber-300">${dT.totalRestock.toLocaleString()}</td>
+                        <td class="p-2.5 text-center font-sans">
+                          <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${dT.fulfillmentRate >= 80 ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-amber-950 text-amber-300 border border-amber-800'}">
+                            ${dT.fulfillmentRate}%
+                          </span>
+                        </td>
+                        <td class="p-2.5 text-right">
+                          <button onclick="printWorkOrderForScope('DISTRICT', '${d.id}')" class="text-indigo-400 hover:text-indigo-300 text-xs font-semibold underline">
+                            Print District BOQ
+                          </button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('') : currentCoordinatorScopeData.upazilas.map(u => {
+                    const uT = u.stock.totals;
+                    return `
+                      <tr class="hover:bg-slate-900/40">
+                        <td class="p-2.5 font-sans font-medium text-white">${u.name}</td>
+                        <td class="p-2.5 text-center text-slate-400 font-sans">${u.reliefCenters[0]?.name || 'Shelter'}</td>
+                        <td class="p-2.5 text-center text-slate-300">${uT.totalPolicy.toLocaleString()}</td>
+                        <td class="p-2.5 text-center text-emerald-300 font-bold">${uT.totalCurrent.toLocaleString()}</td>
+                        <td class="p-2.5 text-center text-amber-300">${uT.totalRestock.toLocaleString()}</td>
+                        <td class="p-2.5 text-center font-sans">
+                          <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${uT.fulfillmentRate >= 80 ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-amber-950 text-amber-300 border border-amber-800'}">
+                            ${uT.fulfillmentRate}%
+                          </span>
+                        </td>
+                        <td class="p-2.5 text-right">
+                          <button onclick="printWorkOrderForCenter('${u.reliefCenters[0]?.id}')" class="text-indigo-400 hover:text-indigo-300 text-xs font-semibold underline">
+                            Print Upazila BOQ
+                          </button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Live recalculate Restock Delta when an input is edited
+    function onStockInputChange(centerId, item) {
+      const pInput = document.querySelector(`input[data-center-id="${centerId}"][data-item="${item}"][data-type="policy"]`);
+      const cInput = document.querySelector(`input[data-center-id="${centerId}"][data-item="${item}"][data-type="current"]`);
+      const deltaSpan = document.getElementById(`restock-delta-${centerId}-${item}`);
+
+      if (pInput && cInput && deltaSpan) {
+        const p = parseInt(pInput.value) || 0;
+        const c = parseInt(cInput.value) || 0;
+        const delta = Math.max(0, p - c);
+        deltaSpan.textContent = delta;
+        deltaSpan.className = `font-bold ${delta > 0 ? 'text-amber-400' : 'text-emerald-400'}`;
+      }
+    }
+
+    // Save single Upazila Stock
+    async function saveSingleUpazilaStock(centerId) {
+      const inputs = document.querySelectorAll(`input[data-center-id="${centerId}"]`);
+      if (!inputs || inputs.length === 0) return;
+
       const stockPolicy = {}, currentStock = {}, emergencyRequirement = {};
 
       inputs.forEach(input => {
@@ -598,42 +2430,239 @@
         if (type === 'emergency') emergencyRequirement[item] = val;
       });
 
-      const res = await fetch(`/api/coordinator/stock/${currentReliefCenterId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stockPolicy, currentStock, emergencyRequirement })
-      });
+      const saveBtn = document.getElementById(`save-btn-${centerId}`);
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+      }
 
-      if (res.ok) {
-        alert('Relief Center Stock updated successfully!');
-        const updated = await res.json();
-        renderStockTable(updated);
+      try {
+        const res = await fetch(`/api/coordinator/stock/${centerId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stockPolicy, currentStock, emergencyRequirement })
+        });
+
+        if (res.ok) {
+          if (saveBtn) {
+            saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
+            saveBtn.classList.remove('bg-emerald-600');
+            saveBtn.classList.add('bg-indigo-600');
+            setTimeout(() => {
+              saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Upazila';
+              saveBtn.classList.remove('bg-indigo-600');
+              saveBtn.classList.add('bg-emerald-600');
+              saveBtn.disabled = false;
+            }, 1500);
+          }
+          // Reload fresh scope data in background
+          loadCoordinatorStockData(currentUser?.districtNodeId || '');
+        } else {
+          alert('Failed to save stock changes.');
+          if (saveBtn) saveBtn.disabled = false;
+        }
+      } catch (err) {
+        console.error('Save stock error:', err);
+        alert('Error saving stock changes.');
+        if (saveBtn) saveBtn.disabled = false;
       }
     }
 
-    // Print Official Relief Work Order Report
-    async function printWorkOrder() {
-      let centerId = currentReliefCenterId;
-      if (!centerId) {
-        try {
-          const uRes = await fetch('/api/upazila-context');
-          if (uRes.ok) {
-            const uData = await uRes.json();
-            if (uData.nearestReliefCenter) {
-              centerId = uData.nearestReliefCenter.id;
-              currentReliefCenterId = centerId;
-            }
-          }
-        } catch(e) {
-          console.warn('Fallback relief center fetch error:', e);
+    // Print active Work Order based on current tab
+    function printActiveWorkOrder() {
+      if (!currentCoordinatorScopeData) return;
+      const tier = currentCoordinatorScopeData.tier;
+
+      if (activeStockViewMode === 'district_total' || (activeStockViewMode === 'upazilas' && tier === 'DISTRICT')) {
+        printWorkOrderForScope('DISTRICT', currentCoordinatorScopeData.scopeNode.id);
+      } else if (activeStockViewMode === 'division_total' || (activeStockViewMode === 'districts' && tier === 'DIVISION')) {
+        printWorkOrderForScope('DIVISION', currentCoordinatorScopeData.scopeNode.id);
+      } else {
+        const firstCenter = currentCoordinatorScopeData.reliefCenters[0];
+        if (firstCenter) {
+          printWorkOrderForCenter(firstCenter.id);
+        } else {
+          printWorkOrderForScope(tier, currentCoordinatorScopeData.scopeNode.id);
         }
       }
+    }
 
-      if (!centerId) {
-        alert('Please select or wait for a Relief Center to load before printing the Work Order.');
-        return;
+    // Print Work Order for an entire Administrative Scope (District or Division)
+    async function printWorkOrderForScope(type, targetId) {
+      try {
+        const res = await fetch(`/api/coordinator/scope-boq/${type}/${targetId}`);
+        if (!res.ok) throw new Error('Scope BOQ generation failed');
+        const boq = await res.json();
+
+        const printArea = document.getElementById('workOrderPrintContent');
+        const serialNo = `WO-${type.slice(0, 3)}-${(boq.scopeCode || 'LOG').toUpperCase()}-${Date.now().toString().slice(-6)}`;
+        const issueDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+        printArea.innerHTML = `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; color: #0f172a; background-color: #ffffff; padding: 24px; line-height: 1.4;">
+            <!-- GOVERNMENT HEADER -->
+            <div style="border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <div style="font-size: 9px; font-weight: 800; letter-spacing: 1px; color: #475569; text-transform: uppercase;">Government of the People's Republic of Bangladesh</div>
+                  <div style="font-size: 10px; font-weight: 700; color: #334155; text-transform: uppercase; margin-top: 1px;">Ministry of Disaster Management & Relief • National Disaster Logistics Command</div>
+                  <h1 style="font-size: 17px; font-weight: 900; color: #0f172a; text-transform: uppercase; margin: 4px 0 0 0; letter-spacing: 0.5px;">
+                    ${type === 'DIVISION' ? 'Division-Wide Master Relief Procurement & Restocking Order' : 'Consolidated District Disaster Relief & Procurement Sanction'}
+                  </h1>
+                </div>
+                <div style="text-align: right; border-left: 2px solid #e2e8f0; padding-left: 12px;">
+                  <div style="display: inline-block; background-color: #f1f5f9; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; font-family: monospace;">
+                    SANCTION: APPROVED
+                  </div>
+                  <div style="font-size: 9px; color: #64748b; margin-top: 3px;">PRIORITY: HIGH EMERGENCY</div>
+                </div>
+              </div>
+
+              <!-- METADATA GRID -->
+              <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 16px; margin-top: 12px; padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 10px;">
+                <div>
+                  <div style="margin-bottom: 3px;"><b>Sanctioned Administrative Scope:</b> ${boq.scopeName} (${type} LEVEL)</div>
+                  <div style="margin-bottom: 3px;"><b>Total Integrated Relief Centers:</b> ${boq.totalCenters} Designated Depots</div>
+                  <div><b>Issuing Coordinator:</b> ${currentUser?.fullName || 'Logistics Coordinator'} (${currentUser?.role || 'COORDINATOR'})</div>
+                </div>
+                <div>
+                  <div style="margin-bottom: 3px;"><b>Work Order Reference:</b> <span style="font-family: monospace; font-weight: bold;">${serialNo}</span></div>
+                  <div style="margin-bottom: 3px;"><b>Issue Date:</b> ${issueDate}</div>
+                  <div><b>Supply Readiness Factor:</b> ${boq.fulfillmentRate}%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ITEMIZED SCHEDULE -->
+            <div style="margin-bottom: 14px;">
+              <h2 style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #0f172a; margin: 0 0 6px 0;">
+                1. Consolidated Procurement & Replenishment Schedule
+              </h2>
+              <table style="width: 100%; border-collapse: collapse; font-size: 10px; background-color: #ffffff;" border="1" cellpadding="6" bordercolor="#cbd5e1">
+                <thead>
+                  <tr style="background-color: #f1f5f9; color: #1e293b; font-weight: bold;">
+                    <th align="left" style="padding: 6px;">Resource Description</th>
+                    <th align="center" style="padding: 6px;">Unit</th>
+                    <th align="center" style="padding: 6px;">Policy Quota</th>
+                    <th align="center" style="padding: 6px;">Current In-Stock</th>
+                    <th align="center" style="padding: 6px;">Crisis Demand</th>
+                    <th align="center" style="padding: 6px; background-color: #e2e8f0;">Ordered Restock Qty</th>
+                    <th align="right" style="padding: 6px;">Est. Rate (BDT)</th>
+                    <th align="right" style="padding: 6px;">Total Subtotal (BDT)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${boq.items.map(item => `
+                    <tr>
+                      <td style="padding: 6px; font-weight: 600; color: #0f172a;">${item.itemName}</td>
+                      <td align="center" style="padding: 6px; color: #475569;">${item.unit}</td>
+                      <td align="center" style="padding: 6px; color: #475569;">${item.policyQty.toLocaleString()}</td>
+                      <td align="center" style="padding: 6px; color: #475569;">${item.currentQty.toLocaleString()}</td>
+                      <td align="center" style="padding: 6px; color: #475569;">${item.emergencyQty.toLocaleString()}</td>
+                      <td align="center" style="padding: 6px; font-weight: bold; background-color: #f8fafc; color: #0f172a;">${item.restockingQty.toLocaleString()}</td>
+                      <td align="right" style="padding: 6px; color: #475569;">৳ ${item.estimatedUnitPriceBDT.toLocaleString()}</td>
+                      <td align="right" style="padding: 6px; font-weight: bold; color: #0f172a;">৳ ${item.totalRestockCostBDT.toLocaleString()}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+                <tfoot>
+                  <tr style="background-color: #f8fafc; font-size: 11px; font-weight: bold;">
+                    <td colspan="7" align="right" style="padding: 8px; text-transform: uppercase;">
+                      TOTAL SANCTIONED RESTOCKING BUDGET ALLOCATION:
+                    </td>
+                    <td align="right" style="padding: 8px; color: #0f172a; font-size: 12px;">
+                      ৳ ${boq.totalProjectedCostBDT.toLocaleString()} BDT
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <!-- SPECIAL DIRECTIVES -->
+            <div style="margin-bottom: 24px; padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 9.5px; color: #334155;">
+              <div style="font-weight: bold; text-transform: uppercase; margin-bottom: 4px; color: #0f172a;">2. Strategic Logistics & Distribution Mandates:</div>
+              <ol style="margin: 0; padding-left: 16px; line-height: 1.5;">
+                <li>This consolidated order authorizes procurement across all <b>${boq.totalCenters} relief shelters</b> within <b>${boq.scopeName}</b>.</li>
+                <li>Central depots must stage emergency dry rations and water purification equipment for dispatch within 12 hours.</li>
+                <li>Expenditures are sanctioned under the Disaster Management Act of Bangladesh emergency restocking protocols.</li>
+              </ol>
+            </div>
+
+            <!-- SIGNATURE BLOCKS -->
+            <div style="margin-top: 36px; padding-top: 12px; border-top: 1px dashed #94a3b8;">
+              <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: #475569; margin-bottom: 20px; letter-spacing: 0.5px;">
+                3. Verification, Administrative Clearance & Authorizing Signatures
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;">
+                <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; background-color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;">
+                  <div>
+                    <div style="font-size: 9px; font-weight: bold; text-transform: uppercase; color: #64748b;">Prepared By:</div>
+                    <div style="font-size: 10px; font-weight: bold; color: #0f172a; margin-top: 2px;">Logistics & Supply Officer</div>
+                  </div>
+                  <div style="margin-top: 36px;">
+                    <div style="border-top: 1px solid #475569; padding-top: 4px; font-size: 9px; color: #475569;">
+                      <div>Signature: ______________________</div>
+                      <div style="margin-top: 2px;">Date: ${issueDate}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; background-color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;">
+                  <div>
+                    <div style="font-size: 9px; font-weight: bold; text-transform: uppercase; color: #64748b;">Verified & Endorsed By:</div>
+                    <div style="font-size: 10px; font-weight: bold; color: #0f172a; margin-top: 2px;">${type === 'DIVISION' ? 'Division Disaster Coordinator' : 'District Disaster Coordinator'}</div>
+                  </div>
+                  <div style="margin-top: 36px;">
+                    <div style="border-top: 1px solid #475569; padding-top: 4px; font-size: 9px; color: #475569;">
+                      <div>Signature: ______________________</div>
+                      <div style="margin-top: 2px;">Name: ${currentUser?.fullName || 'Coordinator'}</div>
+                      <div style="margin-top: 2px;">Date: ${issueDate}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; background-color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;">
+                  <div>
+                    <div style="font-size: 9px; font-weight: bold; text-transform: uppercase; color: #64748b;">Sanctioned & Approved By:</div>
+                    <div style="font-size: 10px; font-weight: bold; color: #0f172a; margin-top: 2px;">${type === 'DIVISION' ? 'Divisional Commissioner' : 'Deputy Commissioner (DC)'}</div>
+                  </div>
+                  <div style="margin-top: 36px;">
+                    <div style="border-top: 1px solid #475569; padding-top: 4px; font-size: 9px; color: #475569;">
+                      <div>Signature: ______________________</div>
+                      <div style="margin-top: 2px;">Official Seal: [ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ]</div>
+                      <div style="margin-top: 2px;">Date: ${issueDate}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="text-align: center; margin-top: 20px; font-size: 8.5px; color: #94a3b8;">
+                Authorized official work order generated by GreenSignalAI Disaster Coordination System. Printed on official administrative bond.
+              </div>
+            </div>
+          </div>
+        `;
+
+        const printContainer = document.getElementById('workOrderPrintContainer');
+        printContainer.classList.remove('hidden');
+
+        setTimeout(() => {
+          window.print();
+          setTimeout(() => {
+            printContainer.classList.add('hidden');
+          }, 1500);
+        }, 150);
+
+      } catch (err) {
+        console.error('Scope Work Order error:', err);
+        alert('Failed to generate Scope Work Order.');
       }
+    }
 
+    // Print Individual Center Work Order
+    async function printWorkOrderForCenter(centerId) {
+      if (!centerId) return;
       try {
         const res = await fetch(`/api/coordinator/work-order/${centerId}`);
         if (!res.ok) return alert('Failed to generate Work Order from relief center data.');
@@ -724,7 +2753,7 @@
               </table>
             </div>
 
-            <!-- SECTION 2: SPECIAL DIRECTIVES & LOGISTICS PROTOCOLS -->
+            <!-- SECTION 2: SPECIAL DIRECTIVES -->
             <div style="margin-bottom: 24px; padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 9.5px; color: #334155;">
               <div style="font-weight: bold; text-transform: uppercase; margin-bottom: 4px; color: #0f172a;">2. Mandatory Handling Directives:</div>
               <ol style="margin: 0; padding-left: 16px; line-height: 1.5;">
@@ -741,7 +2770,6 @@
               </div>
               
               <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;">
-                <!-- Signature 1: Storekeeper / Shelter In-Charge -->
                 <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; background-color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;">
                   <div>
                     <div style="font-size: 9px; font-weight: bold; text-transform: uppercase; color: #64748b;">Requested & Prepared By:</div>
@@ -756,7 +2784,6 @@
                   </div>
                 </div>
 
-                <!-- Signature 2: Upazila Disaster Coordinator -->
                 <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; background-color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;">
                   <div>
                     <div style="font-size: 9px; font-weight: bold; text-transform: uppercase; color: #64748b;">Inspected & Verified By:</div>
@@ -771,7 +2798,6 @@
                   </div>
                 </div>
 
-                <!-- Signature 3: Upazila Nirbahi Officer (UNO) -->
                 <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; background-color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;">
                   <div>
                     <div style="font-size: 9px; font-weight: bold; text-transform: uppercase; color: #64748b;">Approved & Sanctioned By:</div>
@@ -788,7 +2814,7 @@
               </div>
 
               <div style="text-align: center; margin-top: 20px; font-size: 8.5px; color: #94a3b8;">
-                This document is an authorized official work order generated by GreenSignalAI Disaster Coordination System. Printed on clean white administrative bond.
+                This document is an authorized official work order generated by GreenSignalAI Disaster Coordination System.
               </div>
             </div>
 
@@ -811,81 +2837,528 @@
       }
     }
 
-    // Alias for backwards compatibility
-    const printBOQ = printWorkOrder;
+    // Backwards-compatible aliases
+    const printWorkOrder = printActiveWorkOrder;
+    const printBOQ = printActiveWorkOrder;
 
-    // 5. Messenger Functions
-    function toggleMessengerDrawer() {
+    // 5. Messenger Functions (WhatsApp & Facebook Messenger Style)
+    let messengerViewState = 'INBOX'; // 'INBOX' | 'CHAT'
+    let allMessageSenders = [];
+    let senderCategoryFilter = 'ALL'; // 'ALL' | 'COORDINATOR' | 'WORKER' | 'CITIZEN'
+    let activeSenderInfo = {
+      id: 'upazila-general',
+      channel: 'upazila-general',
+      name: 'Upazila General Emergency Channel',
+      role: 'BROADCAST',
+      avatarIcon: 'fa-bullhorn',
+      avatarColor: 'bg-indigo-600',
+      phone: '',
+      organization: 'Emergency Operations Command'
+    };
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeAttr(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatSenderTimestamp(isoStr) {
+      if (!isoStr) return 'Active';
+      const d = new Date(isoStr);
+      if (isNaN(d.getTime())) return '';
+      const now = new Date();
+      const diffMs = now.getTime() - d.getTime();
+      const diffMin = Math.floor(diffMs / 60000);
+
+      if (diffMin < 1) return 'Just now';
+      if (diffMin < 60) return `${diffMin}m`;
+
+      const isToday = d.toDateString() === now.toDateString();
+      if (isToday) {
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      if (d.toDateString() === yesterday.toDateString()) {
+        return 'Yesterday';
+      }
+
+      if (diffMs < 6 * 24 * 3600000) {
+        return d.toLocaleDateString([], { weekday: 'short' });
+      }
+
+      return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+
+    function formatSenderMessagePreview(lastMsg) {
+      if (!lastMsg || !lastMsg.text) {
+        return '<span class="text-slate-500 italic">Available to chat</span>';
+      }
+      const isMe = currentUser && lastMsg.senderId === currentUser.id;
+      const prefix = isMe ? '<span class="text-indigo-300 font-medium">You: </span>' : '';
+      return `${prefix}${escapeHtml(lastMsg.text)}`;
+    }
+
+    function getSenderRoleBadge(role, isGroup) {
+      if (isGroup) {
+        return '<span class="text-[9px] bg-indigo-900/70 text-indigo-300 border border-indigo-700/50 px-1 py-0.2 rounded font-semibold">CHANNEL</span>';
+      }
+      if (role === 'COORDINATOR') {
+        return '<span class="text-[9px] bg-blue-900/60 text-blue-300 border border-blue-700/50 px-1 py-0.2 rounded font-semibold">COORD</span>';
+      }
+      if (role === 'WORKER') {
+        return '<span class="text-[9px] bg-emerald-900/60 text-emerald-300 border border-emerald-700/50 px-1 py-0.2 rounded font-semibold">WORKER</span>';
+      }
+      if (role === 'ADMIN') {
+        return '<span class="text-[9px] bg-purple-900/60 text-purple-300 border border-purple-700/50 px-1 py-0.2 rounded font-semibold">ADMIN</span>';
+      }
+      if (role === 'PLANNER') {
+        return '<span class="text-[9px] bg-cyan-900/60 text-cyan-300 border border-cyan-700/50 px-1 py-0.2 rounded font-semibold">PLANNER</span>';
+      }
+      return '<span class="text-[9px] bg-amber-900/60 text-amber-300 border border-amber-700/50 px-1 py-0.2 rounded font-semibold">CITIZEN</span>';
+    }
+
+    async function toggleMessengerDrawer(preferredView) {
       const drawer = document.getElementById('messengerDrawer');
       const isOpening = drawer.classList.contains('translate-x-full');
       drawer.classList.toggle('translate-x-full');
       if (isOpening) {
-        loadChannelMessages(activeChannel);
+        updateMessengerAccountInfo();
+        await loadRecentSendersList();
+        if (preferredView) {
+          showMessengerView(preferredView);
+        } else if (!activeSenderInfo || activeSenderInfo.id === 'upazila-general') {
+          showMessengerView('INBOX');
+        } else {
+          showMessengerView('CHAT');
+        }
       }
+    }
+
+    function updateMessengerAccountInfo() {
+      const el = document.getElementById('messengerCurrentAccountText');
+      if (!el) return;
+      if (currentUser) {
+        el.innerText = `Connected: ${currentUser.fullName} (${currentUser.role})`;
+      } else {
+        el.innerText = 'Connected as Citizen (Switch Account)';
+      }
+    }
+
+    function showMessengerView(view) {
+      messengerViewState = view;
+      const inboxView = document.getElementById('messengerInboxView');
+      const chatView = document.getElementById('messengerChatView');
+      const tabBtn = document.getElementById('messengerInboxTabBtn');
+
+      if (view === 'INBOX') {
+        inboxView?.classList.remove('hidden');
+        chatView?.classList.add('hidden');
+        if (tabBtn) tabBtn.innerHTML = '<i class="fa-solid fa-list-ul"></i> Chats';
+        renderSendersList();
+      } else {
+        inboxView?.classList.add('hidden');
+        chatView?.classList.remove('hidden');
+        if (tabBtn) tabBtn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Chats';
+        const msgList = document.getElementById('messagesList');
+        if (msgList) msgList.scrollTop = msgList.scrollHeight;
+        setTimeout(() => document.getElementById('chatMessageInput')?.focus(), 80);
+      }
+    }
+
+    async function loadRecentSendersList(isManualRefresh = false) {
+      const container = document.getElementById('conversationSendersList');
+      try {
+        const myId = currentUser?.id || '';
+        const res = await fetch(`/api/messages/senders?userId=${encodeURIComponent(myId)}`);
+        if (!res.ok) throw new Error('Failed to load senders');
+        const data = await res.json();
+        allMessageSenders = Array.isArray(data) ? data : [];
+        renderSendersList();
+      } catch (err) {
+        console.warn('Error loading recent senders list:', err);
+        if (container && allMessageSenders.length === 0) {
+          container.innerHTML = `
+            <div class="p-6 text-center text-slate-500 text-xs">
+              <i class="fa-solid fa-triangle-exclamation text-amber-400 text-base mb-1.5"></i>
+              <p>Unable to load message senders.</p>
+              <button onclick="loadRecentSendersList(true)" class="mt-2 text-indigo-400 hover:text-indigo-300 underline font-semibold">Retry</button>
+            </div>
+          `;
+        }
+      }
+    }
+
+    let searchDebounceTimer = null;
+    let isSearchingDirectory = false;
+    let directorySearchResults = [];
+
+    function renderSendersList() {
+      const container = document.getElementById('conversationSendersList');
+      if (!container) return;
+
+      const q = (document.getElementById('messengerSenderSearchInput')?.value || '').toLowerCase().trim();
+
+      // Combine local recent conversations with directory search results
+      const knownIds = new Set(allMessageSenders.map(s => s.id));
+      const searchItemsToAdd = directorySearchResults.filter(u => !knownIds.has(u.id));
+      const pool = [...allMessageSenders, ...searchItemsToAdd];
+
+      const countEl = document.getElementById('count-ALL');
+      if (countEl) countEl.innerText = pool.length;
+
+      let filtered = pool.filter(item => {
+        if (senderCategoryFilter !== 'ALL') {
+          if (item.isGroup) return true;
+          if (item.role !== senderCategoryFilter) return false;
+        }
+        if (q) {
+          const matchName = (item.name || '').toLowerCase().includes(q);
+          const matchUser = (item.username || '').toLowerCase().includes(q);
+          const matchRole = (item.role || '').toLowerCase().includes(q);
+          const matchOrg = (item.organization || '').toLowerCase().includes(q);
+          const matchMsg = (item.lastMessage?.text || '').toLowerCase().includes(q);
+          return matchName || matchUser || matchRole || matchOrg || matchMsg;
+        }
+        return true;
+      });
+
+      let searchHeaderHtml = '';
+      if (isSearchingDirectory) {
+        searchHeaderHtml = `
+          <div class="px-3 py-1.5 bg-indigo-950/60 text-[10px] text-indigo-300 border-b border-indigo-800/40 flex items-center justify-between">
+            <span class="flex items-center gap-1.5">
+              <i class="fa-solid fa-spinner fa-spin text-indigo-400"></i>
+              Searching entire 2,000+ responder directory...
+            </span>
+            <span class="text-indigo-400/80 font-mono text-[9px]">${filtered.length} found</span>
+          </div>
+        `;
+      } else if (q && directorySearchResults.length > 0) {
+        searchHeaderHtml = `
+          <div class="px-3 py-1 bg-slate-800/80 text-[10px] text-slate-400 border-b border-slate-700/50 flex items-center justify-between">
+            <span>Directory search results for "${escapeHtml(q)}"</span>
+            <span class="text-indigo-400 font-bold">${filtered.length} matches</span>
+          </div>
+        `;
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          ${searchHeaderHtml}
+          <div class="p-8 text-center text-slate-500 text-xs space-y-2">
+            <i class="fa-regular fa-comment-dots text-slate-600 text-2xl"></i>
+            <p class="font-medium text-slate-400">No message senders match "${escapeHtml(q)}"</p>
+            <p class="text-[11px] text-slate-500">Search by name, username (e.g. worker435, Coordinator161), role, or phone.</p>
+            <button onclick="clearSenderSearch()" class="text-indigo-400 hover:text-indigo-300 underline text-xs font-semibold">Clear Search</button>
+          </div>
+        `;
+        return;
+      }
+
+      const listHtml = filtered.map(item => {
+        const isCurrentActive = activeChannel === item.channel;
+        const roleBadge = getSenderRoleBadge(item.role, item.isGroup);
+        const timeFormatted = formatSenderTimestamp(item.lastMessage?.createdAt);
+        const previewFormatted = formatSenderMessagePreview(item.lastMessage);
+        const unreadBadge = (item.unreadCount && item.unreadCount > 0)
+          ? `<span class="px-1.5 py-0.5 rounded-full bg-indigo-500 text-white text-[9px] font-bold shrink-0 shadow animate-pulse">${item.unreadCount}</span>`
+          : '';
+
+        return `
+          <div onclick="enterChatWithSender('${escapeAttr(item.id)}', '${escapeAttr(item.channel)}', '${escapeAttr(item.name)}', '${escapeAttr(item.role || '')}', '${escapeAttr(item.avatarIcon || 'fa-user')}', '${escapeAttr(item.avatarColor || 'bg-indigo-600')}', '${escapeAttr(item.phone || '')}', '${escapeAttr(item.organization || '')}')" 
+               class="p-3 hover:bg-slate-800/80 cursor-pointer transition flex items-center gap-3 border-l-4 ${isCurrentActive ? 'bg-indigo-950/50 border-indigo-500' : 'border-transparent hover:border-slate-700'}">
+            
+            <!-- Avatar with Online Indicator -->
+            <div class="w-10 h-10 rounded-full ${item.avatarColor || 'bg-indigo-600'} flex items-center justify-center text-white text-sm font-bold shrink-0 relative shadow-sm">
+              <i class="fa-solid ${item.avatarIcon || 'fa-user'}"></i>
+              <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
+            </div>
+
+            <!-- Sender Name, Time, Role and Preview -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-1 mb-0.5">
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <h4 class="text-xs font-bold text-white truncate ${isCurrentActive ? 'text-indigo-300' : ''}">${escapeHtml(item.name)}</h4>
+                  ${roleBadge}
+                </div>
+                <span class="text-[10px] ${item.unreadCount > 0 ? 'text-indigo-400 font-bold' : 'text-slate-500'} shrink-0 font-medium">${timeFormatted}</span>
+              </div>
+
+              <div class="flex items-center justify-between gap-2">
+                <p class="text-[11px] text-slate-400 truncate flex-1 leading-snug">
+                  ${previewFormatted}
+                </p>
+                ${unreadBadge}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = searchHeaderHtml + listHtml;
+    }
+
+    function setSenderCategoryFilter(category) {
+      senderCategoryFilter = category;
+      ['ALL', 'COORDINATOR', 'WORKER', 'CITIZEN'].forEach(c => {
+        const btn = document.getElementById(`filterBtn-${c}`);
+        if (!btn) return;
+        if (c === category) {
+          btn.className = 'px-2.5 py-1 rounded-full bg-indigo-600 text-white font-semibold whitespace-nowrap transition';
+        } else {
+          btn.className = 'px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-semibold whitespace-nowrap transition';
+        }
+      });
+      renderSendersList();
+    }
+
+    function filterMessageSenders() {
+      const q = (document.getElementById('messengerSenderSearchInput')?.value || '').trim();
+      const clearBtn = document.getElementById('clearSenderSearchBtn');
+      if (clearBtn) {
+        if (q) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+      }
+
+      // 1. Instant local filter
+      renderSendersList();
+
+      // 2. Debounced search across the 2,000+ responder directory
+      if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+
+      if (!q) {
+        directorySearchResults = [];
+        isSearchingDirectory = false;
+        renderSendersList();
+        return;
+      }
+
+      isSearchingDirectory = true;
+      renderSendersList();
+
+      searchDebounceTimer = setTimeout(async () => {
+        try {
+          const myId = currentUser?.id || '';
+          const res = await fetch(`/api/messages/search-users?q=${encodeURIComponent(q)}&userId=${encodeURIComponent(myId)}`);
+          if (res.ok) {
+            const users = await res.json();
+            if (Array.isArray(users)) {
+              directorySearchResults = users.map(u => {
+                const roleColor = u.role === 'COORDINATOR' ? 'bg-blue-600' :
+                                  u.role === 'WORKER' ? 'bg-emerald-600' :
+                                  u.role === 'ADMIN' ? 'bg-purple-600' :
+                                  u.role === 'PLANNER' ? 'bg-cyan-600' : 'bg-amber-600';
+                const roleIcon = u.role === 'COORDINATOR' ? 'fa-user-shield' :
+                                 u.role === 'WORKER' ? 'fa-helmet-safety' :
+                                 u.role === 'ADMIN' ? 'fa-shield-halved' :
+                                 u.role === 'PLANNER' ? 'fa-chart-line' : 'fa-user';
+                const sorted = [myId || 'guest', u.id].sort();
+                return {
+                  id: u.id,
+                  userId: u.id,
+                  channel: `direct-${sorted.join('-')}`,
+                  name: u.fullName || u.username,
+                  username: u.username,
+                  role: u.role,
+                  organization: u.organization,
+                  phone: u.phone,
+                  isGroup: false,
+                  avatarIcon: roleIcon,
+                  avatarColor: roleColor,
+                  lastMessage: null,
+                  unreadCount: 0,
+                  isSearchResult: true
+                };
+              });
+            }
+          }
+        } catch (err) {
+          console.warn('Directory search error:', err);
+        } finally {
+          isSearchingDirectory = false;
+          renderSendersList();
+        }
+      }, 180);
+    }
+
+    function clearSenderSearch() {
+      const input = document.getElementById('messengerSenderSearchInput');
+      if (input) input.value = '';
+      const clearBtn = document.getElementById('clearSenderSearchBtn');
+      if (clearBtn) clearBtn.classList.add('hidden');
+      if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+      directorySearchResults = [];
+      isSearchingDirectory = false;
+      renderSendersList();
+    }
+
+    async function enterChatWithSender(id, channel, name, role, avatarIcon, avatarColor, phone, organization) {
+      const myId = currentUser ? currentUser.id : 'guest';
+      const isGeneral = (id === 'upazila-general');
+      const calculatedChannel = isGeneral ? 'upazila-general' : `direct-${[myId, id].sort().join('-')}`;
+
+      activeChannel = calculatedChannel;
+      activeSenderInfo = { id, channel: calculatedChannel, name, role, avatarIcon, avatarColor, phone, organization };
+
+      const titleEl = document.getElementById('activeChatTitle');
+      if (titleEl) titleEl.innerText = name;
+
+      const roleBadge = document.getElementById('activeChatRoleBadge');
+      if (roleBadge) {
+        roleBadge.innerText = role || (isGeneral ? 'EMERGENCY CHANNEL' : 'RESPONDER');
+      }
+
+      const subEl = document.getElementById('activeChatSubtitle');
+      if (subEl) {
+        subEl.innerText = organization 
+          ? `🟢 Active now • ${organization}`
+          : `🟢 Active now • GreenSignalAI Network`;
+      }
+
+      const avatarBox = document.getElementById('activeChatAvatarBox');
+      if (avatarBox) {
+        avatarBox.className = `w-9 h-9 rounded-full ${avatarColor || 'bg-indigo-600'} flex items-center justify-center text-white text-xs font-bold shrink-0 relative shadow`;
+      }
+
+      const avatarIconEl = document.getElementById('activeChatAvatarIcon');
+      if (avatarIconEl) {
+        avatarIconEl.className = `fa-solid ${avatarIcon || 'fa-user'}`;
+      }
+
+      const callBtn = document.getElementById('activeChatCallBtn');
+      if (callBtn) {
+        if (phone) {
+          callBtn.href = `tel:${phone}`;
+          callBtn.classList.remove('hidden');
+        } else {
+          callBtn.classList.add('hidden');
+        }
+      }
+
+      // Clear unread count for this sender
+      const targetSender = allMessageSenders.find(s => s.channel === calculatedChannel || s.id === id);
+      if (targetSender) {
+        targetSender.unreadCount = 0;
+      }
+
+      // Join socket channel room
+      if (socket) {
+        socket.emit('join_channel', activeChannel);
+      }
+
+      // Switch to Chat view and clear old messages immediately
+      showMessengerView('CHAT');
+      const list = document.getElementById('messagesList');
+      if (list) {
+        list.innerHTML = `
+          <div class="p-8 text-center text-slate-500 text-xs">
+            <i class="fa-solid fa-spinner fa-spin text-indigo-400 text-lg mb-2"></i>
+            <p>Loading conversation...</p>
+          </div>
+        `;
+      }
+      await loadChannelMessages(activeChannel);
     }
 
     async function loadChannelMessages(channel) {
       const list = document.getElementById('messagesList');
+      if (!list) return;
       try {
-        const res = await fetch(`/api/messages/${encodeURIComponent(channel)}`);
-        if (!res.ok) return;
-        const history = await res.json();
+        const myId = currentUser ? currentUser.id : '';
+        const res = await fetch(`/api/messages/${encodeURIComponent(channel)}?userId=${encodeURIComponent(myId)}`);
         list.innerHTML = '';
-        if (Array.isArray(history)) {
-          history.forEach(msg => appendChatMessage(msg));
+        if (!res.ok) {
+          list.innerHTML = `
+            <div class="p-8 text-center text-slate-500 text-xs space-y-2">
+              <i class="fa-regular fa-comments text-slate-600 text-2xl"></i>
+              <p class="font-medium text-slate-400">Direct Message Channel Ready</p>
+              <p class="text-[11px] text-slate-500">Send a message below to start communicating with this responder.</p>
+            </div>
+          `;
+          return;
         }
+        const history = await res.json();
+        if (Array.isArray(history) && history.length > 0) {
+          history.forEach(msg => appendChatMessage(msg));
+        } else {
+          list.innerHTML = `
+            <div class="p-8 text-center text-slate-500 text-xs space-y-2">
+              <i class="fa-regular fa-comments text-slate-600 text-2xl"></i>
+              <p class="font-medium text-slate-400">Direct Message Channel Ready</p>
+              <p class="text-[11px] text-slate-500">No prior messages. Send a message below to start communicating.</p>
+            </div>
+          `;
+        }
+        list.scrollTop = list.scrollHeight;
       } catch (e) {
         console.warn('Failed to load message history:', e);
+        list.innerHTML = `
+          <div class="p-6 text-center text-slate-500 text-xs">
+            <p>Direct Message Channel Ready. Send a message below.</p>
+          </div>
+        `;
+      }
+    }
+
+    function reloadCurrentChatMessages() {
+      if (activeChannel) {
+        loadChannelMessages(activeChannel);
+      }
+    }
+
+    function insertQuickMessage(txt) {
+      const input = document.getElementById('chatMessageInput');
+      if (input) {
+        input.value = txt;
+        input.focus();
       }
     }
 
     function switchToGeneralChat() {
-      activeChannel = 'upazila-general';
-      document.getElementById('activeChannelName').innerText = 'upazila-general';
-      document.getElementById('resetGeneralChatBtn').classList.add('hidden');
-      if (socket) socket.emit('join_channel', activeChannel);
-      loadChannelMessages(activeChannel);
-    }
-
-    async function handleUserSearch() {
-      const q = document.getElementById('userSearchInput').value.trim();
-      const resultsContainer = document.getElementById('searchResultsList');
-
-      if (!q) {
-        resultsContainer.classList.add('hidden');
-        return;
-      }
-
-      const res = await fetch(`/api/messages/search-users?q=${encodeURIComponent(q)}&userId=${currentUser?.id || ''}`);
-      if (!res.ok) return;
-      const users = await res.json();
-
-      if (users.length === 0) {
-        resultsContainer.innerHTML = `<div class="p-2 text-[11px] text-slate-500">No users found</div>`;
-      } else {
-        resultsContainer.innerHTML = users.map(u => `
-          <div onclick="startDirectChat('${u.id}', '${u.fullName}')" class="p-2 hover:bg-slate-800 cursor-pointer flex items-center justify-between border-b border-slate-800">
-            <div>
-              <div class="text-xs font-semibold text-white">${u.fullName}</div>
-              <div class="text-[10px] text-slate-400">@${u.username} • ${u.role}</div>
-            </div>
-            <i class="fa-solid fa-comment-dots text-indigo-400 text-xs"></i>
-          </div>
-        `).join('');
-      }
-
-      resultsContainer.classList.remove('hidden');
+      enterChatWithSender(
+        'upazila-general',
+        'upazila-general',
+        'Upazila General Emergency Channel',
+        'BROADCAST',
+        'fa-bullhorn',
+        'bg-indigo-600',
+        '',
+        'Emergency Operations Command'
+      );
     }
 
     function startDirectChat(userId, fullName) {
       const myId = currentUser ? currentUser.id : 'guest';
       const sorted = [myId, userId].sort();
-      activeChannel = `direct-${sorted.join('-')}`;
-      document.getElementById('activeChannelName').innerText = `Chat: ${fullName}`;
-      document.getElementById('resetGeneralChatBtn').classList.remove('hidden');
-      document.getElementById('searchResultsList').classList.add('hidden');
-      if (socket) socket.emit('join_channel', activeChannel);
-      loadChannelMessages(activeChannel);
+      const channel = `direct-${sorted.join('-')}`;
+      enterChatWithSender(
+        userId,
+        channel,
+        fullName,
+        'RESPONDER',
+        'fa-user',
+        'bg-indigo-600',
+        '',
+        'GreenSignalAI Responder'
+      );
+    }
+
+    function handleUserSearch() {
+      filterMessageSenders();
     }
 
     async function sendChatMessage() {
@@ -902,32 +3375,170 @@
         return;
       }
 
+      const msgPayload = {
+        senderId: currentUser.id,
+        channel: activeChannel,
+        text
+      };
+
       if (socket) {
-        socket.emit('send_message', {
-          senderId: currentUser.id,
+        socket.emit('send_message', msgPayload);
+      }
+
+      // Optimistic append
+      const optimisticMsg = {
+        id: 'temp-' + Date.now(),
+        senderId: currentUser.id,
+        channel: activeChannel,
+        text,
+        createdAt: new Date().toISOString(),
+        sender: {
+          id: currentUser.id,
+          fullName: currentUser.fullName,
+          username: currentUser.username,
+          role: currentUser.role
+        }
+      };
+      appendChatMessage(optimisticMsg);
+
+      // Update sender in list and bump to top
+      let currentSender = allMessageSenders.find(s => s.channel === activeChannel);
+      if (!currentSender && activeSenderInfo && activeSenderInfo.id !== 'upazila-general') {
+        currentSender = {
+          id: activeSenderInfo.id,
+          userId: activeSenderInfo.id,
           channel: activeChannel,
-          text
-        });
+          name: activeSenderInfo.name,
+          username: activeSenderInfo.name,
+          role: activeSenderInfo.role,
+          organization: activeSenderInfo.organization,
+          phone: activeSenderInfo.phone,
+          isGroup: false,
+          avatarIcon: activeSenderInfo.avatarIcon || 'fa-user',
+          avatarColor: activeSenderInfo.avatarColor || 'bg-indigo-600',
+          lastMessage: null,
+          unreadCount: 0
+        };
+        allMessageSenders.push(currentSender);
+      }
+
+      if (currentSender) {
+        currentSender.lastMessage = {
+          id: optimisticMsg.id,
+          text,
+          senderId: currentUser.id,
+          senderName: currentUser.fullName,
+          createdAt: optimisticMsg.createdAt
+        };
+        allMessageSenders = [currentSender, ...allMessageSenders.filter(s => s !== currentSender)];
       }
 
       input.value = '';
+      input.focus();
     }
 
     function appendChatMessage(msg) {
       const list = document.getElementById('messagesList');
-      const isMe = msg.senderId === currentUser?.id;
+      if (!list) return;
+
+      // Clear placeholder if currently displayed
+      if (list.innerText.includes('Direct Message Channel Ready') || list.innerText.includes('Loading conversation...')) {
+        list.innerHTML = '';
+      }
+
+      const isMe = currentUser && (msg.senderId === currentUser.id || msg.sender?.id === currentUser.id);
+      const timeStr = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+      const senderDisplayName = isMe ? 'You' : (msg.sender?.fullName || msg.sender?.username || 'Responder');
 
       const div = document.createElement('div');
-      div.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+      div.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} transition-all`;
       div.innerHTML = `
-        <span class="text-[10px] text-slate-400 mb-0.5">${msg.sender?.fullName || 'User'}</span>
-        <div class="max-w-[80%] p-2.5 rounded-xl ${isMe ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-200'}">
-          ${msg.text}
+        <div class="flex items-center gap-1.5 mb-0.5">
+          <span class="text-[10px] font-semibold ${isMe ? 'text-indigo-300' : 'text-slate-400'}">${escapeHtml(senderDisplayName)}</span>
+          ${timeStr ? `<span class="text-[9px] text-slate-500">${timeStr}</span>` : ''}
+        </div>
+        <div class="max-w-[85%] px-3.5 py-2 rounded-2xl text-xs leading-relaxed break-words shadow-sm ${
+          isMe 
+            ? 'bg-indigo-600 text-white rounded-br-none' 
+            : 'bg-slate-800 border border-slate-700/80 text-slate-200 rounded-bl-none'
+        }">
+          ${escapeHtml(msg.text)}
         </div>
       `;
 
       list.appendChild(div);
       list.scrollTop = list.scrollHeight;
+    }
+
+    function handleIncomingChatMessage(msg) {
+      if (!msg) return;
+
+      const myId = currentUser?.id || 'guest';
+
+      // Security & Privacy Check:
+      // If direct message, ignore if it does not involve the current user
+      if (msg.channel && msg.channel.startsWith('direct-')) {
+        if (!msg.channel.includes(myId)) {
+          return;
+        }
+      }
+
+      // 1. If currently in this channel, append message bubble
+      if (msg.channel === activeChannel) {
+        const list = document.getElementById('messagesList');
+        const lastEl = list?.lastElementChild;
+        if (!lastEl || !lastEl.innerText.includes(msg.text)) {
+          appendChatMessage(msg);
+        }
+      }
+
+      // 2. Update senders list with latest message
+      if (msg.channel === 'upazila-general') {
+        let generalSender = allMessageSenders.find(s => s.id === 'upazila-general');
+        if (generalSender) {
+          generalSender.lastMessage = {
+            id: msg.id,
+            text: msg.text,
+            senderId: msg.senderId,
+            senderName: msg.sender?.fullName || 'User',
+            createdAt: msg.createdAt || new Date().toISOString()
+          };
+          if (activeChannel !== 'upazila-general') {
+            generalSender.unreadCount = (generalSender.unreadCount || 0) + 1;
+          }
+        }
+      } else if (msg.channel && msg.channel.startsWith('direct-')) {
+        let found = allMessageSenders.find(s => s.channel === msg.channel);
+        if (found) {
+          found.lastMessage = {
+            id: msg.id,
+            text: msg.text,
+            senderId: msg.senderId,
+            senderName: msg.sender?.fullName || 'User',
+            createdAt: msg.createdAt || new Date().toISOString()
+          };
+          if (msg.channel !== activeChannel) {
+            found.unreadCount = (found.unreadCount || 0) + 1;
+          }
+          allMessageSenders = [found, ...allMessageSenders.filter(s => s !== found)];
+        } else {
+          loadRecentSendersList();
+        }
+      }
+
+      // Re-render inbox if currently viewing inbox
+      if (messengerViewState === 'INBOX') {
+        renderSendersList();
+      }
+    }
+
+    function handleConversationUpdated(data) {
+      if (!data) return;
+      if (data.latestMessage) {
+        handleIncomingChatMessage(data.latestMessage);
+      } else {
+        loadRecentSendersList();
+      }
     }
 
     // 6. User Login & Switch Modal
