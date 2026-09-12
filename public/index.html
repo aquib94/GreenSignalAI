@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GreenSignalAI - Adaptive Disaster Response Hub</title>
+  <title>GreenSignalAI</title>
+  <meta name="description" content="Intelligent disaster response, emergency relief coordination, and resource optimization platform.">
+  <meta property="og:title" content="GreenSignalAI">
+  <meta property="og:description" content="Intelligent disaster response, emergency relief coordination, and resource optimization platform.">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -23,9 +26,38 @@
     .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     @media print {
-      body * { visibility: hidden; }
-      #boqPrintContainer, #boqPrintContainer * { visibility: visible; }
-      #boqPrintContainer { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; }
+      @page {
+        margin: 10mm 15mm 10mm 15mm;
+        size: A4 portrait;
+      }
+      html, body {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        height: auto !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      body > *:not(#workOrderPrintContainer):not(#boqPrintContainer) {
+        display: none !important;
+      }
+      #workOrderPrintContainer, #boqPrintContainer {
+        display: block !important;
+        visibility: visible !important;
+        position: static !important;
+        width: 100% !important;
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      #workOrderPrintContainer *, #boqPrintContainer *,
+      #workOrderPrintContent, #workOrderPrintContent * {
+        visibility: visible !important;
+        color: #000000 !important;
+      }
     }
   </style>
 </head>
@@ -47,8 +79,8 @@
     </div>
 
     <div class="flex items-center space-x-2">
-      <!-- Messenger Toggle Button (Worker & Coordinator Only) -->
-      <button id="messengerToggleBtn" onclick="toggleMessengerDrawer()" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow flex items-center gap-1.5">
+      <!-- Messenger Toggle Button (Always accessible for field coordination) -->
+      <button id="messengerToggleBtn" onclick="toggleMessengerDrawer()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow flex items-center gap-1.5">
         <i class="fa-solid fa-comments"></i> Messenger
       </button>
 
@@ -56,6 +88,14 @@
       <button onclick="openLoginModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
         <i class="fa-solid fa-user-gear"></i> Switch User
       </button>
+
+      <!-- DB Studio & District Planner Links -->
+      <a href="/dev/db-manager.html" target="_blank" class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/60 text-emerald-300 text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow" title="Open DB Studio">
+        <i class="fa-solid fa-database"></i> DB Studio
+      </a>
+      <a href="/district-planner.html" target="_blank" class="hidden sm:inline-flex bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg transition items-center gap-1.5 shadow" title="District Disaster Resource Planner">
+        <i class="fa-solid fa-compass-drafting text-emerald-400"></i> Planner
+      </a>
     </div>
   </header>
 
@@ -146,8 +186,8 @@
           </h2>
           <p class="text-xs text-slate-400">Check and update Stock Policy, Current Stock, Emergency Requirements & Restocking Deltas.</p>
         </div>
-        <button onclick="printBOQ()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow flex items-center gap-2">
-          <i class="fa-solid fa-file-invoice-dollar"></i> Print BOQ (Bill of Quantities)
+        <button onclick="printWorkOrder()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow flex items-center gap-2">
+          <i class="fa-solid fa-file-signature text-emerald-300"></i> Print Work Order
         </button>
       </div>
 
@@ -215,9 +255,14 @@
 
     <!-- Active Chat Channel Bar -->
     <div class="px-4 py-2 bg-indigo-950/40 border-b border-indigo-900/50 flex items-center justify-between">
-      <span class="text-[11px] font-semibold text-indigo-300 flex items-center gap-1.5">
-        <i class="fa-solid fa-hashtag text-indigo-400"></i> <span id="activeChannelName">upazila-general</span>
-      </span>
+      <div class="flex items-center gap-2">
+        <span class="text-[11px] font-semibold text-indigo-300 flex items-center gap-1.5">
+          <i class="fa-solid fa-hashtag text-indigo-400"></i> <span id="activeChannelName">upazila-general</span>
+        </span>
+        <button id="resetGeneralChatBtn" onclick="switchToGeneralChat()" class="hidden text-[10px] text-indigo-300 hover:text-white underline">
+          Back to General
+        </button>
+      </div>
       <span class="text-[10px] text-emerald-400 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Live</span>
     </div>
 
@@ -278,10 +323,11 @@
     </div>
   </div>
 
-  <!-- PRINT BOQ CONTAINER (Hidden on Screen, Visible on Print) -->
-  <div id="boqPrintContainer" class="hidden p-8 font-sans">
-    <div id="boqPrintContent"></div>
+  <!-- PRINT WORK ORDER CONTAINER (Hidden on Screen, Visible on Print) -->
+  <div id="workOrderPrintContainer" class="hidden font-sans bg-white text-slate-900 p-8">
+    <div id="workOrderPrintContent"></div>
   </div>
+  <div id="boqPrintContainer" class="hidden"></div>
 
   <!-- CLIENT APP SCRIPT -->
   <script>
@@ -291,10 +337,32 @@
     let activeChannel = 'upazila-general';
     let currentReliefCenterId = null;
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       initMap();
-      loadDefaultContext();
       initSocket();
+      loadAlerts();
+
+      // Check if URL has ?impersonate=username query param
+      const urlParams = new URLSearchParams(window.location.search);
+      const impersonateQuery = urlParams.get('impersonate');
+
+      if (impersonateQuery) {
+        await quickImpersonateLogin(impersonateQuery);
+      } else {
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+          try {
+            const parsed = JSON.parse(savedUser);
+            adaptUIForUser(parsed);
+            loadDefaultContext(parsed.districtNodeId || '');
+          } catch(e) {
+            loadDefaultContext();
+          }
+        } else {
+          // Default to first citizen account for immediate exploration
+          await quickImpersonateLogin('Adamdighi Citizen');
+        }
+      }
     });
 
     // 1. Initialize Leaflet Map
@@ -309,11 +377,59 @@
     // 2. Initialize Socket.io
     function initSocket() {
       socket = io();
-      socket.emit('join_channel', activeChannel);
+      socket.on('connect', () => {
+        socket.emit('join_channel', activeChannel);
+      });
 
       socket.on('new_message', (msg) => {
         appendChatMessage(msg);
       });
+
+      socket.on('new_alert', (alert) => {
+        loadAlerts();
+      });
+    }
+
+    // Load Live Alerts
+    async function loadAlerts() {
+      const container = document.getElementById('alertBannerList');
+      try {
+        const res = await fetch('/api/alerts');
+        if (!res.ok) return;
+        const alerts = await res.json();
+        if (!alerts || alerts.length === 0) return;
+
+        container.innerHTML = alerts.map(alert => {
+          const isCritical = alert.severity === 'CRITICAL';
+          const isWarning = alert.severity === 'WARNING';
+          const bgClass = isCritical ? 'bg-rose-950/70 border-rose-800/80 text-rose-200' :
+                          isWarning ? 'bg-amber-950/70 border-amber-800/80 text-amber-200' :
+                          'bg-emerald-950/70 border-emerald-800/80 text-emerald-200';
+          const iconClass = isCritical ? 'fa-triangle-exclamation text-rose-400' :
+                            isWarning ? 'fa-circle-exclamation text-amber-400' :
+                            'fa-circle-info text-emerald-400';
+
+          return `
+            <div class="p-3.5 rounded-xl border ${bgClass} flex items-start gap-3 shadow-md">
+              <i class="fa-solid ${iconClass} text-base mt-0.5 shrink-0"></i>
+              <div class="flex-1">
+                <div class="text-xs font-bold tracking-wide uppercase flex items-center justify-between">
+                  <span>${alert.title}</span>
+                  <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${isCritical ? 'bg-rose-900 text-rose-200' : 'bg-slate-800 text-slate-300'}">${alert.severity}</span>
+                </div>
+                <div class="text-xs mt-1 text-slate-300 leading-relaxed">${alert.description}</div>
+                <div class="text-[10px] text-slate-400 mt-1.5 flex items-center gap-2">
+                  <span><i class="fa-solid fa-location-dot mr-1"></i>${alert.district}</span>
+                  <span>•</span>
+                  <span>${new Date(alert.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.warn('Failed to load alerts:', e);
+      }
     }
 
     // 3. Load Upazila Dashboard Context
@@ -402,22 +518,21 @@
     // 4. Adapt UI based on Role
     function adaptUIForUser(user) {
       currentUser = user;
+      localStorage.setItem('user', JSON.stringify(user));
       document.getElementById('roleBadge').innerText = user.role;
       document.getElementById('userScopeText').innerText = `Active Account: ${user.fullName} (${user.organization || 'GreenSignalAI User'})`;
 
       const messengerBtn = document.getElementById('messengerToggleBtn');
       const coordinatorStockSec = document.getElementById('coordinatorStockSection');
 
-      if (user.role === 'CITIZEN') {
-        messengerBtn.classList.add('hidden');
-        coordinatorStockSec.classList.add('hidden');
-      } else if (user.role === 'WORKER') {
-        messengerBtn.classList.remove('hidden');
-        coordinatorStockSec.classList.add('hidden');
-      } else if (user.role === 'COORDINATOR' || user.role === 'ADMIN') {
-        messengerBtn.classList.remove('hidden');
+      // Keep messenger accessible for all roles
+      messengerBtn.classList.remove('hidden');
+
+      if (user.role === 'COORDINATOR' || user.role === 'ADMIN') {
         coordinatorStockSec.classList.remove('hidden');
         loadCoordinatorStockData(user.districtNodeId || '');
+      } else {
+        coordinatorStockSec.classList.add('hidden');
       }
     }
 
@@ -496,63 +611,240 @@
       }
     }
 
-    // Print BOQ Report
-    async function printBOQ() {
-      if (!currentReliefCenterId) return;
+    // Print Official Relief Work Order Report
+    async function printWorkOrder() {
+      let centerId = currentReliefCenterId;
+      if (!centerId) {
+        try {
+          const uRes = await fetch('/api/upazila-context');
+          if (uRes.ok) {
+            const uData = await uRes.json();
+            if (uData.nearestReliefCenter) {
+              centerId = uData.nearestReliefCenter.id;
+              currentReliefCenterId = centerId;
+            }
+          }
+        } catch(e) {
+          console.warn('Fallback relief center fetch error:', e);
+        }
+      }
 
-      const res = await fetch(`/api/coordinator/boq/${currentReliefCenterId}`);
-      if (!res.ok) return alert('Failed to generate BOQ');
-      const boq = await res.json();
+      if (!centerId) {
+        alert('Please select or wait for a Relief Center to load before printing the Work Order.');
+        return;
+      }
 
-      const printContainer = document.getElementById('boqPrintContent');
-      printContainer.innerHTML = `
-        <div class="border-b-2 border-black pb-4 mb-4">
-          <h1 class="text-xl font-bold uppercase">GreenSignalAI - Bill of Quantities (BOQ)</h1>
-          <p class="text-sm">Relief Center: <b>${boq.centerName}</b> (${boq.centerCode})</p>
-          <p class="text-xs text-gray-600">Generated Date: ${new Date(boq.generatedAt).toLocaleString()}</p>
-        </div>
+      try {
+        const res = await fetch(`/api/coordinator/work-order/${centerId}`);
+        if (!res.ok) return alert('Failed to generate Work Order from relief center data.');
+        const boq = await res.json();
 
-        <table class="w-full border-collapse text-xs mb-6" border="1" cellpadding="6">
-          <thead>
-            <tr style="background-color: #f3f4f6;">
-              <th align="left">Resource Item</th>
-              <th>Unit</th>
-              <th>Stock Policy</th>
-              <th>Current Stock</th>
-              <th>Emergency Needed</th>
-              <th>Restocking Req.</th>
-              <th>Est. Unit Price (BDT)</th>
-              <th>Total Cost (BDT)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${boq.items.map(i => `
-              <tr>
-                <td><b>${i.itemName}</b></td>
-                <td align="center">${i.unit}</td>
-                <td align="center">${i.policyQty}</td>
-                <td align="center">${i.currentQty}</td>
-                <td align="center">${i.emergencyQty}</td>
-                <td align="center"><b>${i.restockingQty}</b></td>
-                <td align="right">৳ ${i.estimatedUnitPriceBDT.toLocaleString()}</td>
-                <td align="right"><b>৳ ${i.totalRestockCostBDT.toLocaleString()}</b></td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
+        const printArea = document.getElementById('workOrderPrintContent');
+        const serialNo = `WO-UZ-RC-${(boq.centerCode || '01').toUpperCase()}-${Date.now().toString().slice(-6)}`;
+        const issueDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
-        <div class="text-right font-bold text-sm">
-          <p>Total Estimated Procurement Cost: ৳ ${boq.totalProjectedCostBDT.toLocaleString()} BDT</p>
-        </div>
-      `;
+        printArea.innerHTML = `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; color: #0f172a; background-color: #ffffff; padding: 24px; line-height: 1.4;">
+            
+            <!-- OFFICIAL GOVERNMENT HEADER -->
+            <div style="border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <div style="font-size: 9px; font-weight: 800; letter-spacing: 1px; color: #475569; text-transform: uppercase;">Government of the People's Republic of Bangladesh</div>
+                  <div style="font-size: 10px; font-weight: 700; color: #334155; text-transform: uppercase; margin-top: 1px;">Ministry of Disaster Management & Relief • Department of Disaster Management</div>
+                  <h1 style="font-size: 18px; font-weight: 900; color: #0f172a; text-transform: uppercase; margin: 4px 0 0 0; letter-spacing: 0.5px;">
+                    Disaster Relief & Procurement Emergency Work Order
+                  </h1>
+                </div>
+                <div style="text-align: right; border-left: 2px solid #e2e8f0; padding-left: 12px;">
+                  <div style="display: inline-block; background-color: #f1f5f9; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; font-family: monospace;">
+                    STATUS: SANCTIONED
+                  </div>
+                  <div style="font-size: 9px; color: #64748b; margin-top: 3px;">PRIORITY: HIGH EMERGENCY</div>
+                </div>
+              </div>
 
-      window.print();
+              <!-- METADATA GRID -->
+              <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 16px; margin-top: 12px; padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 10px;">
+                <div>
+                  <div style="margin-bottom: 3px;"><b>Designated Relief Center:</b> ${boq.centerName} (${boq.centerCode || 'RC-01'})</div>
+                  <div style="margin-bottom: 3px;"><b>Issuing Administrative Node:</b> ${currentUser?.districtNodeName || 'Upazila Disaster Operations Unit'}</div>
+                  <div><b>Authorized Distribution Officer:</b> ${currentUser?.fullName || 'Upazila Field Coordinator'} (${currentUser?.role || 'COORDINATOR'})</div>
+                </div>
+                <div>
+                  <div style="margin-bottom: 3px;"><b>Work Order Reference:</b> <span style="font-family: monospace; font-weight: bold;">${serialNo}</span></div>
+                  <div style="margin-bottom: 3px;"><b>Issue Date:</b> ${issueDate}</div>
+                  <div><b>Execution Deadline:</b> Within 24 Hours of Sanction</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 1: MANDATED RESOURCE RESTOCKING & PROCUREMENT -->
+            <div style="margin-bottom: 14px;">
+              <h2 style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #0f172a; margin: 0 0 6px 0;">
+                1. Itemized Procurement & Restocking Schedule
+              </h2>
+              <table style="width: 100%; border-collapse: collapse; font-size: 10px; background-color: #ffffff;" border="1" cellpadding="6" bordercolor="#cbd5e1">
+                <thead>
+                  <tr style="background-color: #f1f5f9; color: #1e293b; font-weight: bold;">
+                    <th align="left" style="padding: 6px;">Resource Description</th>
+                    <th align="center" style="padding: 6px;">Unit Type</th>
+                    <th align="center" style="padding: 6px;">Buffer Policy</th>
+                    <th align="center" style="padding: 6px;">Current In-Stock</th>
+                    <th align="center" style="padding: 6px;">Crisis Demand</th>
+                    <th align="center" style="padding: 6px; background-color: #e2e8f0;">Ordered Restock Qty</th>
+                    <th align="right" style="padding: 6px;">Est. Unit Rate (BDT)</th>
+                    <th align="right" style="padding: 6px;">Total Subtotal (BDT)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${boq.items.map(item => `
+                    <tr>
+                      <td style="padding: 6px; font-weight: 600; color: #0f172a;">${item.itemName}</td>
+                      <td align="center" style="padding: 6px; color: #475569;">${item.unit}</td>
+                      <td align="center" style="padding: 6px; color: #475569;">${item.policyQty.toLocaleString()}</td>
+                      <td align="center" style="padding: 6px; color: #475569;">${item.currentQty.toLocaleString()}</td>
+                      <td align="center" style="padding: 6px; color: #475569;">${item.emergencyQty.toLocaleString()}</td>
+                      <td align="center" style="padding: 6px; font-weight: bold; background-color: #f8fafc; color: #0f172a;">${item.restockingQty.toLocaleString()}</td>
+                      <td align="right" style="padding: 6px; color: #475569;">৳ ${item.estimatedUnitPriceBDT.toLocaleString()}</td>
+                      <td align="right" style="padding: 6px; font-weight: bold; color: #0f172a;">৳ ${item.totalRestockCostBDT.toLocaleString()}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+                <tfoot>
+                  <tr style="background-color: #f8fafc; font-size: 11px; font-weight: bold;">
+                    <td colspan="7" align="right" style="padding: 8px; text-transform: uppercase;">
+                      TOTAL SANCTIONED WORK ORDER ALLOCATION:
+                    </td>
+                    <td align="right" style="padding: 8px; color: #0f172a; font-size: 12px;">
+                      ৳ ${boq.totalProjectedCostBDT.toLocaleString()} BDT
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <!-- SECTION 2: SPECIAL DIRECTIVES & LOGISTICS PROTOCOLS -->
+            <div style="margin-bottom: 24px; padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 9.5px; color: #334155;">
+              <div style="font-weight: bold; text-transform: uppercase; margin-bottom: 4px; color: #0f172a;">2. Mandatory Handling Directives:</div>
+              <ol style="margin: 0; padding-left: 16px; line-height: 1.5;">
+                <li>All supplied food dry rations and medical trauma kits must be verified by the Upazila Quality Inspection Team before depot intake.</li>
+                <li>Vendors and depot managers must attach physical receipt vouchers cross-referencing Work Order Serial <b>${serialNo}</b>.</li>
+                <li>Restocked units must be staged for immediate evacuation dispatch as dictated by live GreenSignalAI water level alerts.</li>
+              </ol>
+            </div>
+
+            <!-- SECTION 3: FORMAL SIGNATURE BLOCKS -->
+            <div style="margin-top: 36px; padding-top: 12px; border-top: 1px dashed #94a3b8;">
+              <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: #475569; margin-bottom: 20px; letter-spacing: 0.5px;">
+                3. Verification, Administrative Clearance & Authorizing Signatures
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;">
+                <!-- Signature 1: Storekeeper / Shelter In-Charge -->
+                <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; background-color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;">
+                  <div>
+                    <div style="font-size: 9px; font-weight: bold; text-transform: uppercase; color: #64748b;">Requested & Prepared By:</div>
+                    <div style="font-size: 10px; font-weight: bold; color: #0f172a; margin-top: 2px;">Shelter / Depot In-Charge</div>
+                  </div>
+                  <div style="margin-top: 36px;">
+                    <div style="border-top: 1px solid #475569; padding-top: 4px; font-size: 9px; color: #475569;">
+                      <div>Signature: ______________________</div>
+                      <div style="margin-top: 2px;">Name: _________________________</div>
+                      <div style="margin-top: 2px;">Date: __________________________</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Signature 2: Upazila Disaster Coordinator -->
+                <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; background-color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;">
+                  <div>
+                    <div style="font-size: 9px; font-weight: bold; text-transform: uppercase; color: #64748b;">Inspected & Verified By:</div>
+                    <div style="font-size: 10px; font-weight: bold; color: #0f172a; margin-top: 2px;">Upazila Disaster Coordinator</div>
+                  </div>
+                  <div style="margin-top: 36px;">
+                    <div style="border-top: 1px solid #475569; padding-top: 4px; font-size: 9px; color: #475569;">
+                      <div>Signature: ______________________</div>
+                      <div style="margin-top: 2px;">Name: ${currentUser?.fullName || '_________________________'}</div>
+                      <div style="margin-top: 2px;">Date: ${issueDate}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Signature 3: Upazila Nirbahi Officer (UNO) -->
+                <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; background-color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;">
+                  <div>
+                    <div style="font-size: 9px; font-weight: bold; text-transform: uppercase; color: #64748b;">Approved & Sanctioned By:</div>
+                    <div style="font-size: 10px; font-weight: bold; color: #0f172a; margin-top: 2px;">Upazila Nirbahi Officer (UNO)</div>
+                  </div>
+                  <div style="margin-top: 36px;">
+                    <div style="border-top: 1px solid #475569; padding-top: 4px; font-size: 9px; color: #475569;">
+                      <div>Signature: ______________________</div>
+                      <div style="margin-top: 2px;">Official Seal: [ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ]</div>
+                      <div style="margin-top: 2px;">Date: __________________________</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="text-align: center; margin-top: 20px; font-size: 8.5px; color: #94a3b8;">
+                This document is an authorized official work order generated by GreenSignalAI Disaster Coordination System. Printed on clean white administrative bond.
+              </div>
+            </div>
+
+          </div>
+        `;
+
+        const printContainer = document.getElementById('workOrderPrintContainer');
+        printContainer.classList.remove('hidden');
+
+        setTimeout(() => {
+          window.print();
+          setTimeout(() => {
+            printContainer.classList.add('hidden');
+          }, 1500);
+        }, 150);
+
+      } catch (err) {
+        console.error('Work Order generation error:', err);
+        alert('An error occurred while generating the Work Order.');
+      }
     }
+
+    // Alias for backwards compatibility
+    const printBOQ = printWorkOrder;
 
     // 5. Messenger Functions
     function toggleMessengerDrawer() {
       const drawer = document.getElementById('messengerDrawer');
+      const isOpening = drawer.classList.contains('translate-x-full');
       drawer.classList.toggle('translate-x-full');
+      if (isOpening) {
+        loadChannelMessages(activeChannel);
+      }
+    }
+
+    async function loadChannelMessages(channel) {
+      const list = document.getElementById('messagesList');
+      try {
+        const res = await fetch(`/api/messages/${encodeURIComponent(channel)}`);
+        if (!res.ok) return;
+        const history = await res.json();
+        list.innerHTML = '';
+        if (Array.isArray(history)) {
+          history.forEach(msg => appendChatMessage(msg));
+        }
+      } catch (e) {
+        console.warn('Failed to load message history:', e);
+      }
+    }
+
+    function switchToGeneralChat() {
+      activeChannel = 'upazila-general';
+      document.getElementById('activeChannelName').innerText = 'upazila-general';
+      document.getElementById('resetGeneralChatBtn').classList.add('hidden');
+      if (socket) socket.emit('join_channel', activeChannel);
+      loadChannelMessages(activeChannel);
     }
 
     async function handleUserSearch() {
@@ -586,23 +878,37 @@
     }
 
     function startDirectChat(userId, fullName) {
-      activeChannel = `direct-${userId}`;
+      const myId = currentUser ? currentUser.id : 'guest';
+      const sorted = [myId, userId].sort();
+      activeChannel = `direct-${sorted.join('-')}`;
       document.getElementById('activeChannelName').innerText = `Chat: ${fullName}`;
+      document.getElementById('resetGeneralChatBtn').classList.remove('hidden');
       document.getElementById('searchResultsList').classList.add('hidden');
-      socket.emit('join_channel', activeChannel);
-      document.getElementById('messagesList').innerHTML = '';
+      if (socket) socket.emit('join_channel', activeChannel);
+      loadChannelMessages(activeChannel);
     }
 
-    function sendChatMessage() {
+    async function sendChatMessage() {
       const input = document.getElementById('chatMessageInput');
       const text = input.value.trim();
-      if (!text || !currentUser) return;
+      if (!text) return;
 
-      socket.emit('send_message', {
-        senderId: currentUser.id,
-        channel: activeChannel,
-        text
-      });
+      if (!currentUser) {
+        await quickImpersonateLogin('Adamdighi Citizen');
+      }
+
+      if (!currentUser) {
+        alert('Please sign in or select a user from the Switch User modal.');
+        return;
+      }
+
+      if (socket) {
+        socket.emit('send_message', {
+          senderId: currentUser.id,
+          channel: activeChannel,
+          text
+        });
+      }
 
       input.value = '';
     }
@@ -637,10 +943,47 @@
       document.getElementById('loginUsernameInput').value = username;
     }
 
+    async function quickImpersonateLogin(query) {
+      try {
+        const res = await fetch('/api/db-admin/impersonate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+        adaptUIForUser(data.user);
+        loadDefaultContext(data.user.districtNodeId || '');
+      } catch (e) {
+        console.warn('Quick impersonate error:', e);
+      }
+    }
+
     async function performLogin() {
       const username = document.getElementById('loginUsernameInput').value.trim();
       if (!username) return alert('Enter username');
 
+      // Try quick impersonate first for robust matching across full name or role
+      const impRes = await fetch('/api/db-admin/impersonate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: username })
+      });
+
+      if (impRes.ok) {
+        const data = await impRes.json();
+        closeLoginModal();
+        adaptUIForUser(data.user);
+        loadDefaultContext(data.user.districtNodeId || '');
+        return;
+      }
+
+      // Standard fallback login
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

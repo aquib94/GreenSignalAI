@@ -129,7 +129,7 @@ const getPasswordHash = (username: string): string => {
 async function upsertUser(username: string, role: Role, nodeId: string) {
   if (!username) return;
   const cleanUser = username.toLowerCase().replace(/[^a-z0-9]/g, '');
-  const email = `${cleanUser}@bndrss.gov.bd`;
+  const email = `${cleanUser}@dmr.bd.gov`;
 
   await prisma.user.upsert({
     where: { username },

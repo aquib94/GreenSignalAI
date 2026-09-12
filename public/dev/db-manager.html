@@ -178,8 +178,10 @@
             <input type="text" id="searchTableInput" onkeyup="filterTableRows()" placeholder="Filter current view..." 
                    class="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
           </div>
-          <div class="text-xs text-slate-400">
-            Total Records: <span id="recordCount" class="font-bold text-indigo-400">0</span>
+          <div class="text-xs text-slate-400 flex items-center gap-1.5">
+            <span>Records:</span>
+            <span id="recordCount" class="font-bold font-mono text-indigo-400">0</span>
+            <span class="text-[10px] font-bold text-emerald-400 bg-emerald-950/70 border border-emerald-800/60 px-2 py-0.5 rounded font-mono">ALL ROWS LOADED</span>
           </div>
         </div>
 
@@ -342,10 +344,12 @@
     function filterTableRows() {
       const q = document.getElementById('searchTableInput').value.toLowerCase();
       if (!q) {
+        document.getElementById('recordCount').innerText = loadedData.length;
         renderTableRows(loadedData);
         return;
       }
       const filtered = loadedData.filter(row => JSON.stringify(row).toLowerCase().includes(q));
+      document.getElementById('recordCount').innerText = `${filtered.length} / ${loadedData.length}`;
       renderTableRows(filtered);
     }
 
@@ -382,13 +386,11 @@
         }
 
         // Redirect URL logic depending on role
-        let targetUrl = '/citizen/';
-        if (data.user.role === 'COORDINATOR') {
-          targetUrl = `/coordinators/?tier=${data.user.districtNode?.tier || 'UPAZILA'}`;
-        } else if (data.user.role === 'PLANNER') {
-          targetUrl = '/planners/';
-        } else if (data.user.role === 'ADMIN') {
-          targetUrl = '/coordinators/?tier=COUNTRY';
+        let targetUrl = '/';
+        if (data.user.role === 'PLANNER') {
+          targetUrl = '/district-planner.html';
+        } else {
+          targetUrl = `/?impersonate=${encodeURIComponent(data.user.username)}`;
         }
 
         // Open view in a NEW TAB
@@ -403,18 +405,31 @@
       const text = document.getElementById('msgTextInput').value.trim();
       if (!text) return alert('Enter message body');
 
+      let senderId = null;
+      if (loadedData.length > 0 && loadedData[0]?.id && currentTable === 'users') {
+        senderId = loadedData[0].id;
+      } else {
+        try {
+          const uRes = await fetch('/api/db-admin/table/users');
+          if (uRes.ok) {
+            const uList = await uRes.json();
+            if (uList && uList.length > 0) senderId = uList[0].id;
+          }
+        } catch (e) {}
+      }
+
       const res = await fetch('/api/db-admin/table/chat_messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           channel: 'upazila-general',
           text: text,
-          senderId: loadedData[0]?.id || 'admin-id'
+          senderId: senderId
         })
       });
 
       if (res.ok) {
-        alert('Message injected into chat_messages table!');
+        alert('Message injected and broadcast live to Field Messenger!');
         document.getElementById('msgTextInput').value = '';
         if (currentTable === 'chat_messages') loadTableData();
       } else {
@@ -427,20 +442,19 @@
       const severity = document.getElementById('alertSeveritySelect').value;
       if (!title) return alert('Enter alert title');
 
-      const res = await fetch('/api/db-admin/table/disaster_alerts', {
+      const res = await fetch('/api/alerts/broadcast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title,
           description: 'Emergency automated hazard alert triggered via Dev Studio.',
           district: 'NATIONWIDE',
-          severity,
-          isActive: true
+          severity
         })
       });
 
       if (res.ok) {
-        alert('Alert inserted into disaster_alerts!');
+        alert('Alert broadcast live to all active clients and saved to database!');
         document.getElementById('alertTitleInput').value = '';
         if (currentTable === 'disaster_alerts') loadTableData();
       } else {

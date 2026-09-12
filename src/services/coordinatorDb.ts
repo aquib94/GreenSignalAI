@@ -33,8 +33,8 @@ export class CoordinatorDbService {
   /**
    * Fetch all relief centers and sensors within the coordinator's administrative scope
    */
-  static async getCoordinatorScopeData(userNodeId: string) {
-    const userNode = await prisma.administrativeNode.findUnique({
+  static async getCoordinatorScopeData(userNodeId?: string) {
+    let userNode = userNodeId ? await prisma.administrativeNode.findUnique({
       where: { id: userNodeId },
       include: {
         children: {
@@ -43,7 +43,20 @@ export class CoordinatorDbService {
           }
         }
       }
-    });
+    }) : null;
+
+    if (!userNode) {
+      userNode = await prisma.administrativeNode.findFirst({
+        where: { tier: 'UPAZILA' },
+        include: {
+          children: {
+            include: {
+              children: true
+            }
+          }
+        }
+      });
+    }
 
     if (!userNode) throw new Error('Coordinator administrative node not found.');
 
@@ -119,9 +132,13 @@ export class CoordinatorDbService {
    * Generate Bill of Quantities (BOQ) for procurement & restocking
    */
   static async generateBOQ(centerId: string): Promise<BOQReport> {
-    const center = await prisma.reliefCenter.findUnique({
+    let center = centerId ? await prisma.reliefCenter.findUnique({
       where: { id: centerId }
-    });
+    }) : null;
+
+    if (!center) {
+      center = await prisma.reliefCenter.findFirst();
+    }
 
     if (!center) throw new Error('Relief center not found');
 

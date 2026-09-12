@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 import apiRoutes from './routes/api';
 import { MessagingService } from './services/messaging';
 
-dotenv.config();
+dotenv.config({ override: true });
 
 const app = express();
 const server = http.createServer(app);
@@ -15,15 +15,24 @@ const io = new Server(server, {
   cors: { origin: '*' }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Store Socket.io instance on app for access in routes
+app.set('io', io);
+
+// Convenient alias for dev tools
+app.get(['/dev', '/dev/'], (req, res) => {
+  res.redirect('/dev/db-manager.html');
+});
+
 // Serve static frontend from public/ (automatically covers public/dev)
-app.use(express.static(path.join(__dirname, '../public')));
+const publicDir = path.join(process.cwd(), 'public');
+app.use(express.static(publicDir));
 
 // Mount API routes
 app.use('/api', apiRoutes);
@@ -39,9 +48,9 @@ app.get('*', (req, res) => {
   }
   
   // Otherwise, serve the SPA for standard frontend routes
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  res.sendFile(path.join(publicDir, 'index.html'));
 });
 
-server.listen(PORT, () => {
-  console.log(`🚀 GreenSignalAI Server running at http://localhost:${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 GreenSignalAI Server running at http://0.0.0.0:${PORT}`);
 });

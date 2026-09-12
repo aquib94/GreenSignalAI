@@ -6,12 +6,19 @@ export class AlertsService {
    * Get active broadcast alerts for a specific district or nationwide
    */
   static async getActiveAlerts(districtName?: string) {
+    if (!districtName || districtName.trim() === '' || districtName.toUpperCase() === 'ALL') {
+      return await prisma.disasterAlert.findMany({
+        where: { isActive: true },
+        orderBy: { createdAt: 'desc' }
+      });
+    }
+
     return await prisma.disasterAlert.findMany({
       where: {
         isActive: true,
         OR: [
           { district: 'NATIONWIDE' },
-          ...(districtName ? [{ district: { equals: districtName, mode: 'insensitive' as const } }] : [])
+          { district: { equals: districtName, mode: 'insensitive' as const } }
         ]
       },
       orderBy: { createdAt: 'desc' }
