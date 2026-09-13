@@ -117,23 +117,29 @@
   <div id="plannerDashboard" class="hidden flex-1 flex flex-col h-full overflow-hidden">
     
     <!-- TOP NAVIGATION BAR -->
-    <header class="bg-slate-900 border-b border-slate-800 px-6 py-3.5 flex items-center justify-between shrink-0 shadow-md">
-      <div class="flex items-center space-x-3">
-        <div class="bg-emerald-600 p-2 rounded-xl text-white shadow-md shadow-emerald-500/20">
-          <i class="fa-solid fa-sliders text-lg"></i>
+    <header class="bg-slate-900 border-b border-slate-800 px-3 sm:px-6 py-3 flex items-center justify-between shrink-0 shadow-md">
+      <div class="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
+        <div class="bg-emerald-600 p-1.5 sm:p-2 rounded-xl text-white shadow-md shadow-emerald-500/20 shrink-0">
+          <i class="fa-solid fa-sliders text-base sm:text-lg"></i>
         </div>
-        <div>
-          <h1 class="text-base font-bold text-white flex items-center gap-2">
-            GreenSignalAI <span class="text-xs font-normal text-emerald-400 bg-emerald-950/80 border border-emerald-800/60 px-2 py-0.5 rounded-full">District Resource Planner</span>
+        <div class="min-w-0">
+          <h1 class="text-sm sm:text-base font-bold text-white flex items-center gap-1.5 flex-wrap">
+            <span>GreenSignalAI</span> <span class="text-[10px] sm:text-xs font-normal text-emerald-400 bg-emerald-950/80 border border-emerald-800/60 px-2 py-0.5 rounded-full whitespace-nowrap">Planner</span>
           </h1>
-          <p class="text-xs text-slate-400">Target Region: <span id="activeDistrictBadge" class="font-bold text-slate-200">Bogura District</span></p>
+          <p class="text-[11px] sm:text-xs text-slate-400 truncate">Region: <span id="activeDistrictBadge" class="font-bold text-slate-200">Bogura District</span></p>
         </div>
       </div>
 
-      <div class="flex items-center space-x-3">
-        <span class="text-xs text-slate-400 hidden sm:inline">Logged in as: <b id="plannerNameText" class="text-slate-200">planner.bogura</b></span>
-        <button onclick="handleLogout()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i> Exit
+      <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+        <span class="text-xs text-slate-400 hidden md:inline">Logged in as: <b id="plannerNameText" class="text-slate-200">planner.bogura</b></span>
+        <a href="/proposal.html" class="bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-emerald-600 transition flex items-center gap-1.5 shadow" title="MoDMR National Proposal">
+          <i class="fa-solid fa-file-contract text-emerald-300"></i> <span class="hidden sm:inline">Proposal (100 Cr)</span>
+        </a>
+        <a href="/" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-gauge text-emerald-400"></i> <span class="hidden sm:inline">Dashboard</span>
+        </a>
+        <button onclick="handleLogout()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i> <span class="hidden sm:inline">Exit</span>
         </button>
       </div>
     </header>

@@ -17,34 +17,37 @@
 <body class="h-full flex flex-col font-sans bg-slate-950 text-slate-100">
 
   <!-- TOP HEADER -->
-  <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex items-center justify-between shrink-0 shadow-lg">
+  <header class="bg-slate-900 border-b border-slate-800 px-3 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0 shadow-lg">
     <div class="flex items-center space-x-3">
-      <div class="bg-indigo-600 p-2.5 rounded-lg shadow-md shadow-indigo-500/20">
-        <i class="fa-solid fa-database text-white text-xl"></i>
+      <div class="bg-indigo-600 p-2 sm:p-2.5 rounded-lg shadow-md shadow-indigo-500/20 shrink-0">
+        <i class="fa-solid fa-database text-white text-lg sm:text-xl"></i>
       </div>
       <div>
-        <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-          Green Signal AI Database Studio & Impersonation Hub
-          <span class="text-xs bg-indigo-500/20 text-indigo-400 px-2.5 py-0.5 rounded-full font-mono border border-indigo-500/30">DEV TOOLS</span>
+        <h1 class="text-base sm:text-xl font-bold tracking-tight text-white flex items-center gap-2 flex-wrap">
+          <span>Green Signal AI Database Studio</span>
+          <span class="text-[10px] sm:text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded-full font-mono border border-indigo-500/30">DEV TOOLS</span>
         </h1>
-        <p class="text-xs text-slate-400">Direct PostgreSQL Table Inspector, Live User Account Impersonator & Raw SQL Execution Console</p>
+        <p class="text-[11px] sm:text-xs text-slate-400">PostgreSQL Table Inspector, Live Account Impersonator & SQL Console</p>
       </div>
     </div>
-    <div class="flex items-center space-x-3">
-      <button onclick="exportDatabaseSQL()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow flex items-center gap-2">
-        <i class="fa-solid fa-file-export"></i> Export Entire DB (.sql)
+    <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+      <a href="/" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-gauge text-emerald-400"></i> Dashboard
+      </a>
+      <button onclick="exportDatabaseSQL()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 sm:px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
+        <i class="fa-solid fa-file-export"></i> <span class="hidden sm:inline">Export DB</span><span class="sm:hidden">Export</span>
       </button>
-      <button onclick="fetchDatabaseStats()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
-        <i class="fa-solid fa-rotate text-xs"></i> Refresh Stats
+      <button onclick="fetchDatabaseStats()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-2.5 sm:px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-rotate text-xs"></i> Refresh
       </button>
     </div>
   </header>
 
   <!-- MAIN CONTAINER -->
-  <div class="flex-1 flex overflow-hidden">
+  <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
 
     <!-- LEFT SIDEBAR: QUICK USER IMPERSONATION & ACTIONS -->
-    <aside class="w-80 bg-slate-900/70 border-r border-slate-800 p-4 flex flex-col gap-5 shrink-0 overflow-y-auto custom-scrollbar">
+    <aside class="w-full md:w-80 bg-slate-900/70 border-b md:border-b-0 md:border-r border-slate-800 p-4 flex flex-col gap-5 shrink-0 overflow-y-auto custom-scrollbar max-h-72 md:max-h-none">
       
       <!-- QUICK SIGN IN / IMPERSONATION BOX -->
       <div class="bg-slate-800/80 rounded-xl p-4 border border-indigo-500/30 shadow-lg">

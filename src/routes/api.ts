@@ -6,6 +6,9 @@ import { MessagingService } from '../services/messaging';
 import { AlertsService } from '../services/alerts';
 import { CoordinatorDbService } from '../services/coordinatorDb';
 import { DbAdminService } from '../services/dbAdmin';
+import { generateProposalPdf } from '../services/proposalPdf';
+import path from 'path';
+import fs from 'fs';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'greensignal_ai_secure_jwt_secret_key_2026';
@@ -183,6 +186,7 @@ router.get(['/gis/features', '/gis/map-data'], async (req, res) => {
     const formattedCenters = centers.map((c: any) => {
       const upzName = c.districtNode?.name || 'Upazila Center';
       const distName = c.districtNode?.parent?.name || 'District HQ';
+      const distId = c.districtNode?.parent?.id || c.districtNode?.parentId || c.districtNodeId;
       return {
         id: c.id,
         name: c.name,
@@ -198,14 +202,17 @@ router.get(['/gis/features', '/gis/map-data'], async (req, res) => {
         emergencyRequirement: c.emergencyRequirement || {},
         restockingRequirement: c.restockingRequirement || {},
         upazilaName: upzName,
+        upazilaId: c.districtNodeId,
         districtName: distName,
-        districtNodeId: c.districtNodeId
+        districtId: distId,
+        districtNodeId: distId
       };
     });
 
     const formattedSensors = sensors.map((s: any) => {
       const upzName = s.districtNode?.name || 'Local Area';
       const distName = s.districtNode?.parent?.name || 'District';
+      const distId = s.districtNode?.parent?.id || s.districtNode?.parentId || s.districtNodeId;
       return {
         id: s.id,
         sensorCode: s.sensorCode,
@@ -216,8 +223,10 @@ router.get(['/gis/features', '/gis/map-data'], async (req, res) => {
         status: s.status || 'ACTIVE',
         lastPing: s.lastPing || new Date(),
         upazilaName: upzName,
+        upazilaId: s.districtNodeId,
         districtName: distName,
-        districtNodeId: s.districtNodeId
+        districtId: distId,
+        districtNodeId: distId
       };
     });
 
@@ -489,5 +498,39 @@ router.get('/db-admin/export-sql', async (req, res) => {
     res.status(500).send(`-- Export Failed: ${err.message}`);
   }
 });
+
+// Download Formal Project Proposal PDF
+router.get('/proposal/download', async (req, res) => {
+  try {
+    const staticPdfPath = path.join(process.cwd(), 'public', 'GreenSignal_AI_Project_Proposal.pdf');
+    let pdfBuffer: Buffer;
+
+    if (req.query.fresh === '1' || !fs.existsSync(staticPdfPath)) {
+      pdfBuffer = await generateProposalPdf(staticPdfPath);
+    } else {
+      pdfBuffer = fs.readFileSync(staticPdfPath);
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="GreenSignal_AI_Project_Proposal.pdf"');
+    res.setHeader('Content-Length', pdfBuffer.length);
+    res.send(pdfBuffer);
+  } catch (err: any) {
+    console.error('Error serving proposal PDF:', err);
+    res.status(500).json({ error: 'Failed to generate proposal PDF', details: err.message });
+  }
+});
+
+// Generate static proposal PDF immediately on startup
+(async () => {
+  try {
+    const staticPdfPath = path.join(process.cwd(), 'public', 'GreenSignal_AI_Project_Proposal.pdf');
+    console.log('Generating updated 8-page proposal PDF at', staticPdfPath);
+    await generateProposalPdf(staticPdfPath);
+    console.log('Updated 8-page proposal PDF generated successfully');
+  } catch (e) {
+    console.warn('Initial PDF pre-generation notice:', e);
+  }
+})();
 
 export default router;
