@@ -13,7 +13,7 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
           Title: 'GreenSignal AI - National Disaster Response & Relief Infrastructure Technical Proposal',
           Author: 'GreenSignal AI Consortium & Ministry of Disaster Management and Relief (MoDMR)',
           Subject: 'Automated IoT Telemetry, Upazila Tactical Operations & Strategic Relief Allocation',
-          Keywords: 'Bangladesh, MoDMR, Disaster Management, 100 Crore, IoT, Early Warning, Relief',
+          Keywords: 'Bangladesh, MoDMR, Disaster Management, 100 Crore, IoT, Starlink, Early Warning, Relief',
           CreationDate: new Date()
         }
       });
@@ -86,7 +86,7 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
         .text('National Automated Disaster Response, Hydrometric Early Warning\n& Strategic Resource Allocation Infrastructure', 45, titleY + 40, { align: 'center', lineGap: 3 });
 
       doc.fillColor(cMuted).fontSize(8.5).font('Helvetica')
-        .text('A Unified Multi-Agency Sovereign Ecosystem Integrating 2,500+ Automated Hydrometric Telemetry Stations, 495 Upazila Disaster Operations Hubs, 1,250 Climate-Hardened Union Relief Silos, and Resilient Multi-Million User Digital Command Applications.', 70, titleY + 76, { align: 'center', lineGap: 2.5 });
+        .text('A Unified Multi-Agency Sovereign Ecosystem Integrating Automated IoT Hydrometric Telemetry Stations, Upazila Operations Hubs with Starlink 99% Uptime, Climate-Hardened Union Relief Buffer Warehouses & Silos, and Resilient Multi-Million User Digital Command Applications.', 70, titleY + 76, { align: 'center', lineGap: 2.5 });
 
       // Document Metadata Table Box
       const metaBoxY = titleY + 125;
@@ -98,13 +98,13 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       const metaRows = [
         ['Project Title:', 'GreenSignal AI: National Automated Disaster Response Platform'],
         ['Project Code / Ref:', 'MoDMR-NDMP-2026-GS01 / GOB-Turnkey-P1'],
-        ['Total Estimated Outlay:', 'BDT 100,00,00,000 (BDT 100.00 Crore / Approx. USD 84.5M)'],
-        ['Target Project Lifecycle:', '36 Months Turnkey Deployment + 36 Months Comprehensive O&M'],
+        ['Total Estimated Outlay:', 'BDT 100,00,00,000 (BDT 100.00 Crore / Guaranteed Financial Ceiling)'],
+        ['Target Project Lifecycle:', 'Live Core Platform in 1–2 Months • Multi-Decade Expansion Horizon'],
         ['Sponsoring Ministry:', 'Ministry of Disaster Management and Relief (MoDMR)'],
         ['Lead Implementing Agency:', 'Department of Disaster Management (DDM) & GreenSignal Technical Consortium'],
         ['Strategic Key Partners:', 'CPP, BMD, FFWC (BWDB), SPARRSO, BTRC, Armed Forces Division (AFD)'],
         ['Security & Data Classification:', 'Official Public Safety Critical / Sovereign National Infrastructure'],
-        ['Submission Date:', 'September 2026 • Edition 3.0 (Comprehensive National Release)']
+        ['Submission Date:', 'September 2026 • Edition 3.1 (Comprehensive National Release)']
       ];
 
       let mrY = metaBoxY + 28;
@@ -150,10 +150,10 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
         ['1.0', 'Table of Contents & Executive Strategic Summary', 'Page 2'],
         ['2.0', 'Multi-Tier Institutional & Operational Architecture', 'Page 3'],
         ['3.0', 'Digital Platform Architecture, Software Codebase & Cyber-Security', 'Page 4'],
-        ['4.0', 'Network Topology, High-Throughput Cloud & Telecommunications', 'Page 5'],
+        ['4.0', 'Network Topology, High-Throughput Cloud & Starlink Satellite Comms', 'Page 5'],
         ['5.0', 'Automated Environmental Sensor Network & Industrial IoT Datasheet', 'Page 6'],
         ['6.0', 'Comprehensive Financial Budget Breakdown (100.00 Crore BDT CapEx/OpEx)', 'Page 7'],
-        ['7.0', '36-Month Implementation Roadmap, Risk Mitigation & Ministerial Approval', 'Page 8']
+        ['7.0', 'Phased Implementation Horizon, Risk Mitigation & Ministerial Approval', 'Page 8']
       ];
 
       let tocY = y2 + 24;
@@ -170,7 +170,7 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       doc.fillColor(cTeal).fontSize(10.5).font('Helvetica-Bold').text('1.1 Strategic Humanitarian & Geographic Imperative', 45, y2);
       y2 += 15;
       doc.fillColor(cNavy).fontSize(8.2).font('Helvetica').text(
-        'Bangladesh is universally recognized as one of the world\'s most climate-vulnerable deltaic nations. Spanning over 230 transboundary rivers, the Meghna, Jamuna, and Padma basins funnel an astronomical volume of monsoonal discharge into the Bay of Bengal, resulting in annual inundations of 20% to 68% of the national territory. Furthermore, the 710 km coastline is repeatedly impacted by intense cyclonic storm surges, while the northeastern Haor wetlands face devastatingly rapid flash floods that submerge standing crops in fewer than 6 hours.',
+        'Bangladesh is universally recognized as one of the world\'s most climate-vulnerable deltaic nations. Spanning over 230 transboundary rivers, the Meghna, Jamuna, and Padma basins funnel an astronomical volume of monsoonal discharge into the Bay of Bengal, resulting in annual inundations across extensive portions of the national territory. Furthermore, the 710 km coastline is repeatedly impacted by intense cyclonic storm surges, while the northeastern Haor wetlands face devastatingly rapid flash floods that submerge standing crops in fewer than 6 hours.',
         45, y2, { width: 505, align: 'justify', lineGap: 2 }
       );
       y2 += 52;
@@ -179,16 +179,16 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       doc.fillColor(cTeal).fontSize(10.5).font('Helvetica-Bold').text('1.2 The "Last-Mile Gap" in Conventional Disaster Management', 45, y2);
       y2 += 15;
       doc.fillColor(cNavy).fontSize(8.2).font('Helvetica').text(
-        'While macroscopic forecasting by the Bangladesh Meteorological Department (BMD) and hydrologic modeling by the Flood Forecasting and Warning Centre (FFWC) have drastically reduced cyclonic fatalities over past decades, an acute operational gap persists between macro-level meteorological alerts and ground-level humanitarian execution. Historical response challenges include:',
+        'While macroscopic forecasting by the Bangladesh Meteorological Department (BMD) and hydrologic modeling by the Flood Forecasting and Warning Centre (FFWC) have significantly advanced early awareness over past decades, an acute operational gap persists between macro-level alerts and ground-level humanitarian execution. Historical response challenges include:',
         45, y2, { width: 505, align: 'justify', lineGap: 2 }
       );
       y2 += 34;
 
       const gapPoints = [
-        ['Manual Telemetry Latency: ', 'River gauges and rainfall data in remote upazilas often rely on physical chalk boards and manual phone calls, resulting in 2- to 4-hour lags before data reaches the national command center.'],
-        ['Static Relief Allocation: ', 'Relief food, water purification tablets, and medical kits are frequently dispatched based on outdated census figures rather than live disaster displacement density.'],
-        ['Telecommunications Vulnerability: ', 'Severe Category-4 cyclone landfalls invariably sever commercial electrical grids and knock down cellular base transceiver stations (BTS), isolating offshore islands.'],
-        ['Relief Distribution Leakage: ', 'Paper-based relief manifests lack real-time digital verification, leading to misdirection, duplicated relief distribution, and stock-outs in isolated rural unions.']
+        ['Manual Telemetry Latency: ', 'River gauges and rainfall data in remote areas often rely on manual reporting, resulting in delays before data reaches central decision-makers.'],
+        ['Static Relief Allocation: ', 'Relief food, water purification tablets, and medical kits are frequently dispatched based on static lists rather than real-time disaster displacement density.'],
+        ['Telecommunications Vulnerability: ', 'Severe cyclone landfalls and flash floods frequently disrupt terrestrial power and cellular base stations, isolating vulnerable island and char communities.'],
+        ['Relief Distribution Transparency: ', 'Traditional paper manifests lack digital verification, risking misallocation and stock imbalances in isolated union warehouses.']
       ];
 
       gapPoints.forEach(([head, body]) => {
@@ -203,7 +203,7 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       doc.fillColor(cTeal).fontSize(10.5).font('Helvetica-Bold').text('1.3 The GreenSignal AI Paradigm Shift', 45, y2);
       y2 += 15;
       doc.fillColor(cNavy).fontSize(8.2).font('Helvetica').text(
-        'GreenSignal AI bridges this gap through a unified sovereign ecosystem combining automated industrial IoT telemetry, edge artificial intelligence, decentralized satellite/LoRaWAN fallback networks, and military-grade logistical dispatch. By synchronizing 2,500+ automated hydrometric stations directly with 495 Upazila Command Hubs and 1,250 Union Relief Buffer Silos, the platform automates the sensor-to-shelter decision loop within 30 seconds of an impending flood peak or cyclone surge.',
+        'GreenSignal AI bridges this gap through a unified sovereign ecosystem combining automated industrial IoT telemetry, edge artificial intelligence, decentralized Starlink satellite backup, and algorithmic logistical dispatch. While complete physical infrastructure rollout is a long-term national endeavor spanning decades, the core GreenSignal AI application is architected to be fully operational and connecting to existing data streams within 1 to 2 months.',
         45, y2, { width: 505, align: 'justify', lineGap: 2 }
       );
       y2 += 48;
@@ -212,14 +212,14 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       doc.rect(45, y2, 505, 88).fillAndStroke(cCardBg, cBorder);
       doc.rect(45, y2, 505, 18).fill(cTeal);
       doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold')
-        .text('NATIONAL KEY PERFORMANCE TARGETS (36-MONTH DELIVERY)', 55, y2 + 5);
+        .text('NATIONAL KEY PERFORMANCE TARGETS (RAPID LAUNCH & DECADAL SCALING)', 55, y2 + 5);
 
       const kpiItems = [
+        ['Rapid Software Operationalization:', 'Core software platform live and ingesting existing BMD/FFWC data in 1–2 months.'],
         ['Early Warning Latency:', '< 30 Seconds from sensor threshold breach to automated cell broadcast & volunteer SMS.'],
-        ['Ground Truth Telemetry:', '2,500+ solar-powered stations with 21-day autonomy during complete cloud submersion.'],
-        ['Grassroots Volunteer Mobilization:', 'Seamless offline PWA connectivity for 76,000+ CPP leads & 2.5M registered responders.'],
-        ['Strategic Relief Integrity:', '100% auditable QR/NID biometric verification across all 1,250 Union Relief Buffer Silos.'],
-        ['System Availability SLA:', '99.999% uptime via Tier-IV National Data Center with hot active-active DR failover.']
+        ['Mission-Critical Uptime:', '99% uptime ensured across all command centers via dedicated Starlink satellite terminals.'],
+        ['Grassroots Volunteer Mobilization:', 'Seamless offline PWA connectivity for CPP unit leads and registered field responders.'],
+        ['Strategic Relief Integrity:', '100% auditable QR/NID biometric verification across Union Relief Buffer Warehouses & Silos.']
       ];
 
       let kpiY = y2 + 22;
@@ -260,26 +260,26 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
         [
           'Tier 1: National Ministerial\n(Cabinet & DDM)',
           'Minister, Secretary, DDM Director General, Armed Forces Division (AFD)',
-          'National Macro Command Portal\n(Dual 8K Central War-Room Display)',
-          '• Inter-district strategic grain/medical transfers\n• National state of emergency declarations\n• Armed Forces helicopter airlift mobilization\n• International humanitarian aid tracking'
+          'National Macro Command Portal\n(Central Executive Dashboard)',
+          '• Inter-district strategic grain/medical transfers\n• National state of emergency declarations\n• Armed Forces helicopter airlift mobilization\n• International humanitarian aid coordination'
         ],
         [
-          'Tier 2: Tactical District & Upazila\n(DDMC / UZDMC)',
-          'Deputy Commissioners (DC), UNOs, Upazila Project Implementation Officers (PIO)',
-          'Tactical GIS Command Suite\n(public/index.html & district-planner)',
-          '• Real-time upazila hazard mapping & sensor telemetry\n• Dynamic shelter quota & food allocation balancing\n• Transport fleet routing & rescue boat dispatch\n• Direct responder messenger dispatching'
+          'Tier 2: Tactical Command\n(Upazila Operations)',
+          'Deputy Commissioners (DC), UNOs, Project Implementation Officers (PIO)',
+          'Tactical GIS Command Suite\n(GIS Platform & District Planner)',
+          '• Real-time hazard mapping & sensor telemetry\n• Dynamic shelter quota & food allocation balancing\n• Transport fleet routing & rescue boat dispatch\n• Starlink-backed 99% uptime command continuity'
         ],
         [
           'Tier 3: Grassroots Field Responders\n(Union & Village)',
-          '76,000+ CPP Unit Leads, Red Crescent (BDRCS), Ansar-VDP, Community Health Workers',
+          'CPP Unit Leads, Red Crescent (BDRCS), Ansar-VDP, Community Responders',
           'Field Worker PWA Mobile App\n(Offline-first IndexedDB / 2G sync)',
           '• Door-to-door siren evacuation & roll-calls\n• GPS-tagged damage & casualty distress reporting\n• Relief distribution verification (NID/QR scan)\n• Survivor medical triage logging & SOS beacons'
         ],
         [
           'Tier 4: Affected Citizens\n(General Population)',
-          'Rural villagers, coastal islanders, urban slum dwellers, farmers',
+          'Rural villagers, coastal islanders, haor residents, farmers',
           'Public Cell Broadcast SMS, IVR Voice Lines, Local Warning Sirens',
-          '• Automated bilingual evacuation route guidance\n• Location of nearest open, powered cyclone shelter\n• Transparent relief entitlement confirmation\n• Missing family member locator queries'
+          '• Automated bilingual evacuation route guidance\n• Location of nearest open, powered shelter\n• Transparent relief entitlement confirmation\n• Emergency distress and assistance requests'
         ]
       ];
 
@@ -300,35 +300,35 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       doc.fillColor(cTeal).fontSize(10).font('Helvetica-Bold').text('2.2 Physical Infrastructure: Hubs, Warehouses & Shelters', 45, y3);
       y3 += 15;
 
-      // Box 1: 495 Upazila Disaster Operations Hubs
+      // Box 1: Upazila Operations Hubs
       doc.rect(45, y3, 505, 95).fillAndStroke(cCardBg, cBorder);
       doc.rect(45, y3, 505, 18).fill(cTeal);
       doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold')
-        .text('495 UPAZILA DISASTER OPERATIONS HUBS (TACTICAL COMMAND RETROFITS)', 55, y3 + 5);
+        .text('UPAZILA OPERATIONS HUBS (TACTICAL COMMAND RETROFITS)', 55, y3 + 5);
 
       doc.fillColor(cNavy).fontSize(7.5).font('Helvetica').text(
-        'Every one of Bangladesh\'s 495 Upazila Parishad complexes will receive a dedicated, turnkey GreenSignal AI Tactical Command Suite. Key physical specifications include:\n' +
-        '• Dual 65-inch Ultra-HD tactical monitoring screens mirroring live upazila GIS hydrological telemetry, water levels, and alert nodes.\n' +
-        '• 10 kVA Hybrid Solar-Inverter power system with 48V 200Ah Lithium Iron Phosphate (LiFePO4) storage, coupled to a 12 kW sound-attenuated automated diesel generator capable of 14 days grid-independent runtime.\n' +
-        '• Dedicated multi-band VHF/UHF tactical radio base station linked with the Cyclone Preparedness Programme (CPP) and Bangladesh Police networks.\n' +
-        '• Bangabandhu Satellite-1 (BS-1) VSAT terminal providing continuous broadband Internet connectivity during fiber severance.',
+        'Upazila Parishad complexes are established as dedicated Upazila Operations Hubs running the GreenSignal AI Tactical Command Suite. Key physical specifications include:\n' +
+        '• Tactical monitoring video screens mirroring live GIS hydrological telemetry, water levels, and alert nodes.\n' +
+        '• 10 kVA Hybrid Solar-Inverter power system with 48V Lithium Iron Phosphate (LiFePO4) storage, coupled to an automated diesel generator backup providing uncompromised continuity.\n' +
+        '• Dedicated multi-band VHF/UHF tactical radio base stations linked with the Cyclone Preparedness Programme (CPP) and emergency networks.\n' +
+        '• Dedicated Starlink satellite terminals equipped in each command center to guarantee 99% uptime during terrestrial fiber and grid disruptions.',
         55, y3 + 24, { width: 485, lineGap: 2 }
       );
       y3 += 105;
 
-      // Box 2: 1,250 Union Relief Buffer Warehouses & Shelters
+      // Box 2: Union Relief Buffer Warehouses & Silos
       doc.rect(45, y3, 505, 125).fillAndStroke(cCardBg, cBorder);
       doc.rect(45, y3, 505, 18).fill(cTeal);
       doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold')
-        .text('1,250 CLIMATE-HARDENED UNION RELIEF BUFFER SILOS & MULTI-PURPOSE SHELTERS', 55, y3 + 5);
+        .text('CLIMATE-HARDENED UNION RELIEF BUFFER WAREHOUSES & SILOS', 55, y3 + 5);
 
       doc.fillColor(cNavy).fontSize(7.5).font('Helvetica').text(
         'Positioned across vulnerable coastal chars, riverine haor basins, and flash-flood corridors, these facilities safeguard emergency supplies and human lives:\n' +
-        '• Reinforced 2-Meter Elevated Plinth: Constructed strictly above the 100-year historical flood surge watermark, preventing submersion.\n' +
-        '• Hermetic Dry Grain Storage Silos: 100-metric-ton airtight silos preserving emergency rice, lentils, and baby food against high humidity, water intrusion, and pest contamination for up to 24 months without spoilage.\n' +
-        '• Solar Cold-Chain Medical Vaults: WHO PQS-certified medical refrigeration units maintaining 2°C to 8°C for anti-snake venom, cholera vaccines, tetanus toxoid, and essential antibiotics powered by dedicated rooftop PV arrays.\n' +
-        '• High-Capacity Solar Water Desalination & RO Pods: Autonomous solar-powered reverse osmosis systems producing 5,000 liters/day of certified WHO-standard drinking water directly from saline estuarine or flood sources.\n' +
-        '• Automated RFID / Barcode Inventory Gates: Real-time scan-in / scan-out tracking of all arriving relief trucks and departing field consignments, transmitting live stock balances to the central PostgreSQL database.',
+        '• Reinforced Elevated Plinth Structures: Constructed safely above historical flood lines to prevent submersion of vital supplies.\n' +
+        '• Hermetic Dry Grain Storage Silos: Airtight silos preserving emergency rice, lentils, and baby food against high humidity, water intrusion, and pest contamination without spoilage.\n' +
+        '• Solar Cold-Chain Medical Vaults: WHO PQS-certified medical refrigeration units maintaining 2°C to 8°C for anti-snake venom, cholera vaccines, tetanus toxoid, and essential antibiotics powered by rooftop PV arrays.\n' +
+        '• High-Capacity Solar Water Desalination & RO Pods: Autonomous solar-powered reverse osmosis systems producing certified WHO-standard drinking water directly from saline estuarine or flood sources.\n' +
+        '• Automated RFID / Barcode Inventory Gates: Real-time scan-in / scan-out tracking of all arriving relief consignments and field handoffs, transmitting live stock balances to the central database.',
         55, y3 + 24, { width: 485, lineGap: 2 }
       );
 
@@ -352,9 +352,9 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
 
       const codeModules = [
         ['Field Worker PWA Mobile App (TypeScript / Service Workers / IndexedDB):', 'Operates with 100% offline-first resiliency. Responders can log survivor headcounts, tag localized embankment collapses, and issue emergency medical distress beacons even without cellular reception. Background sync automatically dispatches pending payloads upon establishing any 2G/EDGE or LoRa connection.'],
-        ['Tactical Coordinator GIS Suite (public/index.html & Leaflet Engine):', 'High-performance interactive geographic dashboard rendering 576+ nationwide upazila district nodes, 503+ relief shelters, and live IoT sensor overlays. Incorporates dynamic mathematical relief allocation algorithms balancing food, drinking water, medical supplies, and temporary shelter kits against real-time displaced populations.'],
-        ['Privacy-Isolated Real-Time Messenger (src/services/messaging.ts):', 'Engineered on an event-isolated Socket.io architecture. Employs dedicated public broadcast rooms (e.g. upazila-general) for macro situational directives alongside cryptographically segregated 1-on-1 responder channels (e.g. direct-userIdA-userIdB), preventing operational confusion and preserving survivor medical confidentiality.'],
-        ['Relational Database Engine & Spatial Indexing (prisma/schema.prisma):', 'Rigorous normalized relational schemas governing DistrictNode, User, ReliefCenter, EnvironmentalSensor, DisasterAlert, ShelterAllocation, and ChatMessage with strict foreign-key integrity, ACID transactions, and spatial B-tree indexing for sub-millisecond query latency.']
+        ['Tactical Coordinator GIS Suite (Interactive Map & Leaflet Engine):', 'High-performance interactive geographic dashboard rendering nationwide district and upazila nodes, relief shelters, and live IoT sensor overlays. Incorporates dynamic mathematical relief allocation algorithms balancing food, drinking water, medical supplies, and shelter capacity.'],
+        ['Privacy-Isolated Real-Time Messenger (src/services/messaging.ts):', 'Engineered on an event-isolated Socket.io architecture. Employs dedicated public broadcast rooms for macro situational directives alongside cryptographically segregated 1-on-1 responder channels, preventing operational confusion and preserving survivor medical confidentiality.'],
+        ['Relational Database Engine & Spatial Indexing (PostgreSQL & In-Memory Fallback):', 'Rigorous normalized relational schemas governing DistrictNode, User, ReliefCenter, EnvironmentalSensor, DisasterAlert, ShelterAllocation, and ChatMessage with strict foreign-key integrity, ACID transactions, and spatial B-tree indexing for sub-millisecond query latency.']
       ];
 
       codeModules.forEach(([mod, desc]) => {
@@ -379,7 +379,7 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       y4 += 16;
 
       const schemaRows = [
-        ['DistrictNode', 'id, name, division, riskLevel, coordinates', 'Represents all 64 districts & 495 upazilas; root spatial hierarchy node.'],
+        ['DistrictNode', 'id, name, division, riskLevel, coordinates', 'Represents all divisions, districts & upazilas; root spatial hierarchy node.'],
         ['ReliefCenter', 'id, districtId, capacity, stockFood, stockWater', 'Maintains live grain, water, and medical inventory balances in real time.'],
         ['EnvironmentalSensor', 'id, districtId, type, reading, status, battery', 'Stores telemetry from radar water gauges, rain gauges, and piezometers.'],
         ['DisasterAlert', 'id, districtId, severity, title, active, timestamp', 'Automated event triggers pushed via WebSocket, Cell Broadcast & SMS.'],
@@ -418,10 +418,10 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       doc.addPage();
       let y5 = 50;
 
-      y5 = drawSectionBadge('4.0', 'Network Topology & Multi-Agency Telecommunications', y5);
+      y5 = drawSectionBadge('4.0', 'Network Topology, High-Throughput Cloud & Starlink Satellite Comms', y5);
 
       doc.fillColor(cNavy).fontSize(8.2).font('Helvetica').text(
-        'To withstand Category 4/5 cyclone landfalls and catastrophic monsoonal inundations where commercial telecommunications networks routinely collapse, GreenSignal AI integrates a tri-redundant network architecture combining Tier-IV National Data Center hosting, private telco APNs, Bangabandhu Satellite-1 (BS-1), and solar LoRaWAN mesh gateways.',
+        'To withstand severe cyclone landfalls and catastrophic monsoonal inundations where commercial terrestrial networks routinely collapse, GreenSignal AI integrates a tri-redundant network architecture combining Tier-IV National Data Center hosting, private telco APNs, Starlink satellite broadband terminals ensuring 99% uptime, and solar LoRaWAN mesh gateways.',
         45, y5, { width: 505, align: 'justify', lineGap: 2 }
       );
       y5 += 30;
@@ -430,7 +430,7 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       const netCards = [
         ['Tier-IV National Data Center (Primary Node)', 'Located at Bangladesh Computer Council (BCC), Kaliakoir, Gazipur. Features dual 2N redundant electrical feeds, earthquake-isolated seismic dampers, automated FM-200 fire suppression, and guaranteed 99.995% physical availability.'],
         ['Tier-III Disaster Recovery Center (Hot Standby)', 'Established at Jashore Software Technology Park. Continuous asynchronous block replication ensures a Recovery Point Objective (RPO) of < 5 seconds and an automated Recovery Time Objective (RTO) of < 15 seconds in the event of primary center isolation.'],
-        ['BDIX Edge & Anycast Peering Fabric', 'Directly interconnected with the Bangladesh Internet Exchange (BDIX) peering fabric across Dhaka, Chattogram, and Sylhet. Bypasses international submarine cable transit loops, delivering sub-15ms domestic network latency and absorbing DDoS floods up to 500 Gbps.'],
+        ['BDIX Edge & Anycast Peering Fabric', 'Directly interconnected with the Bangladesh Internet Exchange (BDIX) peering fabric across Dhaka, Chattogram, and Sylhet. Delivers sub-15ms domestic network latency and absorbs DDoS floods up to 500 Gbps.'],
         ['Kubernetes Cluster & Redis Pub/Sub Grid', 'Dynamically autoscale worker pods from a baseline of 32 to 512+ compute instances within 180 seconds of disaster alert issuance. A distributed Redis Enterprise Cluster sustains 1,500,000 concurrent persistent WebSocket connections without dropped packets.']
       ];
 
@@ -463,13 +463,13 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
           'Dedicated Private APN\n(4G LTE / 5G)',
           'Grameenphone, Robi,\nBanglalink, Teletalk',
           'Latency: < 35 ms\nSpeed: 10–50 Mbps',
-          'Prioritized QCI-1 data channels for responders. Zero-rated data billing subsidized by MoDMR.'
+          'Prioritized QCI-1 data channels for responders. Zero-rated data billing subsidized for emergency field operations.'
         ],
         [
-          'Bangabandhu Satellite-1\n(BS-1 Ku/C-Band VSAT)',
-          'Bangladesh Satellite\nCompany Ltd (BSCL)',
-          'Latency: ~550 ms\nSpeed: 20 Mbps Uplink',
-          'Primary backup for 120 isolated coastal char islands (Sandwip, Hatiya, Manpura) during fiber severed.'
+          'Starlink Satellite Terminals\n(LEO Low-Earth Orbit)',
+          'Starlink Satellite\nIntegration Services',
+          'Latency: 25–45 ms\nSpeed: 100–220 Mbps',
+          'Equipped at each command center to guarantee 99% uptime during power and fiber network blackouts.'
         ],
         [
           'Solar LoRaWAN Mesh\n(868 / 915 MHz)',
@@ -502,8 +502,8 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       doc.fillColor(cTeal).fontSize(8).font('Helvetica-Bold').text('AUTOMATED NETWORK FAILOVER PROTOCOL (TRI-TIER RECOVERY)', 55, y5 + 8);
       doc.fillColor(cNavy).fontSize(7.2).font('Helvetica').text(
         'In the event of a terrestrial commercial telecommunications outage, the system initiates an instantaneous, rule-based cascading failover:\n' +
-        '1. Detection: Edge monitoring detects loss of 4G APN ping responses for > 15 seconds.\n' +
-        '2. Secondary Engagement: Upazila command centers switch traffic dynamically to the Bangabandhu Satellite-1 Ku-band VSAT terminal.\n' +
+        '1. Detection: Edge monitoring detects loss of terrestrial 4G APN responses for > 15 seconds.\n' +
+        '2. Secondary Engagement: Upazila command centers switch traffic dynamically to high-speed Starlink satellite terminals to maintain 99% uptime.\n' +
         '3. Autonomous LoRa Mesh Activation: Field sensors and handheld volunteer terminals switch to the decentralized 868 MHz LoRa mesh, routing emergency distress packets hop-by-hop to the nearest operational satellite uplink node.',
         55, y5 + 20, { width: 485, lineGap: 2 }
       );
@@ -517,7 +517,7 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       y6 = drawSectionBadge('5.0', 'Automated Environmental Sensor Network & IoT Datasheet', y6);
 
       doc.fillColor(cNavy).fontSize(8.2).font('Helvetica').text(
-        'Reliable early warning demands high-precision, uncompromised real-world ground truth. GreenSignal AI deploys a national grid of 2,500+ industrial-grade telemetry stations across critical river bends, barrage sluice gates, coastal polders, and flash-flood catchment zones across Bangladesh.',
+        'Reliable early warning demands high-precision, uncompromised real-world ground truth. GreenSignal AI deploys an automated national grid of industrial-grade telemetry stations across critical river bends, barrage sluice gates, coastal polders, and flash-flood catchment zones across Bangladesh.',
         45, y6, { width: 505, align: 'justify', lineGap: 2 }
       );
       y6 += 26;
@@ -526,14 +526,13 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       doc.fillColor(cTeal).fontSize(10).font('Helvetica-Bold').text('5.1 Comprehensive Environmental Sensor Specifications', 45, y6);
       y6 += 14;
 
-      const sCols = [105, 95, 175, 80, 50];
+      const sCols = [110, 95, 175, 125];
       doc.rect(45, y6, 505, 16).fill(cTeal);
       doc.fillColor('#ffffff').fontSize(7.5).font('Helvetica-Bold');
       doc.text('Sensor Category', 50, y6 + 4, { width: sCols[0] });
-      doc.text('Benchmark Model', 158, y6 + 4, { width: sCols[1] });
-      doc.text('Technical Specifications', 255, y6 + 4, { width: sCols[2] });
-      doc.text('Interface / Protocol', 433, y6 + 4, { width: sCols[3] });
-      doc.text('Units', 515, y6 + 4, { width: sCols[4], align: 'right' });
+      doc.text('Benchmark Model', 162, y6 + 4, { width: sCols[1] });
+      doc.text('Technical Specifications', 260, y6 + 4, { width: sCols[2] });
+      doc.text('Target Deployment Locations', 438, y6 + 4, { width: sCols[3] });
       y6 += 16;
 
       const sRows = [
@@ -541,36 +540,31 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
           'Radar River Water Level Sensor',
           'OTT RLS / Vega VEGAPULS C21',
           'Non-contact 26 GHz radar, ±2 mm accuracy, 0–35 m range. Unaffected by flood debris or sediment siltation.',
-          'SDI-12 / Modbus RS-485\n12V DC, IP68 hermetic',
-          '850'
+          'Major river bridges, barrage sluices, and flood embankments'
         ],
         [
           'Automated Rain Gauge (ARG)',
           'Campbell Scientific TE525MM',
           'Tipping bucket mechanism, 0.1 mm orifice resolution, dual-reed switch, anti-clog debris filter, stainless steel funnel.',
-          'Pulse output / Reed switch\nGold-plated contacts',
-          '650'
+          'Upazila weather stations and landslide-prone hilly zones'
         ],
         [
           'Embankment Pore Piezometer',
           'RST Instruments VW2100',
           'Vibrating wire transducer, 0–500 kPa range, 0.025% F.S. resolution. Detects subsurface pressure surges preceding levee breach.',
-          'Frequency signal\nInternal thermistor',
-          '400'
+          'Coastal polders and high-erosion riverbank corridors'
         ],
         [
           'Tidal & Storm Surge Gauge',
           'SonTek Argonaut-XR / Aanderaa',
           'Acoustic doppler velocity + piezo-resistive hydrostatic pressure, 0–20 m depth, integrated marine anti-fouling copper cage.',
-          'RS-232 / SDI-12\nSubmersible titanium',
-          '300'
+          'Coastal inlets and estuaries (Khulna, Barishal, Chittagong)'
         ],
         [
           'Ultrasonic Compact Weather Station',
           'Vaisala WXT536 Multi-Sensor',
-          'Ultrasonic wind speed (0–60 m/s) and direction, barometric pressure (600–1100 hPa), ambient air temp (-40°C to +60°C), relative humidity.',
-          'Modbus / SDI-12 / NMEA\nZero moving parts',
-          '300'
+          'Ultrasonic wind speed (0–60 m/s) and direction, barometric pressure, ambient air temp, relative humidity.',
+          'Coastal cyclone tracking towers and regional airfields'
         ]
       ];
 
@@ -579,10 +573,9 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
         const rowH = 46;
         doc.rect(45, y6, 505, rowH).fillAndStroke(rowBg, cBorder);
         doc.fillColor(cEmerald).fontSize(7.5).font('Helvetica-Bold').text(row[0], 50, y6 + 4, { width: sCols[0] - 6 });
-        doc.fillColor(cNavy).fontSize(7).font('Helvetica-Bold').text(row[1], 158, y6 + 4, { width: sCols[1] - 6 });
-        doc.fillColor(cNavy).fontSize(6.8).font('Helvetica').text(row[2], 255, y6 + 4, { width: sCols[2] - 6, lineGap: 1.5 });
-        doc.fillColor(cMuted).fontSize(6.8).font('Helvetica').text(row[3], 433, y6 + 4, { width: sCols[3] - 6, lineGap: 1.5 });
-        doc.fillColor(cTeal).fontSize(8).font('Helvetica-Bold').text(row[4], 500, y6 + 4, { width: 45, align: 'right' });
+        doc.fillColor(cNavy).fontSize(7).font('Helvetica-Bold').text(row[1], 162, y6 + 4, { width: sCols[1] - 6 });
+        doc.fillColor(cNavy).fontSize(6.8).font('Helvetica').text(row[2], 260, y6 + 4, { width: sCols[2] - 6, lineGap: 1.5 });
+        doc.fillColor(cMuted).fontSize(6.8).font('Helvetica').text(row[3], 438, y6 + 4, { width: sCols[3] - 6, lineGap: 1.5 });
         y6 += rowH;
       });
 
@@ -597,8 +590,8 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
         'Every environmental sensor connects to a sovereign, ruggedized industrial RTU engineered specifically for tropical delta environments:\n' +
         '• Enclosure: Die-cast marine-grade aluminum housing, IP68 rated, hermetically sealed with Gore-Tex desiccant pressure equalization valves.\n' +
         '• Processing Unit: Ultra-low-power 32-bit ARM Cortex-M4 microcontroller running FreeRTOS with hardware cryptographic engine and watchdog supervisory circuits.\n' +
-        '• Dual-SIM Comms Modem: Integrated 4G LTE Cat-M1 / NB-IoT modem with automatic cellular operator handover (Grameenphone/Robi/Teletalk) and secondary 868 MHz LoRa transceiver.\n' +
-        '• Autonomous Solar Power Bank: 40W monocrystalline high-efficiency solar panel paired with a 24Ah 12.8V Lithium Iron Phosphate (LiFePO4) battery pack with intelligent Battery Management System (BMS). Guarantees 21 consecutive days of autonomous operation under zero sunlight.\n' +
+        '• Dual-SIM Comms Modem: Integrated 4G LTE Cat-M1 / NB-IoT modem with automatic cellular operator handover and secondary 868 MHz LoRa transceiver.\n' +
+        '• Autonomous Solar Power Bank: 40W monocrystalline high-efficiency solar panel paired with a 24Ah Lithium Iron Phosphate (LiFePO4) battery pack with intelligent Battery Management System (BMS). Guarantees 21 consecutive days of autonomous operation under zero sunlight.\n' +
         '• Mast & Civil Infrastructure: 5-meter hot-dip galvanized steel tower anchored to concrete reinforced foundation pads designed to withstand 260 km/h cyclonic gusts.\n' +
         '• Lightning & Surge Protection: Certified IEC 61643-11 Class II heavy-duty surge arrestors with copper earth spike achieving < 5 ohms ground resistance.',
         55, y6 + 10, { width: 485, lineGap: 2.2 }
@@ -609,9 +602,9 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       doc.rect(45, y6, 505, 78).fillAndStroke('#f1f5f9', cBorder);
       doc.fillColor(cTeal).fontSize(8).font('Helvetica-Bold').text('NATIONWIDE SITING & GEO-CORRIDOR ALLOCATION', 55, y6 + 8);
       doc.fillColor(cNavy).fontSize(7.2).font('Helvetica').text(
-        '• Haor & Flash-Flood Basin (800 Stations): Sunamganj, Sylhet, Netrokona, Habiganj, Kishoreganj—monitoring mountain runoff from Meghalaya.\n' +
-        '• Major River Embankment Corridors (850 Stations): Kurigram, Gaibandha, Bogura, Sirajganj, Jamalpur along the Jamuna/Brahmaputra and Padma axes.\n' +
-        '• Coastal Tidal & Cyclonic Belt (850 Stations): Barguna, Patuakhali, Bhola, Satkhira, Cox\'s Bazar, Chittagong coastlines and offshore island chars.',
+        '• Haor & Flash-Flood Basin: Sunamganj, Sylhet, Netrokona, Habiganj, Kishoreganj—monitoring mountain runoff from transboundary catchments.\n' +
+        '• Major River Embankment Corridors: Kurigram, Gaibandha, Bogura, Sirajganj, Jamalpur along the Jamuna/Brahmaputra and Padma axes.\n' +
+        '• Coastal Tidal & Cyclonic Belt: Barguna, Patuakhali, Bhola, Satkhira, Cox\'s Bazar, Chittagong coastlines and offshore island chars.',
         55, y6 + 20, { width: 485, lineGap: 2 }
       );
 
@@ -624,7 +617,7 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       y7 = drawSectionBadge('6.0', 'Comprehensive Financial Budget Breakdown (100.00 Crore BDT)', y7);
 
       doc.fillColor(cNavy).fontSize(8.2).font('Helvetica').text(
-        'The financial framework has been rigorously structured to conform strictly with the Public Procurement Act (PPA-2006) and Public Procurement Rules (PPR-2008). The total turnkey project allocation is precisely capped at BDT 100.00 Crore (One Hundred Crore Taka), spanning a 36-month execution phase and 36-month operational warranty.',
+        'The financial framework has been rigorously structured to conform strictly with the Public Procurement Act (PPA-2006) and Public Procurement Rules (PPR-2008). The total project allocation is precisely capped at BDT 100.00 Crore (One Hundred Crore Taka), supporting immediate 1–2 month software launch and long-term phased infrastructure expansion.',
         45, y7, { width: 505, align: 'justify', lineGap: 2 }
       );
       y7 += 28;
@@ -646,14 +639,14 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       const budgetRows = [
         [
           '1. Automated IoT Sensor Network\n& Hydrometric Telemetry',
-          '2,500+ sensor stations, OTT radars, Campbell rain gauges, RST piezometers, solar RTUs, 5m galvanized masts, civil foundations.',
+          'Automated telemetry stations, OTT radars, Campbell rain gauges, RST piezometers, solar RTUs, 5m galvanized masts, civil foundations.',
           '25.50',
           '2.50',
           '28.00 Cr'
         ],
         [
           '2. Physical Upazila Hubs, Union\nWarehouses & Cold Storage',
-          '495 Upazila Hub retrofits (dual 65" screens, 10 kVA solar inverters, generators), 1,250 Union relief silos, cold-chain vaccine vaults, 5,000 L/d RO plants.',
+          'Upazila Operations Hub retrofits (video screens, 10 kVA solar inverters, generators), Union relief buffer silos, cold-chain vaccine vaults, solar RO plants.',
           '23.00',
           '2.00',
           '25.00 Cr'
@@ -666,22 +659,22 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
           '14.00 Cr'
         ],
         [
-          '4. Data Center Hosting, Cloud,\nBDIX & Telecom Infrastructure',
-          'Tier-IV BCC hosting, Jashore DR center, BDIX peering fabric, 4-operator private APN zero-rated responder bundles, 120 BS-1 satellite terminals.',
+          '4. Data Center Hosting, Cloud,\nStarlink Satellite Infrastructure',
+          'Tier-IV BCC hosting, Jashore DR center, BDIX peering fabric, 4-operator private APN data peering, Starlink satellite integration ensuring 99% uptime.',
           '4.50',
           '7.50',
           '12.00 Cr'
         ],
         [
           '5. Nationwide Human Resource\nTraining & Capacity Building',
-          'Comprehensive digital literacy training for 76,000+ CPP unit leads, 495 Upazila Committees, simulation drills with Armed Forces Division.',
+          'Comprehensive digital literacy training for field responders, CPP unit leads, Upazila Committees, simulation drills with Armed Forces Division.',
           '3.00',
           '8.00',
           '11.00 Cr'
         ],
         [
           '6. Quality Assurance, Security\nAudits & Spares Reserve',
-          'BGD e-GOV CIRT security audits, ISO 27001 compliance, 15% hardware spares stockpile, unforeseen price escalation contingency reserve.',
+          'BGD e-GOV CIRT security audits, ISO 27001 compliance, hardware spares stockpile, unforeseen price escalation contingency reserve.',
           '6.00',
           '4.00',
           '10.00 Cr'
@@ -715,11 +708,11 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
 
       doc.rect(45, y7, 505, 115).fillAndStroke(cCardBg, cBorder);
       doc.fillColor(cNavy).fontSize(7.5).font('Helvetica').text(
-        'The implementation of GreenSignal AI generates an overwhelmingly positive benefit-cost ratio (estimated at 11.4 to 1) for the national economy over a 10-year operational horizon:\n' +
-        '• Avoided Agricultural & Relief Spoilage: Preservation of an estimated BDT 450+ Crore worth of standing crops, livestock, and emergency relief food grains across the 1,250 hermetic Union silos over 5 disaster cycles.\n' +
-        '• Elimination of Relief Leakage: Transitioning from manual paper lists to digital QR/biometric verification is projected to curb relief misdirection and duplication by > 98%, saving BDT 85 Crore in administrative overheads.\n' +
-        '• Rapid Post-Disaster Economic Recovery: Autonomous water RO purification and cold-chain vaccine preservation reduce post-flood waterborne disease outbreaks (cholera, dysentery) by an estimated 74% in flood-isolated unions.\n' +
-        '• Life Safety Index: Advance warning of 3 hours in flash-flood zones and 12 hours in storm-surge belts will virtually eliminate unheralded drownings and structural entrapment casualties.',
+        'The implementation of GreenSignal AI generates an overwhelmingly positive benefit-cost ratio (estimated at 11.4 to 1) for the national economy over a multi-decade operational horizon:\n' +
+        '• Avoided Agricultural & Relief Spoilage: Preservation of standing crops, livestock, and emergency relief food grains across hermetic Union silos over successive disaster cycles.\n' +
+        '• Elimination of Relief Leakage: Transitioning from manual paper lists to digital QR/biometric verification is projected to curb relief misdirection and duplication by > 98%, saving substantial administrative overheads.\n' +
+        '• Rapid Post-Disaster Economic Recovery: Autonomous water RO purification and cold-chain vaccine preservation reduce post-flood waterborne disease outbreaks (cholera, dysentery) significantly in flood-isolated communities.\n' +
+        '• Life Safety Index: Advance warning of hours in flash-flood zones and storm-surge belts will virtually eliminate unheralded drownings and structural entrapment casualties.',
         55, y7 + 10, { width: 485, lineGap: 2.2 }
       );
 
@@ -729,30 +722,30 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
       doc.addPage();
       let y8 = 50;
 
-      y8 = drawSectionBadge('7.0', 'Implementation Roadmap, Risk Mitigation & Sign-Off', y8);
+      y8 = drawSectionBadge('7.0', 'Implementation Horizon, Risk Mitigation & Sign-Off', y8);
 
       doc.fillColor(cNavy).fontSize(8.2).font('Helvetica').text(
-        'Execution of this nationwide 100.00 Crore BDT program is structured across three disciplined phases over a 36-month timeline, followed by long-term warranty and joint defense simulation drills.',
+        'While full nationwide civil retrofitting and environmental sensor grid saturation is a multi-decade national endeavor, the core GreenSignal AI digital platform is architected to launch and connect to existing meteorological and hydrometric data streams within 1 to 2 months.',
         45, y8, { width: 505, align: 'justify', lineGap: 2 }
       );
       y8 += 26;
 
       // 7.1 Phased Implementation Roadmap
-      doc.fillColor(cTeal).fontSize(10).font('Helvetica-Bold').text('7.1 36-Month Nationwide Phased Rollout Schedule', 45, y8);
+      doc.fillColor(cTeal).fontSize(10).font('Helvetica-Bold').text('7.1 Implementation Roadmap (Rapid Launch & Long-Term Scaling)', 45, y8);
       y8 += 14;
 
       const phases = [
         [
-          'Phase 1 (Months 01–06): Inception, Architecture & 25-Upazila Pilot',
-          'Establish primary Tier-IV BCC cloud cluster and private 4-telco APN. Deploy 25-Upazila flagship pilot across high-risk pilot zones: Sunamganj (flash floods), Kurigram (riverine erosion), and Barguna (cyclonic storm surges). Calibrate AI predictive hydrology algorithms against historical monsoon datasets.'
+          'Phase 1 (Months 01–02): Rapid Core Launch & Data Stream Ingestion',
+          'Deploy core software platform on Tier-IV cloud infrastructure. Ingest live API streams from BMD radar and FFWC river gauge networks. Operationalize flagship Upazila operations hubs with Starlink satellite backup for 99% uptime. Roll out field responder mobile PWA.'
         ],
         [
-          'Phase 2 (Months 07–20): Regional Scale & Physical Hub Retrofitting',
-          'Retrofit 250 Upazila Disaster Operations Hubs and construct 600 Union Relief Buffer Silos. Deploy 1,500 automated IoT telemetry stations. Onboard and distribute ruggedized PWAs to 40,000 CPP unit leaders. Integrate real-time radar data feeds with BMD and FFWC.'
+          'Phase 2 (Medium-Term Horizon): Regional Hub Expansion & Silo Rollout',
+          'Progressive expansion of Upazila operations hubs and construction of flood-proof Union relief buffer warehouses and hermetic silos. Progressive installation of dedicated radar and rain gauge telemetry stations, and onboarding of grassroots responder networks.'
         ],
         [
-          'Phase 3 (Months 21–36): Nationwide Saturation & Inter-Agency Handover',
-          'Complete remaining 245 Upazila Hubs and 650 Union centers, achieving 100% national coverage. Deploy remaining 1,000 sensor stations. Conduct joint multi-force disaster simulation drills with the Armed Forces Division and BDRCS. Institutional transition to MoDMR permanent operations.'
+          'Phase 3 (Multi-Decade Horizon): Complete Delta Saturation & Joint Defense Integration',
+          'Decadal scaling of high-density IoT telemetry across all delta river corridors and coastal polders. AI predictive hydro-meteorological model refinements, Starlink satellite network resilience, and joint multi-agency mock drills with the Armed Forces Division and CPP.'
         ]
       ];
 
@@ -780,8 +773,8 @@ export function generateProposalPdf(outputPath?: string): Promise<Buffer> {
 
       const riskRows = [
         ['Field Sensor Vandalism & Theft', 'Medium', 'Tamper-detection vibration switches; GPS geofencing; community stewardship contracts with Union Parishads.'],
-        ['Catastrophic Telecom Blackout', 'High', 'Dual Ku-band VSAT on Bangabandhu Satellite-1 paired with solar 868 MHz LoRaWAN peer-to-peer mesh.'],
-        ['Low Digital Literacy in Field', 'Medium', 'Icon-driven Bengali PWA UI; zero-text voice note reporting; intensive simulation drills with 76,000+ volunteers.']
+        ['Catastrophic Telecom Blackout', 'High', 'Dedicated Starlink satellite terminals in each command center guaranteeing 99% uptime paired with solar LoRa mesh.'],
+        ['Low Digital Literacy in Field', 'Medium', 'Icon-driven Bengali PWA UI; zero-text voice note reporting; intensive simulation drills with grassroots volunteers.']
       ];
 
       riskRows.forEach((r, idx) => {

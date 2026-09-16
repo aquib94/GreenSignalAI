@@ -6,7 +6,6 @@ import { MessagingService } from '../services/messaging';
 import { AlertsService } from '../services/alerts';
 import { CoordinatorDbService } from '../services/coordinatorDb';
 import { DbAdminService } from '../services/dbAdmin';
-import { generateProposalPdf } from '../services/proposalPdf';
 import path from 'path';
 import fs from 'fs';
 
@@ -690,38 +689,26 @@ router.get('/db-admin/export-sql', async (req, res) => {
   }
 });
 
-// Download Formal Project Proposal PDF
-router.get('/proposal/download', async (req, res) => {
+// Download Formal Project Proposal PDF (Static file download from src/ folder)
+router.get('/proposal/download', (req, res) => {
   try {
-    const staticPdfPath = path.join(process.cwd(), 'public', 'GreenSignal_AI_Project_Proposal.pdf');
-    let pdfBuffer: Buffer;
+    const srcPdfPath = path.join(process.cwd(), 'src', 'GreenSignal_AI_Project_Proposal.pdf');
+    const publicPdfPath = path.join(process.cwd(), 'public', 'GreenSignal_AI_Project_Proposal.pdf');
+    const targetPath = fs.existsSync(srcPdfPath) ? srcPdfPath : publicPdfPath;
 
-    if (req.query.fresh === '1' || !fs.existsSync(staticPdfPath)) {
-      pdfBuffer = await generateProposalPdf(staticPdfPath);
-    } else {
-      pdfBuffer = fs.readFileSync(staticPdfPath);
+    if (!fs.existsSync(targetPath)) {
+      return res.status(404).json({ error: 'Proposal PDF file not found' });
     }
 
+    const pdfBuffer = fs.readFileSync(targetPath);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename="GreenSignal_AI_Project_Proposal.pdf"');
     res.setHeader('Content-Length', pdfBuffer.length);
     res.send(pdfBuffer);
   } catch (err: any) {
     console.error('Error serving proposal PDF:', err);
-    res.status(500).json({ error: 'Failed to generate proposal PDF', details: err.message });
+    res.status(500).json({ error: 'Failed to download proposal PDF', details: err.message });
   }
 });
-
-// Generate static proposal PDF immediately on startup
-(async () => {
-  try {
-    const staticPdfPath = path.join(process.cwd(), 'public', 'GreenSignal_AI_Project_Proposal.pdf');
-    console.log('Generating updated 8-page proposal PDF at', staticPdfPath);
-    await generateProposalPdf(staticPdfPath);
-    console.log('Updated 8-page proposal PDF generated successfully');
-  } catch (e) {
-    console.warn('Initial PDF pre-generation notice:', e);
-  }
-})();
 
 export default router;
