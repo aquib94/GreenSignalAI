@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GreenSignal AI — Sign In & Field Responder Sign Up</title>
+  <meta name="description" content="Secure access portal for Bangladesh National Disaster Management field workers, upazila coordinators, and citizens.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
+
+  <!-- TOP BRAND NAVBAR -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition">
+          <i class="fa-solid fa-satellite-dish text-white text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-base tracking-tight text-white">GreenSignal</span>
+            <span class="text-xs px-1.5 py-0.5 rounded font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">AI</span>
+          </div>
+          <p class="text-[10px] text-slate-400 font-medium">National Disaster Management & Response Network</p>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-3">
+        <a href="/" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-file-contract text-emerald-400"></i>
+          <span>Project Overview</span>
+        </a>
+        <a href="/platform.html" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-gauge-high text-teal-400"></i>
+          <span>Live Tactical Platform</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 sm:py-12 flex flex-col justify-center">
+
+    <!-- CURRENT SESSION BANNER (if already authenticated) -->
+    <div id="activeSessionBanner" class="hidden mb-6 p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-emerald-800 flex items-center justify-center text-emerald-200 font-bold text-sm">
+          <i class="fa-solid fa-user-check"></i>
+        </div>
+        <div>
+          <p class="text-white font-bold">Currently Signed In: <span id="currentUserName" class="text-emerald-300 font-semibold"></span> (<span id="currentUserRole" class="font-mono text-emerald-400"></span>)</p>
+          <p id="currentUserDetails" class="text-slate-400 text-[11px]"></p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="/platform.html" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition text-xs flex items-center gap-1.5">
+          <span>Go to Live Command</span>
+          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </a>
+        <button onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-rose-300 border border-slate-700 transition text-xs">
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <!-- AUTH CARD -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+      <div class="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- TAB SELECTOR (Sign In vs Sign Up) -->
+      <div class="flex items-center p-1.5 bg-slate-950/80 border border-slate-800 rounded-2xl max-w-md mx-auto mb-8">
+        <button id="tabSignupBtn" onclick="switchAuthTab('signup')" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md">
+          <i class="fa-solid fa-user-plus text-xs"></i>
+          <span>Create Account (Sign Up)</span>
+        </button>
+        <button id="tabSigninBtn" onclick="switchAuthTab('signin')" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+          <span>Sign In</span>
+        </button>
+      </div>
+
+      <!-- SUCCESS / ERROR NOTIFICATION BAR -->
+      <div id="authAlert" class="hidden mb-6 p-4 rounded-2xl text-xs transition flex items-start gap-3">
+        <i id="alertIcon" class="fa-solid fa-circle-info text-base mt-0.5"></i>
+        <div class="flex-1">
+          <p id="alertTitle" class="font-bold text-sm"></p>
+          <p id="alertMessage" class="mt-0.5 leading-relaxed text-xs"></p>
+          <div id="alertActionContainer" class="hidden mt-3 pt-3 border-t border-emerald-700/40 flex items-center gap-2"></div>
+        </div>
+      </div>
+
+      <!-- =========================================================================
+           FORM 1: SIGN UP (CREATE NEW ACCOUNT)
+           ========================================================================= -->
+      <form id="signupForm" onsubmit="handleSignup(event)" class="space-y-6">
+        <div class="border-b border-slate-800/80 pb-4">
+          <h2 class="text-xl font-extrabold text-white">Enroll in the National Disaster Network</h2>
+          <p class="text-xs text-slate-400 mt-1">Register for coordinated emergency disaster response, automated relief logistics, and sensor telemetry.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          
+          <!-- Full Name -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupFullName">
+              Full Name <span class="text-rose-400">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i class="fa-solid fa-user"></i>
+              </span>
+              <input type="text" id="signupFullName" required placeholder="e.g. Dr. Selim Ahmed" 
+                class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+            </div>
+          </div>
+
+          <!-- Username -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupUsername">
+              Username <span class="text-rose-400">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i class="fa-solid fa-at"></i>
+              </span>
+              <input type="text" id="signupUsername" required placeholder="e.g. selim_coordinator" 
+                class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition font-mono">
+            </div>
+          </div>
+
+          <!-- Email Address -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupEmail">
+              Email Address <span class="text-rose-400">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i class="fa-solid fa-envelope"></i>
+              </span>
+              <input type="email" id="signupEmail" required placeholder="name@greensignal.gov.bd" 
+                class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+            </div>
+          </div>
+
+          <!-- Phone Number -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupPhone">
+              Mobile Number (SMS Alerts)
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i class="fa-solid fa-phone"></i>
+              </span>
+              <input type="tel" id="signupPhone" placeholder="+880 1712-345678" 
+                class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupPassword">
+              Password <span class="text-rose-400">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i class="fa-solid fa-lock"></i>
+              </span>
+              <input type="password" id="signupPassword" required minlength="4" placeholder="Min. 4 characters" 
+                class="w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+              <button type="button" onclick="togglePasswordVisibility('signupPassword', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
+                <i class="fa-solid fa-eye text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupConfirmPassword">
+              Confirm Password <span class="text-rose-400">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i class="fa-solid fa-shield-check"></i>
+              </span>
+              <input type="password" id="signupConfirmPassword" required minlength="4" placeholder="Re-enter password" 
+                class="w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+              <button type="button" onclick="togglePasswordVisibility('signupConfirmPassword', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
+                <i class="fa-solid fa-eye text-xs"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Role Selector (Multi-Tier) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-2">
+            Select Operational Role <span class="text-rose-400">*</span>
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            
+            <!-- COORDINATOR -->
+            <label class="cursor-pointer border border-emerald-500/50 bg-emerald-950/30 hover:bg-emerald-950/50 rounded-xl p-3 flex items-start gap-3 transition">
+              <input type="radio" name="signupRole" value="COORDINATOR" checked class="mt-1 accent-emerald-500 text-emerald-500 focus:ring-emerald-500">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-tower-broadcast text-emerald-400 text-xs"></i>
+                  <span class="text-xs font-bold text-white">Upazila Coordinator</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Tactical GIS command, shelter allocation, BOQ generation.</p>
+              </div>
+            </label>
+
+            <!-- WORKER -->
+            <label class="cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-xl p-3 flex items-start gap-3 transition">
+              <input type="radio" name="signupRole" value="WORKER" class="mt-1 accent-emerald-500 text-emerald-500 focus:ring-emerald-500">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-person-shelter text-teal-400 text-xs"></i>
+                  <span class="text-xs font-bold text-white">Field Responder</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Offline mobile app, QR relief scans, search & rescue.</p>
+              </div>
+            </label>
+
+            <!-- PLANNER -->
+            <label class="cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-xl p-3 flex items-start gap-3 transition">
+              <input type="radio" name="signupRole" value="PLANNER" class="mt-1 accent-emerald-500 text-emerald-500 focus:ring-emerald-500">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-compass-drafting text-cyan-400 text-xs"></i>
+                  <span class="text-xs font-bold text-white">Disaster Planner</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Supply chain rebalancing, district stock planning.</p>
+              </div>
+            </label>
+
+            <!-- CITIZEN -->
+            <label class="cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-xl p-3 flex items-start gap-3 transition">
+              <input type="radio" name="signupRole" value="CITIZEN" class="mt-1 accent-emerald-500 text-emerald-500 focus:ring-emerald-500">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-hand-holding-heart text-amber-400 text-xs"></i>
+                  <span class="text-xs font-bold text-white">Citizen / Volunteer</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Early warning alerts, emergency SOS, shelter finder.</p>
+              </div>
+            </label>
+
+            <!-- ADMIN -->
+            <label class="cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-xl p-3 flex items-start gap-3 transition">
+              <input type="radio" name="signupRole" value="ADMIN" class="mt-1 accent-emerald-500 text-emerald-500 focus:ring-emerald-500">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-shield-halved text-indigo-400 text-xs"></i>
+                  <span class="text-xs font-bold text-white">System Admin</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5">National sensor calibration, audit logs, node setup.</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Location & Organization -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          
+          <!-- Assigned Administrative Node / Upazila -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupDistrictNodeId">
+              Assigned Upazila / Operational Center
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i class="fa-solid fa-map-pin"></i>
+              </span>
+              <select id="signupDistrictNodeId" class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white outline-none transition">
+                <option value="">-- National Headquarters (Dhaka) --</option>
+                <!-- Dynamically loaded -->
+              </select>
+            </div>
+            <p class="text-[10px] text-slate-500 mt-1">Select your local Upazila disaster jurisdiction or headquarters.</p>
+          </div>
+
+          <!-- Organization / Agency -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupOrganization">
+              Organization / Government Agency
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i class="fa-solid fa-building-flag"></i>
+              </span>
+              <input type="text" id="signupOrganization" placeholder="e.g. Cyclone Preparedness Programme (CPP)" 
+                class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+            </div>
+            <p class="text-[10px] text-slate-500 mt-1">MoDMR, CPP, Fire Service, Red Crescent, BDRCS, or DDM.</p>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-2">
+          <button type="submit" id="signupSubmitBtn" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm shadow-xl shadow-emerald-700/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-user-check"></i>
+            <span>Register & Initialize Live Access</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- =========================================================================
+           FORM 2: SIGN IN (EXISTING ACCOUNTS)
+           ========================================================================= -->
+      <form id="signinForm" onsubmit="handleSignin(event)" class="space-y-6 hidden">
+        <div class="border-b border-slate-800/80 pb-4">
+          <h2 class="text-xl font-extrabold text-white">Sign In to GreenSignal AI</h2>
+          <p class="text-xs text-slate-400 mt-1">Access the National Disaster Response Command Suite with your credentials.</p>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Username or Email -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signinUsername">
+              Username or Email <span class="text-rose-400">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i class="fa-solid fa-user"></i>
+              </span>
+              <input type="text" id="signinUsername" required placeholder="Username or email" 
+                class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signinPassword">
+              Password <span class="text-rose-400">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i class="fa-solid fa-lock"></i>
+              </span>
+              <input type="password" id="signinPassword" required placeholder="Enter password" 
+                class="w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+              <button type="button" onclick="togglePasswordVisibility('signinPassword', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
+                <i class="fa-solid fa-eye text-xs"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-2">
+          <button type="submit" id="signinSubmitBtn" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm shadow-xl shadow-emerald-700/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>Sign In to Platform</span>
+          </button>
+        </div>
+
+        <!-- Quick Demo Accounts Presets -->
+        <div class="pt-4 border-t border-slate-800">
+          <p class="text-xs font-bold text-slate-400 mb-2">⚡ Quick Test Profiles (One-Click Sign In):</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button type="button" onclick="quickFillCredentials('adamdighi_coordinator', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-emerald-950/60 border border-slate-800 hover:border-emerald-500/40 text-left transition text-xs">
+              <span class="font-bold text-emerald-400 block">🛡️ Coordinator</span>
+              <span class="text-[10px] text-slate-400 font-mono">adamdighi_coordinator</span>
+            </button>
+            <button type="button" onclick="quickFillCredentials('adamdighi_worker', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-teal-950/60 border border-slate-800 hover:border-teal-500/40 text-left transition text-xs">
+              <span class="font-bold text-teal-400 block">🚑 Field Worker</span>
+              <span class="text-[10px] text-slate-400 font-mono">adamdighi_worker</span>
+            </button>
+            <button type="button" onclick="quickFillCredentials('adamdighi_planner', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-cyan-950/60 border border-slate-800 hover:border-cyan-500/40 text-left transition text-xs">
+              <span class="font-bold text-cyan-400 block">📊 Planner</span>
+              <span class="text-[10px] text-slate-400 font-mono">adamdighi_planner</span>
+            </button>
+            <button type="button" onclick="quickFillCredentials('adamdighi_citizen', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-amber-950/60 border border-slate-800 hover:border-amber-500/40 text-left transition text-xs">
+              <span class="font-bold text-amber-400 block">👥 Citizen</span>
+              <span class="text-[10px] text-slate-400 font-mono">adamdighi_citizen</span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800/80 bg-slate-950 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 space-y-1">
+      <p>GreenSignal AI — National Automated Disaster Response, Early Warning & Resource Allocation Infrastructure</p>
+      <p>Ministry of Disaster Management and Relief (MoDMR) • Government of the People's Republic of Bangladesh</p>
+    </div>
+  </footer>
+
+  <!-- AUTH LOGIC JAVASCRIPT -->
+  <script>
+    // 1. Check existing session on load
+    document.addEventListener('DOMContentLoaded', () => {
+      checkActiveSession();
+      loadLocations();
+
+      // Check URL query for tab selection (?tab=signin or ?tab=signup)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('tab') === 'signin') {
+        switchAuthTab('signin');
+      } else {
+        switchAuthTab('signup');
+      }
+    });
+
+    function switchAuthTab(tab) {
+      const signupForm = document.getElementById('signupForm');
+      const signinForm = document.getElementById('signinForm');
+      const tabSignupBtn = document.getElementById('tabSignupBtn');
+      const tabSigninBtn = document.getElementById('tabSigninBtn');
+      hideAlert();
+
+      if (tab === 'signup') {
+        signupForm.classList.remove('hidden');
+        signinForm.classList.add('hidden');
+        tabSignupBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md';
+        tabSigninBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white';
+      } else {
+        signupForm.classList.add('hidden');
+        signinForm.classList.remove('hidden');
+        tabSigninBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md';
+        tabSignupBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white';
+      }
+    }
+
+    function togglePasswordVisibility(fieldId, btn) {
+      const field = document.getElementById(fieldId);
+      const icon = btn.querySelector('i');
+      if (field.type === 'password') {
+        field.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash text-xs text-emerald-400';
+      } else {
+        field.type = 'password';
+        icon.className = 'fa-solid fa-eye text-xs text-slate-500';
+      }
+    }
+
+    function quickFillCredentials(username, password) {
+      document.getElementById('signinUsername').value = username;
+      document.getElementById('signinPassword').value = password;
+      handleSignin(new Event('submit'));
+    }
+
+    // 2. Load Upazila / Administrative locations
+    async function loadLocations() {
+      const select = document.getElementById('signupDistrictNodeId');
+      try {
+        const res = await fetch('/api/locations');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.upazilas && data.upazilas.length > 0) {
+          select.innerHTML = '<option value="">-- National Command HQ (Dhaka) --</option>';
+          data.upazilas.slice(0, 100).forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            opt.textContent = `${u.name} Upazila (${u.code || 'UPZ'})`;
+            select.appendChild(opt);
+          });
+        }
+      } catch (e) {
+        console.warn('Locations load note:', e);
+      }
+    }
+
+    // 3. Handle User Sign Up
+    async function handleSignup(e) {
+      e.preventDefault();
+      hideAlert();
+
+      const fullName = document.getElementById('signupFullName').value.trim();
+      const username = document.getElementById('signupUsername').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const phone = document.getElementById('signupPhone').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      const confirmPassword = document.getElementById('signupConfirmPassword').value;
+      const role = document.querySelector('input[name="signupRole"]:checked')?.value || 'CITIZEN';
+      const districtNodeId = document.getElementById('signupDistrictNodeId').value || null;
+      const organization = document.getElementById('signupOrganization').value.trim() || null;
+
+      if (password !== confirmPassword) {
+        showAlert('error', 'Passwords Do Not Match', 'Please ensure both password fields match.');
+        return;
+      }
+
+      const submitBtn = document.getElementById('signupSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i><span>Creating Account...</span>';
+
+      try {
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fullName,
+            username,
+            email,
+            phone,
+            password,
+            role,
+            districtNodeId,
+            organization
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to create account');
+        }
+
+        // Store authentication token and user profile
+        if (result.token) {
+          localStorage.setItem('greensignal_token', result.token);
+          localStorage.setItem('greensignal_user', JSON.stringify(result.user));
+          localStorage.setItem('greensignal_auth_user', JSON.stringify(result.user));
+        }
+
+        // Display rich success message
+        showAlert('success', 'Registration Successful!', `Welcome to GreenSignal AI, ${result.user.fullName}. Your account has been registered with role: ${result.user.role}.`, [
+          { text: 'Launch Live Tactical Platform', href: '/platform.html', primary: true },
+          { text: 'Open Resource Planner', href: '/district-planner.html', primary: false },
+          { text: 'Return to Project Overview', href: '/', primary: false }
+        ]);
+
+        checkActiveSession();
+      } catch (err) {
+        showAlert('error', 'Registration Error', err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-user-check"></i><span>Register & Initialize Live Access</span>';
+      }
+    }
+
+    // 4. Handle User Sign In
+    async function handleSignin(e) {
+      if (e) e.preventDefault();
+      hideAlert();
+
+      const username = document.getElementById('signinUsername').value.trim();
+      const password = document.getElementById('signinPassword').value;
+
+      if (!username || !password) {
+        showAlert('error', 'Missing Information', 'Please enter both username/email and password.');
+        return;
+      }
+
+      const submitBtn = document.getElementById('signinSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i><span>Authenticating...</span>';
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Invalid username or password');
+        }
+
+        if (result.token) {
+          localStorage.setItem('greensignal_token', result.token);
+          localStorage.setItem('greensignal_user', JSON.stringify(result.user));
+          localStorage.setItem('greensignal_auth_user', JSON.stringify(result.user));
+        }
+
+        showAlert('success', 'Signed In Successfully!', `Welcome back, ${result.user.fullName || result.user.username} (${result.user.role}).`, [
+          { text: 'Launch Live Tactical Platform', href: '/platform.html', primary: true },
+          { text: 'Return to Project Overview', href: '/', primary: false }
+        ]);
+
+        checkActiveSession();
+      } catch (err) {
+        showAlert('error', 'Sign In Failed', err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i><span>Sign In to Platform</span>';
+      }
+    }
+
+    function checkActiveSession() {
+      const userStr = localStorage.getItem('greensignal_user') || localStorage.getItem('greensignal_auth_user');
+      const banner = document.getElementById('activeSessionBanner');
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          document.getElementById('currentUserName').textContent = user.fullName || user.username;
+          document.getElementById('currentUserRole').textContent = user.role || 'USER';
+          document.getElementById('currentUserDetails').textContent = `Email: ${user.email || 'N/A'} • Org: ${user.organization || 'General Public'}`;
+          banner.classList.remove('hidden');
+        } catch (e) {
+          banner.classList.add('hidden');
+        }
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('greensignal_token');
+      localStorage.removeItem('greensignal_user');
+      localStorage.removeItem('greensignal_auth_user');
+      checkActiveSession();
+      showAlert('info', 'Logged Out', 'You have been signed out successfully.');
+    }
+
+    function showAlert(type, title, message, actions = []) {
+      const alertBox = document.getElementById('authAlert');
+      const alertIcon = document.getElementById('alertIcon');
+      const alertTitle = document.getElementById('alertTitle');
+      const alertMessage = document.getElementById('alertMessage');
+      const alertActionContainer = document.getElementById('alertActionContainer');
+
+      alertTitle.textContent = title;
+      alertMessage.textContent = message;
+
+      if (type === 'success') {
+        alertBox.className = 'mb-6 p-4 rounded-2xl text-xs bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 flex items-start gap-3 shadow-lg animate-fade-in';
+        alertIcon.className = 'fa-solid fa-circle-check text-emerald-400 text-lg mt-0.5';
+      } else if (type === 'error') {
+        alertBox.className = 'mb-6 p-4 rounded-2xl text-xs bg-rose-950/80 border border-rose-500/50 text-rose-200 flex items-start gap-3 shadow-lg';
+        alertIcon.className = 'fa-solid fa-triangle-exclamation text-rose-400 text-lg mt-0.5';
+      } else {
+        alertBox.className = 'mb-6 p-4 rounded-2xl text-xs bg-indigo-950/80 border border-indigo-500/50 text-indigo-200 flex items-start gap-3 shadow-lg';
+        alertIcon.className = 'fa-solid fa-circle-info text-indigo-400 text-lg mt-0.5';
+      }
+
+      if (actions && actions.length > 0) {
+        alertActionContainer.innerHTML = '';
+        actions.forEach(a => {
+          const btn = document.createElement('a');
+          btn.href = a.href;
+          btn.textContent = a.text;
+          btn.className = a.primary 
+            ? 'px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition'
+            : 'px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs transition';
+          alertActionContainer.appendChild(btn);
+        });
+        alertActionContainer.classList.remove('hidden');
+      } else {
+        alertActionContainer.classList.add('hidden');
+      }
+
+      alertBox.classList.remove('hidden');
+    }
+
+    function hideAlert() {
+      document.getElementById('authAlert').classList.add('hidden');
+    }
+  </script>
+
+</body>
+</html>

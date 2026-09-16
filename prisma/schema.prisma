@@ -30,6 +30,7 @@ enum SensorType {
   WIND
   SALINITY
   SEISMOGRAPH
+  RAINFALL
 }
 
 // Operational Status for Hardware & Nodes
@@ -99,7 +100,7 @@ model AdministrativeNode {
   inventory        Json  @default("{\"food_packs\": 0, \"water_liters\": 0, \"medical_kits\": 0, \"dry_food_bags\": 0, \"emergency_tents\": 0}")
   requirements     Json  @default("{\"food_packs_needed\": 0, \"water_liters_needed\": 0, \"medical_kits_needed\": 0, \"tents_needed\": 0}")
   affectedPeople   Json  @default("{\"total_affected\": 0, \"displaced\": 0, \"injured\": 0, \"casualties\": 0, \"vulnerable_groups\": {\"children\": 0, \"elderly\": 0, \"pregnant\": 0}}")
-  sensorData       Json  @default("{\"water_level_m\": 0.0, \"rainfall_mm\": 0.0, \"wind_speed_kmh\": 0.0, \"salinity_ppt\": 0.0, \"status\": \"NORMAL\"}")
+  sensorData       Json  @default("{\"water_level_m\": 0.0, \"rainfall_mm\": 0.0, \"wind_speed_kmh\": 0.0, \"pressure_hpa\": 1012.0, \"salinity_ppt\": 0.0, \"seismic_magnitude\": 0.0, \"storm_probability_pct\": 0, \"quake_probability_pct\": 0, \"flood_risk\": \"NORMAL\", \"status\": \"NORMAL\"}")
   incidents        Json  @default("[]")
   situationReport  Json  @default("{\"status\": \"STABLE\", \"summary\": \"Normal operations\", \"last_updated\": \"\", \"updated_by\": \"\"}")
   messages         Json  @default("[]")
@@ -115,20 +116,27 @@ model AdministrativeNode {
   @@map("administrative_nodes")
 }
 
-// 3. Sensor Hardware Infrastructure (4 Per Upazila: WATER, WIND, SALINITY, SEISMOGRAPH)
+// 3. Sensor Hardware Infrastructure (WATER, WIND, SALINITY, SEISMOGRAPH, RAINFALL with Time-Series & Predictive Analytics)
 model SensorNode {
-  id             String              @id @default(uuid())
-  sensorCode     String              @unique // e.g., "SN-UPZ-ADAMDIGHI-WATER"
-  districtNodeId String
-  districtNode   AdministrativeNode  @relation(fields: [districtNodeId], references: [id], onDelete: Cascade)
-  type           SensorType
-  latitude       Float
-  longitude      Float
-  metricValue    String              // Current reading (e.g., "4.2m", "65km/h", "12.4ppt", "3.1M")
-  status         NodeStatus          @default(ACTIVE)
-  lastPing       DateTime            @default(now())
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @updatedAt
+  id               String              @id @default(uuid())
+  sensorCode       String              @unique // e.g., "SN-UPZ-ADAMDIGHI-WATER"
+  districtNodeId   String
+  districtNode     AdministrativeNode  @relation(fields: [districtNodeId], references: [id], onDelete: Cascade)
+  type             SensorType
+  latitude         Float
+  longitude        Float
+  metricValue      String              // Live displayed metric (e.g., "4.8m", "74 km/h • 991 hPa", "3.8 M Foreshock", "92mm • 29°C")
+  currentValue     Float?              // Numeric primary value
+  unit             String?             // e.g., "m", "km/h", "hPa", "Richter (M)", "mm/24h", "ppt", "°C"
+  dangerThreshold  Float?              // Critical threshold
+  warningThreshold Float?              // Early warning watch threshold
+  timeSeries       Json                @default("[]") // Array of timestamped historical sensor readings
+  forecastSeries   Json                @default("[]") // Array of predicted future points with confidence intervals
+  analytics        Json                @default("{}") // Domain specific predictive calculations (storm chance %, flood crest eta, earthquake hazard %)
+  status           NodeStatus          @default(ACTIVE)
+  lastPing         DateTime            @default(now())
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 
   @@map("sensor_nodes")
 }

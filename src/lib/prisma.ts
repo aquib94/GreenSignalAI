@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config({ override: true });
 
-const globalForPrisma = global as unknown as { prisma: any };
+const globalForPrisma = global as unknown as { prisma: any; inMemoryPrisma: any };
 
 const isDbConfigured = Boolean(
   process.env.DATABASE_URL &&
@@ -12,27 +12,118 @@ const isDbConfigured = Boolean(
   !process.env.DATABASE_URL.includes('localhost:5432')
 );
 
-let client: any;
-
-if (globalForPrisma.prisma) {
-  client = globalForPrisma.prisma;
-} else if (isDbConfigured) {
-  try {
-    console.log('[AI Studio] Connecting to live Render PostgreSQL database...');
-    client = new PrismaClient({
-      log: ['error', 'warn']
-    });
-    console.log('[AI Studio] Live Render PostgreSQL client initialized.');
-  } catch (err) {
-    console.warn('[AI Studio] Database initialization failed — using in-memory store', err);
-    client = createInMemoryPrismaClient();
-  }
-} else {
-  console.log('[AI Studio] No PostgreSQL connection specified — active in-memory disaster response store');
-  client = createInMemoryPrismaClient();
+const fallbackClient = globalForPrisma.inMemoryPrisma || createInMemoryPrismaClient();
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.inMemoryPrisma = fallbackClient;
 }
 
-export const prisma = client;
+function createResilientPrismaClient() {
+  if (!isDbConfigured) {
+    console.log('[GreenSignal AI] Active in-memory disaster response database store initialized.');
+    return fallbackClient;
+  }
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+  let realPrisma: any = null;
+  try {
+    realPrisma = new PrismaClient({
+      log: [
+        { emit: 'event', level: 'error' },
+        { emit: 'event', level: 'warn' }
+      ]
+    });
+
+    // Custom event handlers to capture logs cleanly without raw prisma:error stdout noise
+    if (typeof realPrisma.$on === 'function') {
+      realPrisma.$on('error', (e: any) => {
+        console.warn('[Database] Prisma notice:', e.message || e);
+      });
+      realPrisma.$on('warn', (e: any) => {
+        console.warn('[Database] Prisma warning:', e.message || e);
+      });
+    }
+  } catch (initErr) {
+    console.warn('[GreenSignal AI] PostgreSQL instantiation notice — activating in-memory store:', initErr);
+    return fallbackClient;
+  }
+
+  const modelNames = [
+    'user',
+    'administrativeNode',
+    'sensorNode',
+    'reliefCenter',
+    'chatMessage',
+    'disasterAlert',
+    'responsePolicy',
+    'simulationRun'
+  ];
+
+  const resilientClient: any = {
+    $disconnect: async () => {
+      try {
+        if (realPrisma) await realPrisma.$disconnect();
+      } catch {
+        // Safe ignore
+      }
+    },
+    $queryRawUnsafe: async (query: string, ...values: any[]) => {
+      try {
+        if (realPrisma) return await realPrisma.$queryRawUnsafe(query, ...values);
+      } catch (err: any) {
+        console.warn('[Database] Raw query fallback:', err.message);
+      }
+      return fallbackClient.$queryRawUnsafe(query);
+    },
+    $executeRawUnsafe: async (query: string, ...values: any[]) => {
+      try {
+        if (realPrisma) return await realPrisma.$executeRawUnsafe(query, ...values);
+      } catch (err: any) {
+        console.warn('[Database] Raw execute fallback:', err.message);
+      }
+      return fallbackClient.$executeRawUnsafe(query);
+    }
+  };
+
+  for (const model of modelNames) {
+    resilientClient[model] = new Proxy(
+      {},
+      {
+        get(_target, prop: string) {
+          return async (...args: any[]) => {
+            if (realPrisma && realPrisma[model] && typeof realPrisma[model][prop] === 'function') {
+              try {
+                return await realPrisma[model][prop](...args);
+              } catch (queryErr: any) {
+                console.warn(`[Database] Query on ${model}.${prop} redirected to in-memory store:`, queryErr.message || queryErr);
+                if (fallbackClient[model] && typeof fallbackClient[model][prop] === 'function') {
+                  return await fallbackClient[model][prop](...args);
+                }
+                throw queryErr;
+              }
+            }
+            if (fallbackClient[model] && typeof fallbackClient[model][prop] === 'function') {
+              return await fallbackClient[model][prop](...args);
+            }
+            throw new Error(`Method ${prop} not found on model ${model}`);
+          };
+        }
+      }
+    );
+  }
+
+  return resilientClient;
+}
+
+let clientInstance: any;
+
+if (globalForPrisma.prisma) {
+  clientInstance = globalForPrisma.prisma;
+} else {
+  clientInstance = createResilientPrismaClient();
+  if (process.env.NODE_ENV !== 'production') {
+    globalForPrisma.prisma = clientInstance;
+  }
+}
+
+export const prisma = clientInstance;
+
 

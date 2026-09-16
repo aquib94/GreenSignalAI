@@ -2,6 +2,7 @@ import { PrismaClient, Role, NodeTier, SensorType, NodeStatus, PolicyStatus } fr
 import * as fs from 'fs';
 import * as path from 'path';
 import bcrypt from 'bcryptjs';
+import { generateSensorTimeSeries } from '../src/services/sensorTimeSeries';
 
 const prisma = new PrismaClient();
 
@@ -257,8 +258,13 @@ async function main() {
     // ----------------------------------------------------
     // --- HARDWARE & RELIEF CENTER SEEDING ---
     // ----------------------------------------------------
-    const sensorTypes: SensorType[] = [SensorType.WATER, SensorType.WIND, SensorType.SALINITY, SensorType.SEISMOGRAPH];
-    const initialMetrics = { WATER: '2.1m', WIND: '18km/h', SALINITY: '2.4ppt', SEISMOGRAPH: '1.2M' };
+    const sensorTypes: ('WATER' | 'WIND' | 'SALINITY' | 'SEISMOGRAPH' | 'RAINFALL')[] = [
+      'WATER',
+      'WIND',
+      'SALINITY',
+      'SEISMOGRAPH',
+      'RAINFALL'
+    ];
     
     // Safety fallback for base codes if CSV columns are missing
     const baseSensorCode = row.sensorCodeBase || `SN-${row.district}-${row.upazila}`;
@@ -266,17 +272,38 @@ async function main() {
 
     for (const sType of sensorTypes) {
       const sCode = `${baseSensorCode}-${sType}`.toUpperCase().replace(/[^A-Z0-9-]/g, '');
-      await prisma.sensorNode.upsert({
+      const tsPkg = generateSensorTimeSeries(sType, row.district, row.upazila, row.division);
+
+      await (prisma.sensorNode as any).upsert({
         where: { sensorCode: sCode },
-        update: {},
+        update: {
+          metricValue: tsPkg.metricValue,
+          currentValue: tsPkg.currentValue,
+          unit: tsPkg.unit,
+          warningThreshold: tsPkg.warningThreshold,
+          dangerThreshold: tsPkg.dangerThreshold,
+          timeSeries: tsPkg.timeSeries as any,
+          forecastSeries: tsPkg.forecastSeries as any,
+          analytics: tsPkg.analytics as any,
+          status: NodeStatus.ACTIVE,
+          lastPing: new Date()
+        },
         create: {
           sensorCode: sCode,
           districtNodeId: upzNode.id,
-          type: sType,
+          type: sType as any,
           latitude: row.lat + (Math.random() - 0.5) * 0.02,
           longitude: row.lng + (Math.random() - 0.5) * 0.02,
-          metricValue: initialMetrics[sType],
-          status: NodeStatus.ACTIVE
+          metricValue: tsPkg.metricValue,
+          currentValue: tsPkg.currentValue,
+          unit: tsPkg.unit,
+          warningThreshold: tsPkg.warningThreshold,
+          dangerThreshold: tsPkg.dangerThreshold,
+          timeSeries: tsPkg.timeSeries as any,
+          forecastSeries: tsPkg.forecastSeries as any,
+          analytics: tsPkg.analytics as any,
+          status: NodeStatus.ACTIVE,
+          lastPing: new Date()
         }
       });
     }

@@ -208,7 +208,7 @@ export class CoordinatorDbService {
     });
 
     const coordinatorContact = await prisma.user.findFirst({
-      where: { districtNodeId: userNodeId, role: 'COORDINATOR' },
+      where: { districtNodeId: userNode?.id, role: 'COORDINATOR' },
       select: { fullName: true, phone: true, username: true }
     });
 

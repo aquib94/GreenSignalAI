@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import { generateSensorTimeSeries } from '../services/sensorTimeSeries';
 
 // Fast precomputed default password hash
 let cachedDefaultHash = '';
@@ -209,7 +210,7 @@ export class InMemoryStore {
       // Upazila Node
       const upzSlug = `${r.district.toLowerCase().replace(/[^a-z0-9]/g, '')}-${r.upazila.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
       const upzId = `upz-${upzSlug}`;
-      const upzNode = {
+      const upzNode: any = {
         id: upzId,
         name: `${r.upazila} Upazila`,
         tier: 'UPAZILA',
@@ -252,30 +253,57 @@ export class InMemoryStore {
       };
       this.reliefCenters.push(rc);
 
-      // Sensors (WATER, WIND, SALINITY, SEISMOGRAPH)
-      const sensorTypes = [
-        { type: 'WATER', val: '2.1m' },
-        { type: 'WIND', val: '18 km/h' },
-        { type: 'SALINITY', val: '2.4 ppt' },
-        { type: 'SEISMOGRAPH', val: '1.2 M' }
+      // 5 Hardware Sensor Telemetry Streams (WATER, WIND, SALINITY, SEISMOGRAPH, RAINFALL)
+      const sensorTypes: ('WATER' | 'WIND' | 'SALINITY' | 'SEISMOGRAPH' | 'RAINFALL')[] = [
+        'WATER',
+        'WIND',
+        'SALINITY',
+        'SEISMOGRAPH',
+        'RAINFALL'
       ];
 
+      const upzSensorsPackage: Record<string, any> = {};
+
       sensorTypes.forEach((st, idx) => {
-        const sCode = `SN-${r.district.toUpperCase()}-${r.upazila.toUpperCase()}-${st.type}`.replace(/[^A-Z0-9-]/g, '');
+        const sCode = `SN-${r.district.toUpperCase()}-${r.upazila.toUpperCase()}-${st}`.replace(/[^A-Z0-9-]/g, '');
+        const timeSeriesData = generateSensorTimeSeries(st, r.district, r.upazila, r.division);
+        upzSensorsPackage[st.toLowerCase()] = timeSeriesData;
+
         this.sensorNodes.push({
-          id: `sensor-${upzSlug}-${st.type.toLowerCase()}`,
+          id: `sensor-${upzSlug}-${st.toLowerCase()}`,
           sensorCode: sCode,
           districtNodeId: upzNode.id,
-          type: st.type,
-          latitude: r.lat + (idx === 0 ? 0.005 : idx === 1 ? -0.005 : idx === 2 ? 0.003 : -0.003),
-          longitude: r.lng + (idx === 0 ? 0.004 : idx === 1 ? 0.006 : idx === 2 ? -0.005 : -0.002),
-          metricValue: st.val,
+          type: st,
+          latitude: r.lat + (idx === 0 ? 0.005 : idx === 1 ? -0.005 : idx === 2 ? 0.003 : idx === 3 ? -0.003 : 0.007),
+          longitude: r.lng + (idx === 0 ? 0.004 : idx === 1 ? 0.006 : idx === 2 ? -0.005 : idx === 3 ? -0.002 : -0.006),
+          metricValue: timeSeriesData.metricValue,
+          currentValue: timeSeriesData.currentValue,
+          unit: timeSeriesData.unit,
+          warningThreshold: timeSeriesData.warningThreshold,
+          dangerThreshold: timeSeriesData.dangerThreshold,
+          timeSeries: timeSeriesData.timeSeries,
+          forecastSeries: timeSeriesData.forecastSeries,
+          analytics: timeSeriesData.analytics,
           status: 'ACTIVE',
           lastPing: new Date(),
           createdAt: new Date(),
           updatedAt: new Date()
         });
       });
+
+      // Update Upazila node sensorData summary
+      upzNode.sensorData = {
+        water_level_m: upzSensorsPackage.water?.currentValue || 2.1,
+        wind_speed_kmh: upzSensorsPackage.wind?.currentValue || 22.0,
+        pressure_hpa: upzSensorsPackage.wind?.analytics?.currentPressureHpa || 1011.0,
+        salinity_ppt: upzSensorsPackage.salinity?.currentValue || 1.8,
+        seismic_magnitude: upzSensorsPackage.seismograph?.analytics?.foreshockMagnitude || 1.2,
+        rainfall_mm: upzSensorsPackage.rainfall?.currentValue || 35.0,
+        storm_probability_pct: upzSensorsPackage.wind?.analytics?.stormProbabilityPct || 15,
+        quake_probability_pct: upzSensorsPackage.seismograph?.analytics?.probabilityBiggerEarthquakePct || 8,
+        flood_risk: upzSensorsPackage.water?.analytics?.floodRisk || 'NORMAL',
+        status: upzSensorsPackage.water?.currentValue > 5.5 || upzSensorsPackage.wind?.currentValue > 60 ? 'ELEVATED' : 'NORMAL'
+      };
 
       // Users from CSV
       if (r.worker) {

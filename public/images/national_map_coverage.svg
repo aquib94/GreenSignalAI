@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="mapBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#021710"/>
+      <stop offset="100%" stop-color="#052e20"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#mapBg)"/>
+
+  <!-- Bangladesh Map Stylized Polygonal Nodes -->
+  <g transform="translate(180, 50)">
+    <!-- Rangpur / Rajshahi -->
+    <polygon points="120,60 170,40 190,90 140,110" fill="#065f46" stroke="#10b981" stroke-width="1.5"/>
+    <text x="140" y="85" fill="#a7f3d0" font-family="sans-serif" font-size="10" font-weight="bold">Rangpur</text>
+
+    <polygon points="100,120 180,105 200,180 110,190" fill="#047857" stroke="#10b981" stroke-width="1.5"/>
+    <text x="130" y="150" fill="#a7f3d0" font-family="sans-serif" font-size="10" font-weight="bold">Rajshahi</text>
+
+    <!-- Sylhet / Mymensingh -->
+    <polygon points="210,70 300,60 320,130 220,130" fill="#065f46" stroke="#10b981" stroke-width="1.5"/>
+    <text x="240" y="100" fill="#a7f3d0" font-family="sans-serif" font-size="10" font-weight="bold">Mymensingh</text>
+
+    <polygon points="330,70 420,80 430,160 340,150" fill="#047857" stroke="#10b981" stroke-width="1.5"/>
+    <text x="365" y="120" fill="#a7f3d0" font-family="sans-serif" font-size="10" font-weight="bold">Sylhet</text>
+
+    <!-- Dhaka Central -->
+    <polygon points="190,190 310,170 320,270 200,280" fill="#059669" stroke="#34d399" stroke-width="2"/>
+    <text x="240" y="235" fill="#ffffff" font-family="sans-serif" font-size="13" font-weight="bold">DHAKA (HQ)</text>
+
+    <!-- Khulna / Barishal -->
+    <polygon points="110,210 190,200 200,340 100,320" fill="#065f46" stroke="#10b981" stroke-width="1.5"/>
+    <text x="135" y="270" fill="#a7f3d0" font-family="sans-serif" font-size="10" font-weight="bold">Khulna</text>
+
+    <polygon points="210,290 290,280 290,380 200,370" fill="#047857" stroke="#10b981" stroke-width="1.5"/>
+    <text x="230" y="335" fill="#a7f3d0" font-family="sans-serif" font-size="10" font-weight="bold">Barishal</text>
+
+    <!-- Chattogram -->
+    <polygon points="330,220 440,240 420,440 310,360" fill="#047857" stroke="#10b981" stroke-width="1.5"/>
+    <text x="350" y="320" fill="#a7f3d0" font-family="sans-serif" font-size="11" font-weight="bold">Chattogram</text>
+
+    <!-- Mesh connection lines -->
+    <line x1="250" y1="230" x2="140" y2="150" stroke="#34d399" stroke-width="2" stroke-dasharray="3,3"/>
+    <line x1="250" y1="230" x2="365" y2="120" stroke="#34d399" stroke-width="2" stroke-dasharray="3,3"/>
+    <line x1="250" y1="230" x2="350" y2="320" stroke="#34d399" stroke-width="2" stroke-dasharray="3,3"/>
+    <line x1="250" y1="230" x2="230" y2="335" stroke="#34d399" stroke-width="2" stroke-dasharray="3,3"/>
+    <line x1="250" y1="230" x2="135" y2="270" stroke="#34d399" stroke-width="2" stroke-dasharray="3,3"/>
+  </g>
+
+  <!-- Legend & Stats on Side -->
+  <g transform="translate(40, 480)">
+    <rect x="0" y="0" width="720" height="85" rx="14" fill="#064e3b" stroke="#10b981" stroke-width="1.5"/>
+    <text x="30" y="30" fill="#ffffff" font-family="sans-serif" font-size="14" font-weight="bold">Nationwide Geographical Footprint</text>
+    <text x="30" y="55" fill="#a7f3d0" font-family="sans-serif" font-size="12">495 Upazila Hubs • 64 District Commands • 8 Divisions • 1,250 Union Silos • 2,500+ IoT Telemetry Stations</text>
+  </g>
+</svg>

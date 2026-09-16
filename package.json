@@ -6,6 +6,7 @@
   "scripts": {
     "postinstall": "prisma generate",
     "build": "prisma generate && tsc",
+    "lint": "tsc --noEmit",
     "start": "node dist/server.js",
     "dev": "tsx src/server.ts",
     "db:push": "prisma db push",

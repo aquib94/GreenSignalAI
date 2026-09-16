@@ -17,6 +17,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'greensignal_ai_secure_jwt_secret_k
 router.post('/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username/email and password are required' });
+    }
+
     const user = await prisma.user.findFirst({
       where: {
         OR: [{ username }, { email: username }]
@@ -35,7 +39,132 @@ router.post('/auth/login', async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    return res.json({ token, user });
+    return res.json({ token, user, message: 'Authentication successful' });
+  } catch (err: any) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
+// User Registration / Signup
+router.post(['/auth/signup', '/auth/register'], async (req, res) => {
+  try {
+    const {
+      username,
+      email,
+      password,
+      fullName,
+      role = 'CITIZEN',
+      phone,
+      organization,
+      districtNodeId
+    } = req.body;
+
+    if (!username || !email || !password || !fullName) {
+      return res.status(400).json({
+        message: 'Missing required fields: username, email, password, and fullName are mandatory.'
+      });
+    }
+
+    // Format and sanitize
+    const cleanUsername = username.trim().toLowerCase().replace(/\s+/g, '_');
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanFullName = fullName.trim();
+
+    if (password.length < 4) {
+      return res.status(400).json({ message: 'Password must be at least 4 characters long' });
+    }
+
+    // Check for duplicate username or email
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: cleanUsername },
+          { email: cleanEmail }
+        ]
+      }
+    });
+
+    if (existingUser) {
+      if (existingUser.username.toLowerCase() === cleanUsername) {
+        return res.status(409).json({ message: `Username "${cleanUsername}" is already taken. Please choose another.` });
+      }
+      if (existingUser.email.toLowerCase() === cleanEmail) {
+        return res.status(409).json({ message: `Email "${cleanEmail}" is already registered. Please sign in instead.` });
+      }
+    }
+
+    // Validate role
+    const validRoles = ['CITIZEN', 'WORKER', 'COORDINATOR', 'PLANNER', 'ADMIN'];
+    const assignedRole = validRoles.includes(role?.toUpperCase()) ? role.toUpperCase() : 'CITIZEN';
+
+    // Hash password
+    const passwordHash = bcrypt.hashSync(password, 10);
+
+    // Verify districtNodeId if provided
+    let verifiedDistrictNodeId: string | null = null;
+    if (districtNodeId) {
+      const node = await prisma.administrativeNode.findUnique({
+        where: { id: districtNodeId }
+      });
+      if (node) {
+        verifiedDistrictNodeId = node.id;
+      }
+    }
+
+    // Create user in database
+    const newUser = await prisma.user.create({
+      data: {
+        username: cleanUsername,
+        email: cleanEmail,
+        passwordHash,
+        fullName: cleanFullName,
+        role: assignedRole as any,
+        phone: phone ? phone.trim() : null,
+        organization: organization ? organization.trim() : (assignedRole === 'CITIZEN' ? 'General Public' : 'National Emergency Response'),
+        districtNodeId: verifiedDistrictNodeId,
+        messages: []
+      },
+      include: {
+        districtNode: true
+      }
+    });
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: newUser.id, role: newUser.role, districtNodeId: newUser.districtNodeId },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    return res.status(201).json({
+      message: 'Account created successfully! Welcome to GreenSignal AI.',
+      token,
+      user: newUser
+    });
+  } catch (err: any) {
+    console.error('Signup error:', err);
+    return res.status(500).json({ message: err.message || 'Internal server error during registration' });
+  }
+});
+
+// Administrative Nodes & Locations Listing for Signup Selectors
+router.get(['/locations', '/administrative-nodes', '/nodes'], async (req, res) => {
+  try {
+    const nodes = await prisma.administrativeNode.findMany({
+      orderBy: { name: 'asc' }
+    });
+
+    const upazilas = nodes.filter((n: any) => n.tier === 'UPAZILA');
+    const districts = nodes.filter((n: any) => n.tier === 'DISTRICT');
+    const divisions = nodes.filter((n: any) => n.tier === 'DIVISION');
+
+    return res.json({
+      total: nodes.length,
+      upazilas: upazilas.map((u: any) => ({ id: u.id, name: u.name, code: u.code, parentId: u.parentId })),
+      districts: districts.map((d: any) => ({ id: d.id, name: d.name, code: d.code, parentId: d.parentId })),
+      divisions: divisions.map((v: any) => ({ id: v.id, name: v.name, code: v.code })),
+      all: nodes.map((n: any) => ({ id: n.id, name: n.name, tier: n.tier, code: n.code, parentId: n.parentId }))
+    });
   } catch (err: any) {
     return res.status(500).json({ message: err.message });
   }
@@ -133,7 +262,7 @@ router.get(['/upazila-context', '/upazila-context/:nodeId'], async (req, res) =>
 });
 
 // 3b. Interactive GIS Telemetry & Map Features API
-router.get(['/gis/features', '/gis/map-data'], async (req, res) => {
+router.get(['/gis/features', '/gis/map-data', '/gis/overview'], async (req, res) => {
   try {
     const { nodeId, district, type } = req.query as { nodeId?: string; district?: string; type?: string };
 
@@ -220,6 +349,13 @@ router.get(['/gis/features', '/gis/map-data'], async (req, res) => {
         latitude: s.latitude,
         longitude: s.longitude,
         metricValue: s.metricValue,
+        currentValue: s.currentValue,
+        unit: s.unit,
+        warningThreshold: s.warningThreshold,
+        dangerThreshold: s.dangerThreshold,
+        timeSeries: s.timeSeries || [],
+        forecastSeries: s.forecastSeries || [],
+        analytics: s.analytics || {},
         status: s.status || 'ACTIVE',
         lastPing: s.lastPing || new Date(),
         upazilaName: upzName,
@@ -235,6 +371,7 @@ router.get(['/gis/features', '/gis/map-data'], async (req, res) => {
       WIND: (scopeData.sensors || []).filter((s: any) => s.type === 'WIND').length,
       SALINITY: (scopeData.sensors || []).filter((s: any) => s.type === 'SALINITY').length,
       SEISMOGRAPH: (scopeData.sensors || []).filter((s: any) => s.type === 'SEISMOGRAPH').length,
+      RAINFALL: (scopeData.sensors || []).filter((s: any) => s.type === 'RAINFALL').length,
     };
 
     return res.json({
@@ -249,6 +386,60 @@ router.get(['/gis/features', '/gis/map-data'], async (req, res) => {
       totalSensors: formattedSensors.length,
       sensorCounts
     });
+  } catch (err: any) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
+// 3c. Direct Sensor Detail & Time-Series Prediction API
+router.get('/sensors/:id', async (req, res) => {
+  try {
+    const sensor = await prisma.sensorNode.findUnique({
+      where: { id: req.params.id },
+      include: {
+        districtNode: {
+          include: {
+            parent: true
+          }
+        }
+      }
+    });
+
+    if (!sensor) {
+      return res.status(404).json({ message: 'Sensor not found' });
+    }
+
+    return res.json({
+      ...sensor,
+      upazilaName: sensor.districtNode?.name || 'Upazila',
+      districtName: sensor.districtNode?.parent?.name || 'District'
+    });
+  } catch (err: any) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
+router.get('/sensors/:id/history', async (req, res) => {
+  try {
+    const sensor = await prisma.sensorNode.findUnique({
+      where: { id: req.params.id },
+      select: {
+        id: true,
+        sensorCode: true,
+        type: true,
+        metricValue: true,
+        currentValue: true,
+        unit: true,
+        warningThreshold: true,
+        dangerThreshold: true,
+        timeSeries: true,
+        forecastSeries: true,
+        analytics: true
+      }
+    });
+
+    if (!sensor) return res.status(404).json({ message: 'Sensor not found' });
+    return res.json(sensor);
   } catch (err: any) {
     return res.status(500).json({ message: err.message });
   }
