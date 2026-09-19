@@ -523,15 +523,23 @@
           throw new Error(result.message || 'Failed to create account');
         }
 
-        // Store authentication token and user profile
-        if (result.token) {
-          localStorage.setItem('greensignal_token', result.token);
+        // Store authentication token and user profile in all keys for platform synchronization
+        if (result.token && result.user) {
+          localStorage.setItem('user', JSON.stringify(result.user));
+          localStorage.setItem('token', result.token);
           localStorage.setItem('greensignal_user', JSON.stringify(result.user));
           localStorage.setItem('greensignal_auth_user', JSON.stringify(result.user));
+          localStorage.setItem('greensignal_token', result.token);
+        }
+
+        // Auto-fill signin tab with registered username
+        const signinInput = document.getElementById('signinUsername');
+        if (signinInput && result.user) {
+          signinInput.value = result.user.username || result.user.email;
         }
 
         // Display rich success message
-        showAlert('success', 'Registration Successful!', `Welcome to GreenSignal AI, ${result.user.fullName}. Your account has been registered with role: ${result.user.role}.`, [
+        showAlert('success', 'Registration Successful!', `Welcome to GreenSignal AI, ${result.user.fullName}. Your account has been registered with role: ${result.user.role}. You are signed in and ready to launch the tactical platform.`, [
           { text: 'Launch Live Tactical Platform', href: '/platform.html', primary: true },
           { text: 'Open Resource Planner', href: '/district-planner.html', primary: false },
           { text: 'Return to Project Overview', href: '/', primary: false }
@@ -576,18 +584,25 @@
           throw new Error(result.message || 'Invalid username or password');
         }
 
-        if (result.token) {
-          localStorage.setItem('greensignal_token', result.token);
+        if (result.token && result.user) {
+          localStorage.setItem('user', JSON.stringify(result.user));
+          localStorage.setItem('token', result.token);
           localStorage.setItem('greensignal_user', JSON.stringify(result.user));
           localStorage.setItem('greensignal_auth_user', JSON.stringify(result.user));
+          localStorage.setItem('greensignal_token', result.token);
         }
 
-        showAlert('success', 'Signed In Successfully!', `Welcome back, ${result.user.fullName || result.user.username} (${result.user.role}).`, [
+        showAlert('success', 'Signed In Successfully!', `Welcome back, ${result.user.fullName || result.user.username} (${result.user.role}). Redirecting to platform...`, [
           { text: 'Launch Live Tactical Platform', href: '/platform.html', primary: true },
           { text: 'Return to Project Overview', href: '/', primary: false }
         ]);
 
         checkActiveSession();
+
+        // Smooth redirect to platform
+        setTimeout(() => {
+          window.location.href = '/platform.html';
+        }, 1200);
       } catch (err) {
         showAlert('error', 'Sign In Failed', err.message);
       } finally {
@@ -597,7 +612,7 @@
     }
 
     function checkActiveSession() {
-      const userStr = localStorage.getItem('greensignal_user') || localStorage.getItem('greensignal_auth_user');
+      const userStr = localStorage.getItem('user') || localStorage.getItem('greensignal_user') || localStorage.getItem('greensignal_auth_user');
       const banner = document.getElementById('activeSessionBanner');
       if (userStr) {
         try {
@@ -615,6 +630,8 @@
     }
 
     function handleLogout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
       localStorage.removeItem('greensignal_token');
       localStorage.removeItem('greensignal_user');
       localStorage.removeItem('greensignal_auth_user');

@@ -1648,6 +1648,7 @@
     // Handle User Log Out
     function handlePlatformLogout() {
       localStorage.removeItem('user');
+      localStorage.removeItem('token');
       localStorage.removeItem('greensignal_user');
       localStorage.removeItem('greensignal_auth_user');
       localStorage.removeItem('greensignal_token');

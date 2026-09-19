@@ -382,10 +382,15 @@
         }
 
         const data = await res.json();
-        // Save auth token in local storage
+        // Save auth token in local storage across all keys
         if (data.token) {
           localStorage.setItem('token', data.token);
+          localStorage.setItem('greensignal_token', data.token);
+        }
+        if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('greensignal_user', JSON.stringify(data.user));
+          localStorage.setItem('greensignal_auth_user', JSON.stringify(data.user));
         }
 
         // Redirect URL logic depending on role

@@ -334,9 +334,13 @@ export class InMemoryStore {
     const rajshahiDiv = divisionMap.get('Rajshahi') || this.administrativeNodes.find(n => n.tier === 'DIVISION') || nationalNode;
 
     this.addUser('Adamdighi Citizen', 'CITIZEN', adamdighiUpz.id, 'Adamdighi Citizen', 'citizen.adamdighi@dmr.bd.gov');
+    this.addUser('adamdighi_citizen', 'CITIZEN', adamdighiUpz.id, 'Adamdighi Citizen', 'citizen.adamdighi@dmr.bd.gov');
     this.addUser('citizen1', 'CITIZEN', adamdighiUpz.id, 'Adamdighi Citizen', 'citizen1@dmr.bd.gov');
     this.addUser('Adamdighi Coordinator', 'COORDINATOR', adamdighiUpz.id, 'Adamdighi Disaster Coordinator', 'coord.adamdighi@dmr.bd.gov', '+8801712345678');
+    this.addUser('adamdighi_coordinator', 'COORDINATOR', adamdighiUpz.id, 'Adamdighi Disaster Coordinator', 'coord.adamdighi@dmr.bd.gov', '+8801712345678');
     this.addUser('Coordinator1', 'COORDINATOR', adamdighiUpz.id, 'Adamdighi Disaster Coordinator', 'coordinator1@dmr.bd.gov', '+8801712345678');
+    this.addUser('adamdighi_worker', 'WORKER', adamdighiUpz.id, 'Adamdighi Field Responder', 'worker.adamdighi@dmr.bd.gov', '+8801711112222');
+    this.addUser('adamdighi_planner', 'PLANNER', boguraDist.id, 'Bogura District Planner', 'planner.adamdighi@dmr.bd.gov', '+8801733334444');
     this.addUser('Bogura Coordinator', 'COORDINATOR', boguraDist.id, 'Bogura District Relief Officer', 'coord.bogura@dmr.bd.gov', '+8801798765432');
     this.addUser('Rajshahi Coordinator', 'COORDINATOR', rajshahiDiv.id, 'Rajshahi Division Director', 'coord.rajshahi@dmr.bd.gov', '+8801755555555');
     this.addUser('Admin', 'ADMIN', nationalNode.id, 'National HQ Administrator', 'admin@dmr.bd.gov', '+8801700000000');
@@ -478,15 +482,27 @@ function matchesWhere(item: any, where: any, store: InMemoryStore): boolean {
         continue;
       }
       if (expected.equals !== undefined) {
-        if (expected.mode === 'insensitive') {
-          if (String(actual || '').toLowerCase() !== String(expected.equals).toLowerCase()) return false;
+        if (expected.mode === 'insensitive' || key === 'username' || key === 'email') {
+          const act = String(actual || '').trim().toLowerCase();
+          const exp = String(expected.equals || '').trim().toLowerCase();
+          const actNorm = act.replace(/[\s_]+/g, '');
+          const expNorm = exp.replace(/[\s_]+/g, '');
+          if (act !== exp && actNorm !== expNorm) return false;
         } else {
           if (actual !== expected.equals) return false;
         }
         continue;
       }
     } else {
-      if (actual !== expected) return false;
+      if (key === 'username' || key === 'email') {
+        const act = String(actual || '').trim().toLowerCase();
+        const exp = String(expected || '').trim().toLowerCase();
+        const actNorm = act.replace(/[\s_]+/g, '');
+        const expNorm = exp.replace(/[\s_]+/g, '');
+        if (act !== exp && actNorm !== expNorm) return false;
+      } else {
+        if (actual !== expected) return false;
+      }
     }
   }
 

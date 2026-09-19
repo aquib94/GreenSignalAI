@@ -2259,6 +2259,7 @@
     // Handle User Log Out
     function handlePlatformLogout() {
       localStorage.removeItem('user');
+      localStorage.removeItem('token');
       localStorage.removeItem('greensignal_user');
       localStorage.removeItem('greensignal_auth_user');
       localStorage.removeItem('greensignal_token');
@@ -2290,17 +2291,24 @@
         // Replace history state so subsequent reloads don't revert to old query parameter
         window.history.replaceState({}, document.title, window.location.pathname);
       } else {
-        const savedUser = localStorage.getItem('user');
-        if (savedUser) {
+        // Prioritize actively logged-in user from auth.html or previous session
+        const savedUserStr = localStorage.getItem('user') || localStorage.getItem('greensignal_user') || localStorage.getItem('greensignal_auth_user');
+        let sessionActive = false;
+        if (savedUserStr) {
           try {
-            const parsed = JSON.parse(savedUser);
-            adaptUIForUser(parsed);
-            loadDefaultContext(parsed.districtNodeId || '');
+            const parsed = JSON.parse(savedUserStr);
+            if (parsed && (parsed.id || parsed.username || parsed.fullName)) {
+              adaptUIForUser(parsed);
+              loadDefaultContext(parsed.districtNodeId || '');
+              sessionActive = true;
+            }
           } catch(e) {
-            loadDefaultContext();
+            console.warn('Could not restore saved user:', e);
           }
-        } else {
-          // Default to first citizen account for immediate exploration
+        }
+
+        if (!sessionActive) {
+          // Default to first citizen account only if no authenticated session exists
           await quickImpersonateLogin('Adamdighi Citizen');
         }
       }
@@ -4937,6 +4945,8 @@
     function adaptUIForUser(user) {
       currentUser = user;
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('greensignal_user', JSON.stringify(user));
+      localStorage.setItem('greensignal_auth_user', JSON.stringify(user));
       document.getElementById('roleBadge').innerText = user.role;
       document.getElementById('userScopeText').innerText = `Active Account: ${user.fullName} (${user.organization || 'GreenSignalAI User'})`;
 
@@ -6884,9 +6894,12 @@
         const data = await res.json();
         if (data.token) {
           localStorage.setItem('token', data.token);
+          localStorage.setItem('greensignal_token', data.token);
         }
         if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('greensignal_user', JSON.stringify(data.user));
+          localStorage.setItem('greensignal_auth_user', JSON.stringify(data.user));
         }
 
         if (reloadOnSwitch) {
@@ -6924,9 +6937,12 @@
           const data = await impRes.json();
           if (data.token) {
             localStorage.setItem('token', data.token);
+            localStorage.setItem('greensignal_token', data.token);
           }
           if (data.user) {
             localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('greensignal_user', JSON.stringify(data.user));
+            localStorage.setItem('greensignal_auth_user', JSON.stringify(data.user));
           }
           closeLoginModal();
           // Reload page on user change
@@ -6953,9 +6969,12 @@
         const data = await res.json();
         if (data.token) {
           localStorage.setItem('token', data.token);
+          localStorage.setItem('greensignal_token', data.token);
         }
         if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('greensignal_user', JSON.stringify(data.user));
+          localStorage.setItem('greensignal_auth_user', JSON.stringify(data.user));
         }
         closeLoginModal();
         // Reload page on user change
