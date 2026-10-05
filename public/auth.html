@@ -204,92 +204,190 @@
         </div>
 
         <!-- Role Selector (Multi-Tier) -->
-        <div>
-          <label class="block text-xs font-bold text-slate-300 mb-2">
-            Select Operational Role <span class="text-rose-400">*</span>
-          </label>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div class="space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-xs font-bold text-slate-300">
+                Select Operational Role <span class="text-rose-400">*</span>
+              </label>
+              <span id="roleBadgeIndicator" class="text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-700/50 flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i>
+                <span>Selected: Upazila Coordinator</span>
+              </span>
+            </div>
             
-            <!-- COORDINATOR -->
-            <label class="cursor-pointer border border-emerald-500/50 bg-emerald-950/30 hover:bg-emerald-950/50 rounded-xl p-3 flex items-start gap-3 transition">
-              <input type="radio" name="signupRole" value="COORDINATOR" checked class="mt-1 accent-emerald-500 text-emerald-500 focus:ring-emerald-500">
-              <div>
-                <div class="flex items-center gap-1.5">
-                  <i class="fa-solid fa-tower-broadcast text-emerald-400 text-xs"></i>
-                  <span class="text-xs font-bold text-white">Upazila Coordinator</span>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-0.5">Tactical GIS command, shelter allocation, BOQ generation.</p>
+            <!-- Category 1: Coordinator Tiers -->
+            <div class="mb-4">
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-sitemap text-emerald-400"></i> Disaster Coordination Tiers (Multi-Level Command)
+                </p>
+                <span class="text-[10px] text-slate-400">Select hierarchy level</span>
               </div>
-            </label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="coordinatorRolesGrid">
+                
+                <!-- UPAZILA COORDINATOR -->
+                <label class="role-card cursor-pointer border-2 border-emerald-500 bg-emerald-950/40 rounded-2xl p-3.5 flex flex-col justify-between transition relative overflow-hidden group shadow-lg" data-role="COORDINATOR">
+                  <div class="flex items-start justify-between gap-2 mb-2">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-sm shadow">
+                      <i class="fa-solid fa-tower-broadcast"></i>
+                    </div>
+                    <input type="radio" name="signupRole" value="COORDINATOR" checked onchange="handleRoleRadioChange(this.value)" class="accent-emerald-500 text-emerald-500 focus:ring-emerald-500 mt-1">
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-extrabold text-white">Upazila Coordinator</span>
+                    </div>
+                    <span class="inline-block text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 my-1">Local Upazila Level</span>
+                    <p class="text-[11px] text-slate-400 leading-snug">Local shelter stock, field volunteer dispatch, and immediate BOQ requisition.</p>
+                  </div>
+                </label>
 
-            <!-- WORKER -->
-            <label class="cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-xl p-3 flex items-start gap-3 transition">
-              <input type="radio" name="signupRole" value="WORKER" class="mt-1 accent-emerald-500 text-emerald-500 focus:ring-emerald-500">
-              <div>
-                <div class="flex items-center gap-1.5">
-                  <i class="fa-solid fa-person-shelter text-teal-400 text-xs"></i>
-                  <span class="text-xs font-bold text-white">Field Responder</span>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-0.5">Offline mobile app, QR relief scans, search & rescue.</p>
-              </div>
-            </label>
+                <!-- DISTRICT COORDINATOR -->
+                <label class="role-card cursor-pointer border border-slate-800 hover:border-teal-500/60 bg-slate-950/60 hover:bg-teal-950/30 rounded-2xl p-3.5 flex flex-col justify-between transition relative overflow-hidden group shadow" data-role="DISTRICT_COORDINATOR">
+                  <div class="flex items-start justify-between gap-2 mb-2">
+                    <div class="w-8 h-8 rounded-xl bg-teal-500/20 text-teal-400 border border-teal-500/30 flex items-center justify-center text-sm shadow">
+                      <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <input type="radio" name="signupRole" value="DISTRICT_COORDINATOR" onchange="handleRoleRadioChange(this.value)" class="accent-emerald-500 text-emerald-500 focus:ring-emerald-500 mt-1">
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-extrabold text-white">District Coordinator</span>
+                    </div>
+                    <span class="inline-block text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 my-1">District Level (All Upazilas)</span>
+                    <p class="text-[11px] text-slate-400 leading-snug">District-wide oversight, cross-upazila supply rebalancing & relief allocations.</p>
+                  </div>
+                </label>
 
-            <!-- PLANNER -->
-            <label class="cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-xl p-3 flex items-start gap-3 transition">
-              <input type="radio" name="signupRole" value="PLANNER" class="mt-1 accent-emerald-500 text-emerald-500 focus:ring-emerald-500">
-              <div>
-                <div class="flex items-center gap-1.5">
-                  <i class="fa-solid fa-compass-drafting text-cyan-400 text-xs"></i>
-                  <span class="text-xs font-bold text-white">Disaster Planner</span>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-0.5">Supply chain rebalancing, district stock planning.</p>
-              </div>
-            </label>
+                <!-- DIVISION COORDINATOR -->
+                <label class="role-card cursor-pointer border border-slate-800 hover:border-cyan-500/60 bg-slate-950/60 hover:bg-cyan-950/30 rounded-2xl p-3.5 flex flex-col justify-between transition relative overflow-hidden group shadow" data-role="DIVISION_COORDINATOR">
+                  <div class="flex items-start justify-between gap-2 mb-2">
+                    <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-sm shadow">
+                      <i class="fa-solid fa-globe"></i>
+                    </div>
+                    <input type="radio" name="signupRole" value="DIVISION_COORDINATOR" onchange="handleRoleRadioChange(this.value)" class="accent-emerald-500 text-emerald-500 focus:ring-emerald-500 mt-1">
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-extrabold text-white">Division Coordinator</span>
+                    </div>
+                    <span class="inline-block text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 my-1">Division Level (All Districts)</span>
+                    <p class="text-[11px] text-slate-400 leading-snug">Inter-district logistics routing, regional relief corridors, and high-level escalations.</p>
+                  </div>
+                </label>
 
-            <!-- CITIZEN -->
-            <label class="cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-xl p-3 flex items-start gap-3 transition">
-              <input type="radio" name="signupRole" value="CITIZEN" class="mt-1 accent-emerald-500 text-emerald-500 focus:ring-emerald-500">
-              <div>
-                <div class="flex items-center gap-1.5">
-                  <i class="fa-solid fa-hand-holding-heart text-amber-400 text-xs"></i>
-                  <span class="text-xs font-bold text-white">Citizen / Volunteer</span>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-0.5">Early warning alerts, emergency SOS, shelter finder.</p>
-              </div>
-            </label>
+                <!-- NATIONAL COORDINATOR -->
+                <label class="role-card cursor-pointer border border-slate-800 hover:border-indigo-500/60 bg-slate-950/60 hover:bg-indigo-950/30 rounded-2xl p-3.5 flex flex-col justify-between transition relative overflow-hidden group shadow" data-role="NATIONAL_COORDINATOR">
+                  <div class="flex items-start justify-between gap-2 mb-2">
+                    <div class="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-sm shadow">
+                      <i class="fa-solid fa-flag"></i>
+                    </div>
+                    <input type="radio" name="signupRole" value="NATIONAL_COORDINATOR" onchange="handleRoleRadioChange(this.value)" class="accent-emerald-500 text-emerald-500 focus:ring-emerald-500 mt-1">
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-extrabold text-white">National Coordinator</span>
+                    </div>
+                    <span class="inline-block text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 my-1">National Command HQ</span>
+                    <p class="text-[11px] text-slate-400 leading-snug">Nationwide disaster command, multi-divisional strategy, budget & military/DDM sync.</p>
+                  </div>
+                </label>
 
-            <!-- ADMIN -->
-            <label class="cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-xl p-3 flex items-start gap-3 transition">
-              <input type="radio" name="signupRole" value="ADMIN" class="mt-1 accent-emerald-500 text-emerald-500 focus:ring-emerald-500">
-              <div>
-                <div class="flex items-center gap-1.5">
-                  <i class="fa-solid fa-shield-halved text-indigo-400 text-xs"></i>
-                  <span class="text-xs font-bold text-white">System Admin</span>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-0.5">National sensor calibration, audit logs, node setup.</p>
               </div>
-            </label>
+            </div>
+
+            <!-- Category 2: Field & Operational Roles -->
+            <div>
+              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-users text-slate-400"></i> Field Operations, Planning & Citizen Access
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="operationalRolesGrid">
+                
+                <!-- WORKER -->
+                <label class="role-card cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-2xl p-3 flex flex-col justify-between transition relative overflow-hidden group" data-role="WORKER">
+                  <div class="flex items-start justify-between gap-2 mb-2">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-sm">
+                      <i class="fa-solid fa-person-shelter"></i>
+                    </div>
+                    <input type="radio" name="signupRole" value="WORKER" onchange="handleRoleRadioChange(this.value)" class="accent-emerald-500 text-emerald-500 focus:ring-emerald-500 mt-1">
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-white block">Field Responder</span>
+                    <span class="text-[9px] text-emerald-400 font-mono">Field Operations</span>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Offline mobile app, QR relief scans, search & rescue teams.</p>
+                  </div>
+                </label>
+
+                <!-- PLANNER -->
+                <label class="role-card cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-2xl p-3 flex flex-col justify-between transition relative overflow-hidden group" data-role="PLANNER">
+                  <div class="flex items-start justify-between gap-2 mb-2">
+                    <div class="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center text-sm">
+                      <i class="fa-solid fa-compass-drafting"></i>
+                    </div>
+                    <input type="radio" name="signupRole" value="PLANNER" onchange="handleRoleRadioChange(this.value)" class="accent-emerald-500 text-emerald-500 focus:ring-emerald-500 mt-1">
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-white block">Disaster Planner</span>
+                    <span class="text-[9px] text-sky-400 font-mono">Supply Chain</span>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Supply chain rebalancing, district stock planning & simulations.</p>
+                  </div>
+                </label>
+
+                <!-- CITIZEN -->
+                <label class="role-card cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-2xl p-3 flex flex-col justify-between transition relative overflow-hidden group" data-role="CITIZEN">
+                  <div class="flex items-start justify-between gap-2 mb-2">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center text-sm">
+                      <i class="fa-solid fa-hand-holding-heart"></i>
+                    </div>
+                    <input type="radio" name="signupRole" value="CITIZEN" onchange="handleRoleRadioChange(this.value)" class="accent-emerald-500 text-emerald-500 focus:ring-emerald-500 mt-1">
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-white block">Citizen / Volunteer</span>
+                    <span class="text-[9px] text-amber-400 font-mono">Community</span>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Early warning alerts, emergency SOS, community shelter finder.</p>
+                  </div>
+                </label>
+
+                <!-- ADMIN -->
+                <label class="role-card cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-2xl p-3 flex flex-col justify-between transition relative overflow-hidden group" data-role="ADMIN">
+                  <div class="flex items-start justify-between gap-2 mb-2">
+                    <div class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center text-sm">
+                      <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <input type="radio" name="signupRole" value="ADMIN" onchange="handleRoleRadioChange(this.value)" class="accent-emerald-500 text-emerald-500 focus:ring-emerald-500 mt-1">
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-white block">System Admin</span>
+                    <span class="text-[9px] text-purple-400 font-mono">System Control</span>
+                    <p class="text-[11px] text-slate-400 mt-0.5">National sensor calibration, audit logs, node configuration.</p>
+                  </div>
+                </label>
+
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- Location & Organization -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           
-          <!-- Assigned Administrative Node / Upazila -->
+          <!-- Assigned Administrative Node / Jurisdiction -->
           <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupDistrictNodeId">
-              Assigned Upazila / Operational Center
+            <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupDistrictNodeId" id="signupDistrictNodeLabel">
+              Assigned Upazila / Operational Center <span class="text-rose-400">*</span>
             </label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                <i class="fa-solid fa-map-pin"></i>
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400" id="signupDistrictNodeIcon">
+                <i class="fa-solid fa-tower-broadcast"></i>
               </span>
               <select id="signupDistrictNodeId" class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white outline-none transition">
-                <option value="">-- National Headquarters (Dhaka) --</option>
-                <!-- Dynamically loaded -->
+                <option value="">-- Loading jurisdictions... --</option>
               </select>
             </div>
-            <p class="text-[10px] text-slate-500 mt-1">Select your local Upazila disaster jurisdiction or headquarters.</p>
+            <p id="signupDistrictNodeHelp" class="text-[10px] text-slate-500 mt-1">
+              Select your local Upazila disaster jurisdiction or shelter headquarters.
+            </p>
           </div>
 
           <!-- Organization / Agency -->
@@ -301,10 +399,12 @@
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                 <i class="fa-solid fa-building-flag"></i>
               </span>
-              <input type="text" id="signupOrganization" placeholder="e.g. Cyclone Preparedness Programme (CPP)" 
+              <input type="text" id="signupOrganization" placeholder="e.g. Upazila Disaster Management Committee (UzDMC)" 
                 class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
             </div>
-            <p class="text-[10px] text-slate-500 mt-1">MoDMR, CPP, Fire Service, Red Crescent, BDRCS, or DDM.</p>
+            <p id="signupOrganizationHelp" class="text-[10px] text-slate-500 mt-1">
+              MoDMR, CPP, Fire Service, Red Crescent, BDRCS, or DDM.
+            </p>
           </div>
         </div>
 
@@ -370,22 +470,34 @@
         <!-- Quick Demo Accounts Presets -->
         <div class="pt-4 border-t border-slate-800">
           <p class="text-xs font-bold text-slate-400 mb-2">⚡ Quick Test Profiles (One-Click Sign In):</p>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <button type="button" onclick="quickFillCredentials('adamdighi_coordinator', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-emerald-950/60 border border-slate-800 hover:border-emerald-500/40 text-left transition text-xs">
-              <span class="font-bold text-emerald-400 block">🛡️ Coordinator</span>
-              <span class="text-[10px] text-slate-400 font-mono">adamdighi_coordinator</span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+            <button type="button" onclick="quickFillCredentials('adamdighi_coordinator', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-emerald-950/60 border border-slate-800 hover:border-emerald-500/40 text-left transition text-xs group">
+              <span class="font-bold text-emerald-400 block truncate group-hover:text-emerald-300">🛡️ Upazila Coord</span>
+              <span class="text-[9px] text-slate-400 font-mono block truncate">adamdighi_coord</span>
             </button>
-            <button type="button" onclick="quickFillCredentials('adamdighi_worker', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-teal-950/60 border border-slate-800 hover:border-teal-500/40 text-left transition text-xs">
-              <span class="font-bold text-teal-400 block">🚑 Field Worker</span>
-              <span class="text-[10px] text-slate-400 font-mono">adamdighi_worker</span>
+            <button type="button" onclick="quickFillCredentials('Bogura Coordinator', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-teal-950/60 border border-slate-800 hover:border-teal-500/40 text-left transition text-xs group">
+              <span class="font-bold text-teal-400 block truncate group-hover:text-teal-300">🏛️ District Coord</span>
+              <span class="text-[9px] text-slate-400 font-mono block truncate">Bogura Coord</span>
             </button>
-            <button type="button" onclick="quickFillCredentials('adamdighi_planner', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-cyan-950/60 border border-slate-800 hover:border-cyan-500/40 text-left transition text-xs">
-              <span class="font-bold text-cyan-400 block">📊 Planner</span>
-              <span class="text-[10px] text-slate-400 font-mono">adamdighi_planner</span>
+            <button type="button" onclick="quickFillCredentials('Rajshahi Coordinator', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-cyan-950/60 border border-slate-800 hover:border-cyan-500/40 text-left transition text-xs group">
+              <span class="font-bold text-cyan-400 block truncate group-hover:text-cyan-300">🌐 Division Coord</span>
+              <span class="text-[9px] text-slate-400 font-mono block truncate">Rajshahi Coord</span>
             </button>
-            <button type="button" onclick="quickFillCredentials('adamdighi_citizen', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-amber-950/60 border border-slate-800 hover:border-amber-500/40 text-left transition text-xs">
-              <span class="font-bold text-amber-400 block">👥 Citizen</span>
-              <span class="text-[10px] text-slate-400 font-mono">adamdighi_citizen</span>
+            <button type="button" onclick="quickFillCredentials('Admin', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/40 text-left transition text-xs group">
+              <span class="font-bold text-indigo-400 block truncate group-hover:text-indigo-300">🚩 National Coord</span>
+              <span class="text-[9px] text-slate-400 font-mono block truncate">Admin (National)</span>
+            </button>
+            <button type="button" onclick="quickFillCredentials('adamdighi_worker', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-teal-950/60 border border-slate-800 hover:border-teal-500/40 text-left transition text-xs group">
+              <span class="font-bold text-teal-400 block truncate group-hover:text-teal-300">🚑 Responder</span>
+              <span class="text-[9px] text-slate-400 font-mono block truncate">adamdighi_worker</span>
+            </button>
+            <button type="button" onclick="quickFillCredentials('adamdighi_planner', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-sky-950/60 border border-slate-800 hover:border-sky-500/40 text-left transition text-xs group">
+              <span class="font-bold text-sky-400 block truncate group-hover:text-sky-300">📊 Planner</span>
+              <span class="text-[9px] text-slate-400 font-mono block truncate">adamdighi_planner</span>
+            </button>
+            <button type="button" onclick="quickFillCredentials('adamdighi_citizen', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-amber-950/60 border border-slate-800 hover:border-amber-500/40 text-left transition text-xs group">
+              <span class="font-bold text-amber-400 block truncate group-hover:text-amber-300">👥 Citizen</span>
+              <span class="text-[9px] text-slate-400 font-mono block truncate">adamdighi_citizen</span>
             </button>
           </div>
         </div>
@@ -404,6 +516,8 @@
 
   <!-- AUTH LOGIC JAVASCRIPT -->
   <script>
+    let cachedLocations = null;
+
     // 1. Check existing session on load
     document.addEventListener('DOMContentLoaded', () => {
       checkActiveSession();
@@ -415,6 +529,17 @@
         switchAuthTab('signin');
       } else {
         switchAuthTab('signup');
+      }
+
+      // Check if a role was requested via URL e.g. ?role=district_coordinator
+      const requestedRole = urlParams.get('role');
+      if (requestedRole) {
+        const cleanReqRole = requestedRole.toUpperCase();
+        const radio = document.querySelector(`input[name="signupRole"][value="${cleanReqRole}"]`);
+        if (radio) {
+          radio.checked = true;
+          handleRoleRadioChange(cleanReqRole);
+        }
       }
     });
 
@@ -456,24 +581,272 @@
       handleSignin(new Event('submit'));
     }
 
-    // 2. Load Upazila / Administrative locations
+    // Role Selection Change Handler
+    function handleRoleRadioChange(selectedRole) {
+      updateRoleCardStyles(selectedRole);
+      updateJurisdictionForRole(selectedRole);
+    }
+
+    function updateRoleCardStyles(selectedRole) {
+      const cards = document.querySelectorAll('.role-card');
+      const badgeIndicator = document.getElementById('roleBadgeIndicator');
+
+      const roleDisplayNames = {
+        'COORDINATOR': 'Upazila Coordinator',
+        'DISTRICT_COORDINATOR': 'District Coordinator',
+        'DIVISION_COORDINATOR': 'Division Coordinator',
+        'NATIONAL_COORDINATOR': 'National Coordinator',
+        'WORKER': 'Field Responder',
+        'PLANNER': 'Disaster Planner',
+        'CITIZEN': 'Citizen / Volunteer',
+        'ADMIN': 'System Administrator'
+      };
+
+      const roleThemes = {
+        'COORDINATOR': { border: 'border-emerald-500', bg: 'bg-emerald-950/40', text: 'text-emerald-300' },
+        'DISTRICT_COORDINATOR': { border: 'border-teal-500', bg: 'bg-teal-950/40', text: 'text-teal-300' },
+        'DIVISION_COORDINATOR': { border: 'border-cyan-500', bg: 'bg-cyan-950/40', text: 'text-cyan-300' },
+        'NATIONAL_COORDINATOR': { border: 'border-indigo-500', bg: 'bg-indigo-950/40', text: 'text-indigo-300' },
+        'WORKER': { border: 'border-emerald-500', bg: 'bg-emerald-950/40', text: 'text-emerald-300' },
+        'PLANNER': { border: 'border-sky-500', bg: 'bg-sky-950/40', text: 'text-sky-300' },
+        'CITIZEN': { border: 'border-amber-500', bg: 'bg-amber-950/40', text: 'text-amber-300' },
+        'ADMIN': { border: 'border-purple-500', bg: 'bg-purple-950/40', text: 'text-purple-300' }
+      };
+
+      const currentTheme = roleThemes[selectedRole] || roleThemes['COORDINATOR'];
+
+      cards.forEach(card => {
+        const cardRole = card.getAttribute('data-role');
+        if (cardRole === selectedRole) {
+          card.className = `role-card cursor-pointer border-2 ${currentTheme.border} ${currentTheme.bg} rounded-2xl p-3.5 flex flex-col justify-between transition relative overflow-hidden group shadow-lg`;
+        } else {
+          card.className = `role-card cursor-pointer border border-slate-800 hover:border-slate-700 bg-slate-950/60 hover:bg-slate-950 rounded-2xl p-3.5 flex flex-col justify-between transition relative overflow-hidden group shadow`;
+        }
+      });
+
+      if (badgeIndicator) {
+        badgeIndicator.className = `text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-slate-900 border border-slate-700 ${currentTheme.text} flex items-center gap-1.5`;
+        badgeIndicator.innerHTML = `<i class="fa-solid fa-circle-check ${currentTheme.text} text-[10px]"></i><span>Selected: ${roleDisplayNames[selectedRole] || selectedRole}</span>`;
+      }
+    }
+
+    // 2. Load Administrative locations & update UI based on selected role
     async function loadLocations() {
-      const select = document.getElementById('signupDistrictNodeId');
       try {
         const res = await fetch('/api/locations');
         if (!res.ok) return;
-        const data = await res.json();
-        if (data.upazilas && data.upazilas.length > 0) {
-          select.innerHTML = '<option value="">-- National Command HQ (Dhaka) --</option>';
-          data.upazilas.slice(0, 100).forEach(u => {
+        cachedLocations = await res.json();
+
+        // Update jurisdiction selector based on currently checked role
+        const checkedRole = document.querySelector('input[name="signupRole"]:checked')?.value || 'COORDINATOR';
+        updateRoleCardStyles(checkedRole);
+        updateJurisdictionForRole(checkedRole);
+      } catch (e) {
+        console.warn('Locations load note:', e);
+      }
+    }
+
+    function updateJurisdictionForRole(role) {
+      const select = document.getElementById('signupDistrictNodeId');
+      const label = document.getElementById('signupDistrictNodeLabel');
+      const icon = document.getElementById('signupDistrictNodeIcon');
+      const help = document.getElementById('signupDistrictNodeHelp');
+      const orgInput = document.getElementById('signupOrganization');
+
+      if (!select) return;
+
+      select.innerHTML = '';
+
+      if (!cachedLocations) {
+        select.innerHTML = '<option value="">-- Loading jurisdictions from network... --</option>';
+        return;
+      }
+
+      const { national, divisions, districts, upazilas } = cachedLocations;
+
+      if (role === 'NATIONAL_COORDINATOR') {
+        label.innerHTML = 'National Command Jurisdiction <span class="text-indigo-400">*</span>';
+        icon.className = 'absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-indigo-400';
+        icon.innerHTML = '<i class="fa-solid fa-flag"></i>';
+        help.textContent = 'Directly assigned to Bangladesh National Command HQ (Dhaka) overseeing all 8 Divisions and 64 Districts.';
+        
+        const nationalId = national?.id || 'node-bd-national-hq';
+        const nationalName = national?.name || 'Bangladesh National Command (Dhaka HQ)';
+        const nationalCode = national?.code || 'BD-HQ';
+        select.innerHTML = `<option value="${nationalId}" selected>🇧🇩 ${nationalName} (${nationalCode})</option>`;
+
+        if (!orgInput.value || orgInput.value.includes('Committee') || orgInput.value.includes('General')) {
+          orgInput.value = 'National Disaster Response Coordination Centre (NDRCC)';
+        }
+      } else if (role === 'DIVISION_COORDINATOR') {
+        label.innerHTML = 'Assigned Division Jurisdiction <span class="text-rose-400">*</span>';
+        icon.className = 'absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-cyan-400';
+        icon.innerHTML = '<i class="fa-solid fa-globe"></i>';
+        help.textContent = 'Select the administrative division you will coordinate (overseeing all districts and relief operations within this division).';
+
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '-- Select Administrative Division (8 Divisions) --';
+        select.appendChild(defaultOpt);
+
+        if (divisions && divisions.length > 0) {
+          divisions.forEach(d => {
             const opt = document.createElement('option');
-            opt.value = u.id;
-            opt.textContent = `${u.name} Upazila (${u.code || 'UPZ'})`;
+            opt.value = d.id;
+            opt.textContent = `🌐 ${d.name} (${d.code || 'DIV'})`;
             select.appendChild(opt);
           });
         }
-      } catch (e) {
-        console.warn('Locations load note:', e);
+
+        if (!orgInput.value || orgInput.value.includes('Committee') || orgInput.value.includes('General')) {
+          orgInput.value = 'Divisional Disaster Relief & Management Commission';
+        }
+      } else if (role === 'DISTRICT_COORDINATOR') {
+        label.innerHTML = 'Assigned District Jurisdiction <span class="text-rose-400">*</span>';
+        icon.className = 'absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-teal-400';
+        icon.innerHTML = '<i class="fa-solid fa-building-columns"></i>';
+        help.textContent = 'Select the district you will coordinate and oversee (managing all relief shelters across upazilas in this district).';
+
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '-- Select District Jurisdiction (64 Districts) --';
+        select.appendChild(defaultOpt);
+
+        if (districts && districts.length > 0) {
+          districts.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d.id;
+            const parentInfo = d.parentName ? ` • ${d.parentName}` : '';
+            opt.textContent = `🏛️ ${d.name} (${d.code || 'DIST'}${parentInfo})`;
+            select.appendChild(opt);
+          });
+        }
+
+        if (!orgInput.value || orgInput.value.includes('Commission') || orgInput.value.includes('General')) {
+          orgInput.value = 'District Disaster Management Committee (DDMC)';
+        }
+      } else if (role === 'COORDINATOR') {
+        // Upazila Coordinator
+        label.innerHTML = 'Assigned Upazila / Operational Center <span class="text-rose-400">*</span>';
+        icon.className = 'absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400';
+        icon.innerHTML = '<i class="fa-solid fa-tower-broadcast"></i>';
+        help.textContent = 'Select your local Upazila disaster jurisdiction or primary relief shelter headquarters.';
+
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '-- Select Upazila Jurisdiction (Local Operations) --';
+        select.appendChild(defaultOpt);
+
+        if (upazilas && upazilas.length > 0) {
+          upazilas.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            const parentInfo = u.parentName ? ` (${u.parentName})` : '';
+            opt.textContent = `${u.name}${parentInfo}`;
+            select.appendChild(opt);
+          });
+        }
+
+        if (!orgInput.value || orgInput.value.includes('Commission')) {
+          orgInput.value = 'Upazila Disaster Management Committee (UzDMC)';
+        }
+      } else if (role === 'WORKER') {
+        label.innerHTML = 'Assigned Field Station / Upazila <span class="text-rose-400">*</span>';
+        icon.className = 'absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400';
+        icon.innerHTML = '<i class="fa-solid fa-person-shelter"></i>';
+        help.textContent = 'Select the upazila field station or shelter where your response team is stationed.';
+
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '-- Select Upazila Field Station --';
+        select.appendChild(defaultOpt);
+
+        if (upazilas && upazilas.length > 0) {
+          upazilas.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            const parentInfo = u.parentName ? ` (${u.parentName})` : '';
+            opt.textContent = `${u.name}${parentInfo}`;
+            select.appendChild(opt);
+          });
+        }
+
+        if (!orgInput.value || orgInput.value.includes('Committee') || orgInput.value.includes('Commission')) {
+          orgInput.value = 'Cyclone Preparedness Programme (CPP) / Red Crescent';
+        }
+      } else if (role === 'PLANNER') {
+        label.innerHTML = 'Planning Jurisdiction (District or Division) <span class="text-rose-400">*</span>';
+        icon.className = 'absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-400';
+        icon.innerHTML = '<i class="fa-solid fa-compass-drafting"></i>';
+        help.textContent = 'Select the district or division hub for simulation and resource pre-positioning models.';
+
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '-- Select District or Division Planning Hub --';
+        select.appendChild(defaultOpt);
+
+        // Include divisions first
+        if (divisions && divisions.length > 0) {
+          divisions.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d.id;
+            opt.textContent = `🌐 ${d.name} (Divisional Planning Hub)`;
+            select.appendChild(opt);
+          });
+        }
+
+        // Include districts
+        if (districts && districts.length > 0) {
+          districts.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d.id;
+            const parentInfo = d.parentName ? ` • ${d.parentName}` : '';
+            opt.textContent = `🏛️ ${d.name} (District Office${parentInfo})`;
+            select.appendChild(opt);
+          });
+        }
+
+        if (!orgInput.value || orgInput.value.includes('Committee')) {
+          orgInput.value = 'Disaster Management & Planning Commission';
+        }
+      } else if (role === 'ADMIN') {
+        label.innerHTML = 'Administrative Command Jurisdiction';
+        icon.className = 'absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-400';
+        icon.innerHTML = '<i class="fa-solid fa-shield-halved"></i>';
+        help.textContent = 'System Administrators hold root access across the national disaster network.';
+
+        const nationalId = national?.id || 'node-bd-national-hq';
+        const nationalName = national?.name || 'Bangladesh National Command (Dhaka HQ)';
+        select.innerHTML = `<option value="${nationalId}" selected>🇧🇩 ${nationalName}</option>`;
+
+        if (!orgInput.value || orgInput.value.includes('Committee') || orgInput.value.includes('General')) {
+          orgInput.value = 'Ministry of Disaster Management and Relief (MoDMR)';
+        }
+      } else {
+        // Citizen / Volunteer
+        label.innerHTML = 'Local Residential Area / Upazila';
+        icon.className = 'absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-amber-400';
+        icon.innerHTML = '<i class="fa-solid fa-hand-holding-heart"></i>';
+        help.textContent = 'Select your local area to receive emergency sirens, localized flood warnings, and shelter directions.';
+
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '-- General Citizen Network (or choose local Upazila) --';
+        select.appendChild(defaultOpt);
+
+        if (upazilas && upazilas.length > 0) {
+          upazilas.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            const parentInfo = u.parentName ? ` (${u.parentName})` : '';
+            opt.textContent = `${u.name}${parentInfo}`;
+            select.appendChild(opt);
+          });
+        }
+
+        if (!orgInput.value || orgInput.value.includes('Commission') || orgInput.value.includes('UzDMC')) {
+          orgInput.value = 'General Public / Community Volunteer';
+        }
       }
     }
 
@@ -494,6 +867,14 @@
 
       if (password !== confirmPassword) {
         showAlert('error', 'Passwords Do Not Match', 'Please ensure both password fields match.');
+        return;
+      }
+
+      // Check required jurisdiction for coordinator roles
+      if (['DISTRICT_COORDINATOR', 'DIVISION_COORDINATOR', 'COORDINATOR'].includes(role) && !districtNodeId) {
+        const tierName = role === 'DISTRICT_COORDINATOR' ? 'District' : role === 'DIVISION_COORDINATOR' ? 'Division' : 'Upazila';
+        showAlert('error', 'Jurisdiction Required', `Please select your assigned ${tierName} jurisdiction from the dropdown.`);
+        document.getElementById('signupDistrictNodeId').focus();
         return;
       }
 
@@ -538,8 +919,10 @@
           signinInput.value = result.user.username || result.user.email;
         }
 
+        const roleTitle = result.user.roleTitle || result.user.role;
+
         // Display rich success message
-        showAlert('success', 'Registration Successful!', `Welcome to GreenSignal AI, ${result.user.fullName}. Your account has been registered with role: ${result.user.role}. You are signed in and ready to launch the tactical platform.`, [
+        showAlert('success', 'Registration Successful!', `Welcome to GreenSignal AI, ${result.user.fullName}. Your account has been registered as ${roleTitle}. You are signed in and ready to launch the tactical command platform.`, [
           { text: 'Launch Live Tactical Platform', href: '/platform.html', primary: true },
           { text: 'Open Resource Planner', href: '/district-planner.html', primary: false },
           { text: 'Return to Project Overview', href: '/', primary: false }
@@ -592,7 +975,9 @@
           localStorage.setItem('greensignal_token', result.token);
         }
 
-        showAlert('success', 'Signed In Successfully!', `Welcome back, ${result.user.fullName || result.user.username} (${result.user.role}). Redirecting to platform...`, [
+        const roleTitle = result.user.roleTitle || result.user.role;
+
+        showAlert('success', 'Signed In Successfully!', `Welcome back, ${result.user.fullName || result.user.username} (${roleTitle}). Redirecting to platform...`, [
           { text: 'Launch Live Tactical Platform', href: '/platform.html', primary: true },
           { text: 'Return to Project Overview', href: '/', primary: false }
         ]);
@@ -618,7 +1003,7 @@
         try {
           const user = JSON.parse(userStr);
           document.getElementById('currentUserName').textContent = user.fullName || user.username;
-          document.getElementById('currentUserRole').textContent = user.role || 'USER';
+          document.getElementById('currentUserRole').textContent = user.roleTitle || user.role || 'USER';
           document.getElementById('currentUserDetails').textContent = `Email: ${user.email || 'N/A'} • Org: ${user.organization || 'General Public'}`;
           banner.classList.remove('hidden');
         } catch (e) {

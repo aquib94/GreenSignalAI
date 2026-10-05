@@ -164,12 +164,24 @@ export class CoordinatorDbService {
     // Collect all child node IDs in scope
     const scopedNodeIds: string[] = [userNode.id];
 
-    if (userNode.children) {
+    if (userNode.tier === 'COUNTRY') {
+      const allNodes = await prisma.administrativeNode.findMany();
+      for (const n of allNodes) {
+        if (!scopedNodeIds.includes(n.id)) {
+          scopedNodeIds.push(n.id);
+        }
+      }
+    } else if (userNode.children) {
       for (const child of userNode.children) {
         scopedNodeIds.push(child.id);
         if (child.children) {
           for (const grandChild of child.children) {
             scopedNodeIds.push(grandChild.id);
+            if (grandChild.children) {
+              for (const greatGrandChild of grandChild.children) {
+                scopedNodeIds.push(greatGrandChild.id);
+              }
+            }
           }
         }
       }

@@ -212,66 +212,12 @@ export class MessagingService {
       }
     }
 
-    // 3. Add default available contacts to chat with, but with lastMessage = null
-    const availableContacts = await prisma.user.findMany({
-      where: effectiveUserId ? { id: { not: effectiveUserId } } : undefined,
-      select: {
-        id: true,
-        username: true,
-        fullName: true,
-        role: true,
-        phone: true,
-        organization: true
-      },
-      orderBy: [
-        { role: 'asc' },
-        { createdAt: 'desc' }
-      ],
-      take: 40
-    });
-
-    for (const contact of availableContacts) {
-      if (!conversationsMap.has(contact.id)) {
-        const roleColor = contact.role === 'COORDINATOR' ? 'bg-blue-600' :
-                          contact.role === 'WORKER' ? 'bg-emerald-600' :
-                          contact.role === 'ADMIN' ? 'bg-purple-600' :
-                          contact.role === 'PLANNER' ? 'bg-cyan-600' : 'bg-amber-600';
-        const roleIcon = contact.role === 'COORDINATOR' ? 'fa-user-shield' :
-                         contact.role === 'WORKER' ? 'fa-helmet-safety' :
-                         contact.role === 'ADMIN' ? 'fa-shield-halved' :
-                         contact.role === 'PLANNER' ? 'fa-chart-line' : 'fa-user';
-
-        const myId = effectiveUserId || 'guest';
-        const sortedIds = [myId, contact.id].sort();
-        const channelName = `direct-${sortedIds.join('-')}`;
-
-        conversationsMap.set(contact.id, {
-          id: contact.id,
-          userId: contact.id,
-          channel: channelName,
-          name: contact.fullName || contact.username,
-          username: contact.username,
-          role: contact.role,
-          organization: contact.organization,
-          phone: contact.phone,
-          isGroup: false,
-          avatarIcon: roleIcon,
-          avatarColor: roleColor,
-          lastMessage: null,
-          unreadCount: 0
-        });
-      }
-    }
-
-    // 4. Sort: Conversations with actual messages first (newest to oldest), then contacts without messages
+    // 3. Sort: Conversations with actual messages first (newest to oldest)
     const directList = Array.from(conversationsMap.values());
     directList.sort((a, b) => {
       const timeA = a.lastMessage ? new Date(a.lastMessage.createdAt).getTime() : 0;
       const timeB = b.lastMessage ? new Date(b.lastMessage.createdAt).getTime() : 0;
-      if (timeA > 0 || timeB > 0) {
-        return timeB - timeA;
-      }
-      return a.name.localeCompare(b.name);
+      return timeB - timeA;
     });
 
     return [generalConv, ...directList];
@@ -281,6 +227,14 @@ export class MessagingService {
    * Save message to chat_messages table
    */
   static async saveMessage(senderId: string, channel: string, text: string) {
+    const sender = await prisma.user.findUnique({
+      where: { id: senderId },
+      select: { id: true, role: true }
+    });
+    if (sender && sender.role === 'CITIZEN') {
+      throw new Error('Citizens do not have access to send messages in the tactical field messenger.');
+    }
+
     return await prisma.chatMessage.create({
       data: {
         senderId,

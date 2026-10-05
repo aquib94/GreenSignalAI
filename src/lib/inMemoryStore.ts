@@ -332,6 +332,8 @@ export class InMemoryStore {
     const adamdighiUpz = upazilaMap.get('Adamdighi') || this.administrativeNodes.find(n => n.tier === 'UPAZILA') || nationalNode;
     const boguraDist = districtMap.get('Rajshahi|Bogura') || this.administrativeNodes.find(n => n.tier === 'DISTRICT') || nationalNode;
     const rajshahiDiv = divisionMap.get('Rajshahi') || this.administrativeNodes.find(n => n.tier === 'DIVISION') || nationalNode;
+    const dhakaDiv = divisionMap.get('Dhaka') || this.administrativeNodes.find(n => n.id === 'div-dhaka') || rajshahiDiv;
+    const dhakaDist = districtMap.get('Dhaka|Dhaka') || this.administrativeNodes.find(n => n.id === 'dist-dhaka') || boguraDist;
 
     this.addUser('Adamdighi Citizen', 'CITIZEN', adamdighiUpz.id, 'Adamdighi Citizen', 'citizen.adamdighi@dmr.bd.gov');
     this.addUser('adamdighi_citizen', 'CITIZEN', adamdighiUpz.id, 'Adamdighi Citizen', 'citizen.adamdighi@dmr.bd.gov');
@@ -343,6 +345,11 @@ export class InMemoryStore {
     this.addUser('adamdighi_planner', 'PLANNER', boguraDist.id, 'Bogura District Planner', 'planner.adamdighi@dmr.bd.gov', '+8801733334444');
     this.addUser('Bogura Coordinator', 'COORDINATOR', boguraDist.id, 'Bogura District Relief Officer', 'coord.bogura@dmr.bd.gov', '+8801798765432');
     this.addUser('Rajshahi Coordinator', 'COORDINATOR', rajshahiDiv.id, 'Rajshahi Division Director', 'coord.rajshahi@dmr.bd.gov', '+8801755555555');
+    this.addUser('Dhaka Coordinator', 'COORDINATOR', dhakaDiv.id, 'Dhaka Division Director', 'coord.dhaka@dmr.bd.gov', '+8801751112233');
+    this.addUser('dhaka_coordinator', 'COORDINATOR', dhakaDiv.id, 'Dhaka Division Coordinator', 'coord.dhaka@dmr.bd.gov', '+8801751112233');
+    this.addUser('Dhaka District Coordinator', 'COORDINATOR', dhakaDist.id, 'Dhaka District Relief Officer', 'coord.dhakadist@dmr.bd.gov', '+8801759998877');
+    this.addUser('National Coordinator', 'COORDINATOR', nationalNode.id, 'National Disaster Coordinator', 'national.coord@dmr.bd.gov', '+8801700112233');
+    this.addUser('national_coordinator', 'COORDINATOR', nationalNode.id, 'National Disaster Coordinator', 'national.coord@dmr.bd.gov', '+8801700112233');
     this.addUser('Admin', 'ADMIN', nationalNode.id, 'National HQ Administrator', 'admin@dmr.bd.gov', '+8801700000000');
     this.addUser('planner.bogura', 'PLANNER', boguraDist.id, 'Bogura District Planner', 'planner.bogura@dmr.bd.gov', '+8801744444444');
 
@@ -457,11 +464,18 @@ function matchesWhere(item: any, where: any, store: InMemoryStore): boolean {
     const expected = where[key];
     const actual = item[key];
 
-    // Relation filter (e.g. districtNode: { OR: [...] })
+    // Relation filter (e.g. districtNode: { OR: [...] }, parent: { ... })
     if (key === 'districtNode' && expected && typeof expected === 'object') {
       const node = store.administrativeNodes.find(n => n.id === item.districtNodeId);
       if (!node) return false;
       if (!matchesWhere(node, expected, store)) return false;
+      continue;
+    }
+
+    if (key === 'parent' && expected && typeof expected === 'object') {
+      const parentNode = item.parentId ? store.administrativeNodes.find(n => n.id === item.parentId) : null;
+      if (!parentNode) return false;
+      if (!matchesWhere(parentNode, expected, store)) return false;
       continue;
     }
 

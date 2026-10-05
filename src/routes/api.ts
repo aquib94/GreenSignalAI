@@ -12,6 +12,39 @@ import fs from 'fs';
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'greensignal_ai_secure_jwt_secret_key_2026';
 
+// Helper to enrich user with human-readable roleTitle and coordinatorTier
+function enrichUser(u: any) {
+  if (!u) return u;
+  let roleTitle = u.role || 'Citizen';
+  const tier = u.districtNode?.tier || u.coordinatorTier || null;
+
+  if (u.role === 'COORDINATOR') {
+    if (tier === 'COUNTRY') {
+      roleTitle = 'National Coordinator';
+    } else if (tier === 'DIVISION') {
+      roleTitle = 'Division Coordinator';
+    } else if (tier === 'DISTRICT') {
+      roleTitle = 'District Coordinator';
+    } else {
+      roleTitle = 'Upazila Coordinator';
+    }
+  } else if (u.role === 'WORKER') {
+    roleTitle = 'Field Responder';
+  } else if (u.role === 'PLANNER') {
+    roleTitle = 'Disaster Planner';
+  } else if (u.role === 'ADMIN') {
+    roleTitle = 'System Administrator';
+  } else {
+    roleTitle = 'Citizen / Volunteer';
+  }
+
+  return {
+    ...u,
+    roleTitle,
+    coordinatorTier: u.role === 'COORDINATOR' ? (tier || 'UPAZILA') : null
+  };
+}
+
 // 1. Authentication Endpoints
 router.post('/auth/login', async (req, res) => {
   try {
@@ -71,13 +104,15 @@ router.post('/auth/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid password. Please verify your credentials and try again.' });
     }
 
+    const enriched = enrichUser(user);
+
     const token = jwt.sign(
-      { userId: user.id, role: user.role, districtNodeId: user.districtNodeId },
+      { userId: user.id, role: user.role, districtNodeId: user.districtNodeId, coordinatorTier: enriched.coordinatorTier },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    return res.json({ token, user, message: 'Authentication successful' });
+    return res.json({ token, user: enriched, message: 'Authentication successful' });
   } catch (err: any) {
     return res.status(500).json({ message: err.message });
   }
@@ -99,7 +134,7 @@ router.get('/auth/me', async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    return res.json({ user });
+    return res.json({ user: enrichUser(user) });
   } catch (err: any) {
     return res.status(401).json({ message: 'Invalid or expired token' });
   }
@@ -153,9 +188,41 @@ router.post(['/auth/signup', '/auth/register'], async (req, res) => {
       }
     }
 
-    // Validate role
-    const validRoles = ['CITIZEN', 'WORKER', 'COORDINATOR', 'PLANNER', 'ADMIN'];
-    const assignedRole = validRoles.includes(role?.toUpperCase()) ? role.toUpperCase() : 'CITIZEN';
+    // Validate and map role & coordinator tier
+    const rawRole = String(role || 'CITIZEN').toUpperCase().trim();
+    let assignedRole = 'CITIZEN';
+    let coordinatorTier: string | null = null;
+    let explicitRoleTitle = 'Citizen';
+
+    if (rawRole === 'NATIONAL_COORDINATOR') {
+      assignedRole = 'COORDINATOR';
+      coordinatorTier = 'COUNTRY';
+      explicitRoleTitle = 'National Coordinator';
+    } else if (rawRole === 'DIVISION_COORDINATOR') {
+      assignedRole = 'COORDINATOR';
+      coordinatorTier = 'DIVISION';
+      explicitRoleTitle = 'Division Coordinator';
+    } else if (rawRole === 'DISTRICT_COORDINATOR') {
+      assignedRole = 'COORDINATOR';
+      coordinatorTier = 'DISTRICT';
+      explicitRoleTitle = 'District Coordinator';
+    } else if (rawRole === 'COORDINATOR' || rawRole === 'UPAZILA_COORDINATOR') {
+      assignedRole = 'COORDINATOR';
+      coordinatorTier = 'UPAZILA';
+      explicitRoleTitle = 'Upazila Coordinator';
+    } else if (rawRole === 'WORKER') {
+      assignedRole = 'WORKER';
+      explicitRoleTitle = 'Field Responder';
+    } else if (rawRole === 'PLANNER') {
+      assignedRole = 'PLANNER';
+      explicitRoleTitle = 'Disaster Planner';
+    } else if (rawRole === 'ADMIN') {
+      assignedRole = 'ADMIN';
+      explicitRoleTitle = 'System Administrator';
+    } else {
+      assignedRole = 'CITIZEN';
+      explicitRoleTitle = 'Citizen / Volunteer';
+    }
 
     // Hash password
     const passwordHash = bcrypt.hashSync(password, 10);
@@ -168,7 +235,33 @@ router.post(['/auth/signup', '/auth/register'], async (req, res) => {
       });
       if (node) {
         verifiedDistrictNodeId = node.id;
+        if (assignedRole === 'COORDINATOR' && !coordinatorTier) {
+          coordinatorTier = node.tier;
+        }
       }
+    }
+
+    // Default node for National Coordinator if not specified or set to empty
+    if (assignedRole === 'COORDINATOR' && coordinatorTier === 'COUNTRY' && !verifiedDistrictNodeId) {
+      const nationalNode = await prisma.administrativeNode.findFirst({
+        where: { tier: 'COUNTRY' }
+      });
+      if (nationalNode) verifiedDistrictNodeId = nationalNode.id;
+    }
+
+    // Determine default organization if not specified
+    let defaultOrg = 'General Public';
+    if (assignedRole === 'COORDINATOR') {
+      if (coordinatorTier === 'COUNTRY') defaultOrg = 'National Disaster Response Coordination Centre (NDRCC)';
+      else if (coordinatorTier === 'DIVISION') defaultOrg = 'Divisional Disaster Relief & Management Commission';
+      else if (coordinatorTier === 'DISTRICT') defaultOrg = 'District Disaster Management Committee (DDMC)';
+      else defaultOrg = 'Upazila Disaster Management Committee (UzDMC)';
+    } else if (assignedRole === 'WORKER') {
+      defaultOrg = 'Cyclone Preparedness Programme (CPP) / Red Crescent';
+    } else if (assignedRole === 'PLANNER') {
+      defaultOrg = 'Disaster Management & Planning Commission';
+    } else if (assignedRole === 'ADMIN') {
+      defaultOrg = 'Ministry of Disaster Management and Relief (MoDMR)';
     }
 
     // Create user in database
@@ -180,7 +273,7 @@ router.post(['/auth/signup', '/auth/register'], async (req, res) => {
         fullName: cleanFullName,
         role: assignedRole as any,
         phone: phone ? phone.trim() : null,
-        organization: organization ? organization.trim() : (assignedRole === 'CITIZEN' ? 'General Public' : 'National Emergency Response'),
+        organization: organization ? organization.trim() : defaultOrg,
         districtNodeId: verifiedDistrictNodeId,
         messages: []
       },
@@ -189,17 +282,23 @@ router.post(['/auth/signup', '/auth/register'], async (req, res) => {
       }
     });
 
+    const enrichedUser = enrichUser({
+      ...newUser,
+      coordinatorTier: coordinatorTier || newUser.districtNode?.tier || (assignedRole === 'COORDINATOR' ? 'UPAZILA' : null),
+      roleTitle: explicitRoleTitle
+    });
+
     // Generate JWT token
     const token = jwt.sign(
-      { userId: newUser.id, role: newUser.role, districtNodeId: newUser.districtNodeId },
+      { userId: newUser.id, role: newUser.role, districtNodeId: newUser.districtNodeId, coordinatorTier: enrichedUser.coordinatorTier },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
 
     return res.status(201).json({
-      message: 'Account created successfully! Welcome to GreenSignal AI.',
+      message: `Account created successfully! Welcome to GreenSignal AI as ${enrichedUser.roleTitle}.`,
       token,
-      user: newUser
+      user: enrichedUser
     });
   } catch (err: any) {
     console.error('Signup error:', err);
@@ -214,15 +313,49 @@ router.get(['/locations', '/administrative-nodes', '/nodes'], async (req, res) =
       orderBy: { name: 'asc' }
     });
 
-    const upazilas = nodes.filter((n: any) => n.tier === 'UPAZILA');
-    const districts = nodes.filter((n: any) => n.tier === 'DISTRICT');
-    const divisions = nodes.filter((n: any) => n.tier === 'DIVISION');
+    const nodeMap = new Map(nodes.map((n: any) => [n.id, n]));
+
+    const upazilas = nodes.filter((n: any) => n.tier === 'UPAZILA').map((u: any) => {
+      const parent = u.parentId ? (nodeMap.get(u.parentId) as any) : null;
+      return {
+        id: u.id,
+        name: u.name,
+        code: u.code,
+        parentId: u.parentId,
+        parentName: parent ? parent.name : null
+      };
+    });
+
+    const districts = nodes.filter((n: any) => n.tier === 'DISTRICT').map((d: any) => {
+      const parent = d.parentId ? (nodeMap.get(d.parentId) as any) : null;
+      return {
+        id: d.id,
+        name: d.name,
+        code: d.code,
+        parentId: d.parentId,
+        parentName: parent ? parent.name : null
+      };
+    });
+
+    const divisions = nodes.filter((n: any) => n.tier === 'DIVISION').map((v: any) => ({
+      id: v.id,
+      name: v.name,
+      code: v.code
+    }));
+
+    const national = nodes.find((n: any) => n.tier === 'COUNTRY') || {
+      id: 'node-bd-national-hq',
+      name: 'Bangladesh National Command',
+      code: 'BD-HQ',
+      tier: 'COUNTRY'
+    };
 
     return res.json({
       total: nodes.length,
-      upazilas: upazilas.map((u: any) => ({ id: u.id, name: u.name, code: u.code, parentId: u.parentId })),
-      districts: districts.map((d: any) => ({ id: d.id, name: d.name, code: d.code, parentId: d.parentId })),
-      divisions: divisions.map((v: any) => ({ id: v.id, name: v.name, code: v.code })),
+      national,
+      divisions,
+      districts,
+      upazilas,
       all: nodes.map((n: any) => ({ id: n.id, name: n.name, tier: n.tier, code: n.code, parentId: n.parentId }))
     });
   } catch (err: any) {
@@ -267,20 +400,27 @@ router.get(['/upazila-context', '/upazila-context/:nodeId'], async (req, res) =>
     const nodeId = req.params.nodeId;
 
     let targetNode = nodeId ? await prisma.administrativeNode.findUnique({
-      where: { id: nodeId }
+      where: { id: nodeId },
+      include: { parent: true }
     }) : null;
 
     if (!targetNode) {
       targetNode = await prisma.administrativeNode.findFirst({
-        where: { tier: 'UPAZILA' }
+        where: { tier: 'UPAZILA' },
+        include: { parent: true }
       });
     }
 
     if (!targetNode) return res.status(404).json({ message: 'Administrative node not found' });
 
-    const reliefCenter = await prisma.reliefCenter.findFirst({
-      where: { districtNodeId: targetNode.id }
-    });
+    // 1. Relief center is strictly for Upazila tier nodes (workers and citizens based on their upazila)
+    let reliefCenter = null;
+    if (targetNode.tier === 'UPAZILA') {
+      reliefCenter = await prisma.reliefCenter.findFirst({
+        where: { districtNodeId: targetNode.id },
+        include: { districtNode: true }
+      });
+    }
 
     const sensors = await prisma.sensorNode.findMany({
       where: { districtNodeId: targetNode.id }
@@ -552,6 +692,12 @@ router.get(['/coordinator/scope-boq/:type/:id', '/coordinator/work-order/scope/:
 router.get(['/messages/conversations', '/messages/senders'], async (req, res) => {
   try {
     const userId = (req.query.userId as string) || '';
+    if (userId) {
+      const requester = await prisma.user.findUnique({ where: { id: userId } });
+      if (requester && requester.role === 'CITIZEN') {
+        return res.status(403).json({ message: 'Access restricted: Citizens do not have access to the field emergency messenger.' });
+      }
+    }
     const conversations = await MessagingService.getRecentConversations(userId);
     return res.json(conversations);
   } catch (err: any) {
@@ -563,6 +709,12 @@ router.get('/messages/search-users', async (req, res) => {
   try {
     const q = (req.query.q as string) || '';
     const userId = (req.query.userId as string) || '';
+    if (userId) {
+      const requester = await prisma.user.findUnique({ where: { id: userId } });
+      if (requester && requester.role === 'CITIZEN') {
+        return res.status(403).json({ message: 'Access restricted: Citizens do not have access to the field emergency messenger.' });
+      }
+    }
     const results = await MessagingService.searchUsers(q, userId);
     return res.json(results);
   } catch (err: any) {
@@ -574,6 +726,13 @@ router.get(['/messages/:channel', '/messages/channel/:channel'], async (req, res
   try {
     const channel = req.params.channel;
     const userId = (req.query.userId as string) || '';
+
+    if (userId) {
+      const requester = await prisma.user.findUnique({ where: { id: userId } });
+      if (requester && requester.role === 'CITIZEN') {
+        return res.status(403).json({ message: 'Access restricted: Citizens do not have access to the field emergency messenger.' });
+      }
+    }
 
     // If channel is direct message, verify user belongs to it
     if (channel.startsWith('direct-') && userId) {
@@ -705,21 +864,72 @@ router.post('/db-admin/impersonate', async (req, res) => {
       include: { districtNode: true }
     });
 
-    // 2. Keyword fallback for quick presets ("Citizen", "Coordinator", "Planner", "Admin")
+    // 2. Keyword fallback for quick presets ("Citizen", "Coordinator", "Planner", "Admin", "Dhaka", etc.)
     if (!user) {
-      const qUpper = trimmed.toUpperCase();
-      let targetRole: any = null;
-      if (qUpper.includes('CITIZEN')) targetRole = 'CITIZEN';
-      else if (qUpper.includes('COORDINATOR')) targetRole = 'COORDINATOR';
-      else if (qUpper.includes('PLANNER')) targetRole = 'PLANNER';
-      else if (qUpper.includes('ADMIN')) targetRole = 'ADMIN';
-
-      if (targetRole) {
-        user = await prisma.user.findFirst({
-          where: { role: targetRole },
-          include: { districtNode: true }
-        });
-      }
+       const qUpper = trimmed.toUpperCase();
+       if (qUpper.includes('DHAKA')) {
+         user = await prisma.user.findFirst({
+           where: {
+             OR: [
+               { username: { contains: 'dhaka', mode: 'insensitive' } },
+               { fullName: { contains: 'Dhaka', mode: 'insensitive' } }
+             ]
+           },
+           include: { districtNode: true }
+         });
+       } else if (qUpper.includes('NATIONAL')) {
+         user = await prisma.user.findFirst({
+           where: {
+             OR: [
+               { username: { contains: 'national', mode: 'insensitive' } },
+               { fullName: { contains: 'National', mode: 'insensitive' } },
+               { role: 'ADMIN' }
+             ]
+           },
+           include: { districtNode: true }
+         });
+       } else if (qUpper.includes('DIVISION') && qUpper.includes('COORDINATOR')) {
+         user = await prisma.user.findFirst({
+           where: {
+             role: 'COORDINATOR',
+             districtNode: { tier: 'DIVISION' }
+           },
+           include: { districtNode: true }
+         });
+       } else if (qUpper.includes('DISTRICT') && qUpper.includes('COORDINATOR')) {
+         user = await prisma.user.findFirst({
+           where: {
+             role: 'COORDINATOR',
+             districtNode: { tier: 'DISTRICT' }
+           },
+           include: { districtNode: true }
+         });
+       } else if (qUpper.includes('WORKER') || qUpper.includes('RESPONDER')) {
+         user = await prisma.user.findFirst({
+           where: { role: 'WORKER' },
+           include: { districtNode: true }
+         });
+       } else if (qUpper.includes('CITIZEN')) {
+         user = await prisma.user.findFirst({
+           where: { role: 'CITIZEN' },
+           include: { districtNode: true }
+         });
+       } else if (qUpper.includes('COORDINATOR')) {
+         user = await prisma.user.findFirst({
+           where: { role: 'COORDINATOR' },
+           include: { districtNode: true }
+         });
+       } else if (qUpper.includes('PLANNER')) {
+         user = await prisma.user.findFirst({
+           where: { role: 'PLANNER' },
+           include: { districtNode: true }
+         });
+       } else if (qUpper.includes('ADMIN')) {
+         user = await prisma.user.findFirst({
+           where: { role: 'ADMIN' },
+           include: { districtNode: true }
+         });
+       }
     }
 
     if (!user) {

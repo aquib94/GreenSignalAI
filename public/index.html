@@ -1600,6 +1600,16 @@
       const desktopAuthContainer = document.getElementById('navbarAuthContainer');
       const mobileAuthItem = document.getElementById('dropdownMobileAuthItem');
 
+      // Restrict messenger for citizens
+      const messengerBtn = document.getElementById('navMessengerBtn');
+      if (messengerBtn) {
+        if (user && user.role === 'CITIZEN') {
+          messengerBtn.classList.add('hidden');
+        } else {
+          messengerBtn.classList.remove('hidden');
+        }
+      }
+
       if (user && (user.id || user.username)) {
         const displayName = user.fullName ? user.fullName.split(' ')[0] : (user.username || 'User');
         if (desktopAuthContainer) {
