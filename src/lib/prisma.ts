@@ -9,7 +9,7 @@ const globalForPrisma = global as unknown as { prisma: any; inMemoryPrisma: any 
 const isDbConfigured = Boolean(
   process.env.DATABASE_URL &&
   process.env.DATABASE_URL.trim().length > 0 &&
-  !process.env.DATABASE_URL.includes('localhost:5432')
+  !process.env.DATABASE_URL.includes('USER:PASSWORD')
 );
 
 const fallbackClient = globalForPrisma.inMemoryPrisma || createInMemoryPrismaClient();
@@ -53,11 +53,47 @@ function createResilientPrismaClient() {
     'reliefCenter',
     'chatMessage',
     'disasterAlert',
+    'disasterIncident',
+    'incidentUpdate',
+    'coordinationGroup',
+    'coordinationGroupMember',
+    'volunteerProfile',
+    'responseTask',
+    'responseTaskAssignee',
+    'responseTaskUpdate',
+    'userNotification',
+    'alertSubscription',
+    'incidentAttachment',
+    'shelterOccupancyUpdate',
+    'operationalAudit',
     'responsePolicy',
     'simulationRun'
   ];
 
   const resilientClient: any = {
+    $transaction: async (callback: (transaction: any) => Promise<any>) => {
+      if (!realPrisma) return fallbackClient.$transaction(callback);
+      return realPrisma.$transaction(async (realTransaction: any) => {
+        const transactionClient: any = {};
+        for (const model of modelNames) {
+          transactionClient[model] = new Proxy(
+            {},
+            {
+              get(_target, prop: string) {
+                return (...args: any[]) => {
+                  const method = realTransaction[model]?.[prop];
+                  if (typeof method !== 'function') {
+                    throw new Error(`Method ${prop} not found on transaction model ${model}`);
+                  }
+                  return method.apply(realTransaction[model], args);
+                };
+              }
+            }
+          );
+        }
+        return callback(transactionClient);
+      });
+    },
     $disconnect: async () => {
       try {
         if (realPrisma) await realPrisma.$disconnect();
@@ -125,5 +161,3 @@ if (globalForPrisma.prisma) {
 }
 
 export const prisma = clientInstance;
-
-
