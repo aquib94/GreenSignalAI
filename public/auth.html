@@ -15,43 +15,63 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+      width: 100%;
+    }
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
+    input, select, textarea, button {
+      box-sizing: border-box !important;
+      max-width: 100% !important;
+    }
+    select {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .min-w-0 {
+      min-width: 0 !important;
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white overflow-x-hidden">
 
   <!-- TOP BRAND NAVBAR -->
-  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3 group">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition">
-          <i class="fa-solid fa-satellite-dish text-white text-lg"></i>
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+      <a href="/" class="flex items-center gap-2 sm:gap-3 group min-w-0 shrink">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition shrink-0">
+          <i class="fa-solid fa-satellite-dish text-white text-base sm:text-lg"></i>
         </div>
-        <div>
+        <div class="min-w-0 truncate">
           <div class="flex items-center gap-1.5">
-            <span class="font-extrabold text-base tracking-tight text-white">GreenSignal</span>
-            <span class="text-xs px-1.5 py-0.5 rounded font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">AI</span>
+            <span class="font-extrabold text-sm sm:text-base tracking-tight text-white truncate">GreenSignal</span>
+            <span class="text-[10px] sm:text-xs px-1.5 py-0.5 rounded font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">AI</span>
           </div>
-          <p class="text-[10px] text-slate-400 font-medium">National Disaster Management & Response Network</p>
+          <p class="text-[10px] text-slate-400 font-medium truncate hidden sm:block">National Disaster Management & Response Network</p>
         </div>
       </a>
 
-      <div class="flex items-center gap-3">
-        <a href="/" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5">
+      <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <a href="/" class="text-xs font-semibold text-slate-300 hover:text-white px-2 sm:px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5" title="Project Overview">
           <i class="fa-solid fa-file-contract text-emerald-400"></i>
-          <span>Project Overview</span>
+          <span class="hidden md:inline">Project Overview</span>
         </a>
-        <a href="/platform.html" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5">
+        <a href="/platform.html" class="text-xs font-semibold text-slate-300 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5" title="Live Tactical Platform">
           <i class="fa-solid fa-gauge-high text-teal-400"></i>
-          <span>Live Tactical Platform</span>
+          <span class="hidden sm:inline">Live Tactical Platform</span>
+          <span class="inline sm:hidden">Live</span>
         </a>
       </div>
     </div>
   </header>
 
   <!-- MAIN CONTAINER -->
-  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 sm:py-12 flex flex-col justify-center">
+  <main class="flex-1 max-w-4xl w-full mx-auto px-3 sm:px-6 py-6 sm:py-12 flex flex-col justify-center min-w-0">
 
     <!-- CURRENT SESSION BANNER (if already authenticated) -->
     <div id="activeSessionBanner" class="hidden mb-6 p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
@@ -76,25 +96,25 @@
     </div>
 
     <!-- AUTH CARD -->
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-8 md:p-10 shadow-2xl relative overflow-hidden w-full max-w-full min-w-0">
       <div class="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <!-- TAB SELECTOR (Sign In vs Sign Up) -->
-      <div class="flex items-center p-1.5 bg-slate-950/80 border border-slate-800 rounded-2xl max-w-md mx-auto mb-8">
-        <button id="tabSignupBtn" onclick="switchAuthTab('signup')" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md">
-          <i class="fa-solid fa-user-plus text-xs"></i>
-          <span>Create Account (Sign Up)</span>
+      <div class="flex items-center p-1 sm:p-1.5 bg-slate-950/80 border border-slate-800 rounded-xl sm:rounded-2xl max-w-md mx-auto mb-6 sm:mb-8 w-full min-w-0">
+        <button id="tabSignupBtn" onclick="switchAuthTab('signup')" class="flex-1 py-2 sm:py-2.5 px-2 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 sm:gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md min-w-0">
+          <i class="fa-solid fa-user-plus text-xs shrink-0"></i>
+          <span class="truncate">Sign Up / Enroll</span>
         </button>
-        <button id="tabSigninBtn" onclick="switchAuthTab('signin')" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white">
-          <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
-          <span>Sign In</span>
+        <button id="tabSigninBtn" onclick="switchAuthTab('signin')" class="flex-1 py-2 sm:py-2.5 px-2 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 sm:gap-2 text-slate-400 hover:text-white min-w-0">
+          <i class="fa-solid fa-arrow-right-to-bracket text-xs shrink-0"></i>
+          <span class="truncate">Sign In</span>
         </button>
       </div>
 
       <!-- SUCCESS / ERROR NOTIFICATION BAR -->
       <div id="authAlert" class="hidden mb-6 p-4 rounded-2xl text-xs transition flex items-start gap-3">
         <i id="alertIcon" class="fa-solid fa-circle-info text-base mt-0.5"></i>
-        <div class="flex-1">
+        <div class="flex-1 min-w-0">
           <p id="alertTitle" class="font-bold text-sm"></p>
           <p id="alertMessage" class="mt-0.5 leading-relaxed text-xs"></p>
           <div id="alertActionContainer" class="hidden mt-3 pt-3 border-t border-emerald-700/40 flex items-center gap-2"></div>
@@ -104,81 +124,81 @@
       <!-- =========================================================================
            FORM 1: SIGN UP (CREATE NEW ACCOUNT)
            ========================================================================= -->
-      <form id="signupForm" onsubmit="handleSignup(event)" class="space-y-6">
+      <form id="signupForm" onsubmit="handleSignup(event)" class="space-y-6 w-full min-w-0">
         <div class="border-b border-slate-800/80 pb-4">
-          <h2 class="text-xl font-extrabold text-white">Enroll in the National Disaster Network</h2>
+          <h2 class="text-lg sm:text-xl font-extrabold text-white">Enroll in the National Disaster Network</h2>
           <p class="text-xs text-slate-400 mt-1">Register for coordinated emergency disaster response, automated relief logistics, and sensor telemetry.</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 w-full min-w-0">
           
           <!-- Full Name -->
-          <div>
+          <div class="min-w-0 w-full">
             <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupFullName">
               Full Name <span class="text-rose-400">*</span>
             </label>
-            <div class="relative">
+            <div class="relative w-full min-w-0">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                 <i class="fa-solid fa-user"></i>
               </span>
               <input type="text" id="signupFullName" required placeholder="e.g. Dr. Selim Ahmed" 
-                class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+                class="w-full max-w-full box-border pl-10 pr-3 sm:pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
             </div>
           </div>
 
           <!-- Username -->
-          <div>
+          <div class="min-w-0 w-full">
             <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupUsername">
               Username <span class="text-rose-400">*</span>
             </label>
-            <div class="relative">
+            <div class="relative w-full min-w-0">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                 <i class="fa-solid fa-at"></i>
               </span>
               <input type="text" id="signupUsername" required placeholder="e.g. selim_coordinator" 
-                class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition font-mono">
+                class="w-full max-w-full box-border pl-10 pr-3 sm:pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition font-mono">
             </div>
           </div>
 
           <!-- Email Address -->
-          <div>
+          <div class="min-w-0 w-full">
             <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupEmail">
               Email Address <span class="text-rose-400">*</span>
             </label>
-            <div class="relative">
+            <div class="relative w-full min-w-0">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                 <i class="fa-solid fa-envelope"></i>
               </span>
               <input type="email" id="signupEmail" required placeholder="name@greensignal.gov.bd" 
-                class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+                class="w-full max-w-full box-border pl-10 pr-3 sm:pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
             </div>
           </div>
 
           <!-- Phone Number -->
-          <div>
+          <div class="min-w-0 w-full">
             <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupPhone">
               Mobile Number (SMS Alerts)
             </label>
-            <div class="relative">
+            <div class="relative w-full min-w-0">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                 <i class="fa-solid fa-phone"></i>
               </span>
               <input type="tel" id="signupPhone" placeholder="+880 1712-345678" 
-                class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+                class="w-full max-w-full box-border pl-10 pr-3 sm:pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
             </div>
           </div>
 
           <!-- Password -->
-          <div>
+          <div class="min-w-0 w-full">
             <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupPassword">
               Password <span class="text-rose-400">*</span>
             </label>
-            <div class="relative">
+            <div class="relative w-full min-w-0">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                 <i class="fa-solid fa-lock"></i>
               </span>
               <input type="password" id="signupPassword" required minlength="4" placeholder="Min. 4 characters" 
-                class="w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+                class="w-full max-w-full box-border pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
               <button type="button" onclick="togglePasswordVisibility('signupPassword', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
                 <i class="fa-solid fa-eye text-xs"></i>
               </button>
@@ -186,16 +206,16 @@
           </div>
 
           <!-- Confirm Password -->
-          <div>
+          <div class="min-w-0 w-full">
             <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupConfirmPassword">
               Confirm Password <span class="text-rose-400">*</span>
             </label>
-            <div class="relative">
+            <div class="relative w-full min-w-0">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                 <i class="fa-solid fa-shield-check"></i>
               </span>
               <input type="password" id="signupConfirmPassword" required minlength="4" placeholder="Re-enter password" 
-                class="w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+                class="w-full max-w-full box-border pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
               <button type="button" onclick="togglePasswordVisibility('signupConfirmPassword', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
                 <i class="fa-solid fa-eye text-xs"></i>
               </button>
@@ -370,18 +390,18 @@
         </div>
 
         <!-- Location & Organization -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 w-full min-w-0">
           
           <!-- Assigned Administrative Node / Jurisdiction -->
-          <div>
+          <div class="min-w-0 w-full">
             <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupDistrictNodeId" id="signupDistrictNodeLabel">
               Assigned Upazila / Operational Center <span class="text-rose-400">*</span>
             </label>
-            <div class="relative">
+            <div class="relative w-full min-w-0">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400" id="signupDistrictNodeIcon">
                 <i class="fa-solid fa-tower-broadcast"></i>
               </span>
-              <select id="signupDistrictNodeId" class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white outline-none transition">
+              <select id="signupDistrictNodeId" class="w-full max-w-full box-border pl-10 pr-3 sm:pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white outline-none transition truncate">
                 <option value="">-- Loading jurisdictions... --</option>
               </select>
             </div>
@@ -391,16 +411,16 @@
           </div>
 
           <!-- Organization / Agency -->
-          <div>
+          <div class="min-w-0 w-full">
             <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signupOrganization">
               Organization / Government Agency
             </label>
-            <div class="relative">
+            <div class="relative w-full min-w-0">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                 <i class="fa-solid fa-building-flag"></i>
               </span>
               <input type="text" id="signupOrganization" placeholder="e.g. Upazila Disaster Management Committee (UzDMC)" 
-                class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+                class="w-full max-w-full box-border pl-10 pr-3 sm:pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
             </div>
             <p id="signupOrganizationHelp" class="text-[10px] text-slate-500 mt-1">
               MoDMR, CPP, Fire Service, Red Crescent, BDRCS, or DDM.
@@ -409,8 +429,8 @@
         </div>
 
         <!-- Submit Button -->
-        <div class="pt-2">
-          <button type="submit" id="signupSubmitBtn" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm shadow-xl shadow-emerald-700/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+        <div class="pt-2 w-full">
+          <button type="submit" id="signupSubmitBtn" class="w-full py-3.5 px-4 sm:px-6 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-emerald-700/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
             <i class="fa-solid fa-user-check"></i>
             <span>Register & Initialize Live Access</span>
           </button>
@@ -420,38 +440,38 @@
       <!-- =========================================================================
            FORM 2: SIGN IN (EXISTING ACCOUNTS)
            ========================================================================= -->
-      <form id="signinForm" onsubmit="handleSignin(event)" class="space-y-6 hidden">
+      <form id="signinForm" onsubmit="handleSignin(event)" class="space-y-6 hidden w-full min-w-0">
         <div class="border-b border-slate-800/80 pb-4">
-          <h2 class="text-xl font-extrabold text-white">Sign In to GreenSignal AI</h2>
+          <h2 class="text-lg sm:text-xl font-extrabold text-white">Sign In to GreenSignal AI</h2>
           <p class="text-xs text-slate-400 mt-1">Access the National Disaster Response Command Suite with your credentials.</p>
         </div>
 
-        <div class="space-y-4">
+        <div class="space-y-4 w-full min-w-0">
           <!-- Username or Email -->
-          <div>
+          <div class="min-w-0 w-full">
             <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signinUsername">
               Username or Email <span class="text-rose-400">*</span>
             </label>
-            <div class="relative">
+            <div class="relative w-full min-w-0">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                 <i class="fa-solid fa-user"></i>
               </span>
               <input type="text" id="signinUsername" required placeholder="Username or email" 
-                class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+                class="w-full max-w-full box-border pl-10 pr-3 sm:pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
             </div>
           </div>
 
           <!-- Password -->
-          <div>
+          <div class="min-w-0 w-full">
             <label class="block text-xs font-bold text-slate-300 mb-1.5" for="signinPassword">
               Password <span class="text-rose-400">*</span>
             </label>
-            <div class="relative">
+            <div class="relative w-full min-w-0">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                 <i class="fa-solid fa-lock"></i>
               </span>
               <input type="password" id="signinPassword" required placeholder="Enter password" 
-                class="w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
+                class="w-full max-w-full box-border pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-white placeholder-slate-500 outline-none transition">
               <button type="button" onclick="togglePasswordVisibility('signinPassword', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
                 <i class="fa-solid fa-eye text-xs"></i>
               </button>
@@ -460,43 +480,43 @@
         </div>
 
         <!-- Submit Button -->
-        <div class="pt-2">
-          <button type="submit" id="signinSubmitBtn" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm shadow-xl shadow-emerald-700/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+        <div class="pt-2 w-full">
+          <button type="submit" id="signinSubmitBtn" class="w-full py-3.5 px-4 sm:px-6 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-emerald-700/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
             <i class="fa-solid fa-right-to-bracket"></i>
             <span>Sign In to Platform</span>
           </button>
         </div>
 
         <!-- Quick Demo Accounts Presets -->
-        <div class="pt-4 border-t border-slate-800">
+        <div class="pt-4 border-t border-slate-800 w-full min-w-0">
           <p class="text-xs font-bold text-slate-400 mb-2">⚡ Quick Test Profiles (One-Click Sign In):</p>
-          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-            <button type="button" onclick="quickFillCredentials('adamdighi_coordinator', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-emerald-950/60 border border-slate-800 hover:border-emerald-500/40 text-left transition text-xs group">
-              <span class="font-bold text-emerald-400 block truncate group-hover:text-emerald-300">🛡️ Upazila Coord</span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 w-full min-w-0">
+            <button type="button" onclick="quickFillCredentials('adamdighi_coordinator', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-emerald-950/60 border border-slate-800 hover:border-emerald-500/40 text-left transition text-xs group min-w-0">
+              <span class="font-bold text-emerald-400 block truncate group-hover:text-emerald-300 text-[11px]">🛡️ Upazila</span>
               <span class="text-[9px] text-slate-400 font-mono block truncate">adamdighi_coord</span>
             </button>
-            <button type="button" onclick="quickFillCredentials('Bogura Coordinator', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-teal-950/60 border border-slate-800 hover:border-teal-500/40 text-left transition text-xs group">
-              <span class="font-bold text-teal-400 block truncate group-hover:text-teal-300">🏛️ District Coord</span>
+            <button type="button" onclick="quickFillCredentials('Bogura Coordinator', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-teal-950/60 border border-slate-800 hover:border-teal-500/40 text-left transition text-xs group min-w-0">
+              <span class="font-bold text-teal-400 block truncate group-hover:text-teal-300 text-[11px]">🏛️ District</span>
               <span class="text-[9px] text-slate-400 font-mono block truncate">Bogura Coord</span>
             </button>
-            <button type="button" onclick="quickFillCredentials('Rajshahi Coordinator', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-cyan-950/60 border border-slate-800 hover:border-cyan-500/40 text-left transition text-xs group">
-              <span class="font-bold text-cyan-400 block truncate group-hover:text-cyan-300">🌐 Division Coord</span>
+            <button type="button" onclick="quickFillCredentials('Rajshahi Coordinator', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-cyan-950/60 border border-slate-800 hover:border-cyan-500/40 text-left transition text-xs group min-w-0">
+              <span class="font-bold text-cyan-400 block truncate group-hover:text-cyan-300 text-[11px]">🌐 Division</span>
               <span class="text-[9px] text-slate-400 font-mono block truncate">Rajshahi Coord</span>
             </button>
-            <button type="button" onclick="quickFillCredentials('Admin', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/40 text-left transition text-xs group">
-              <span class="font-bold text-indigo-400 block truncate group-hover:text-indigo-300">🚩 National Coord</span>
+            <button type="button" onclick="quickFillCredentials('Admin', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/40 text-left transition text-xs group min-w-0">
+              <span class="font-bold text-indigo-400 block truncate group-hover:text-indigo-300 text-[11px]">🚩 National</span>
               <span class="text-[9px] text-slate-400 font-mono block truncate">Admin (National)</span>
             </button>
-            <button type="button" onclick="quickFillCredentials('adamdighi_worker', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-teal-950/60 border border-slate-800 hover:border-teal-500/40 text-left transition text-xs group">
-              <span class="font-bold text-teal-400 block truncate group-hover:text-teal-300">🚑 Responder</span>
+            <button type="button" onclick="quickFillCredentials('adamdighi_worker', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-teal-950/60 border border-slate-800 hover:border-teal-500/40 text-left transition text-xs group min-w-0">
+              <span class="font-bold text-teal-400 block truncate group-hover:text-teal-300 text-[11px]">🚑 Responder</span>
               <span class="text-[9px] text-slate-400 font-mono block truncate">adamdighi_worker</span>
             </button>
-            <button type="button" onclick="quickFillCredentials('adamdighi_planner', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-sky-950/60 border border-slate-800 hover:border-sky-500/40 text-left transition text-xs group">
-              <span class="font-bold text-sky-400 block truncate group-hover:text-sky-300">📊 Planner</span>
+            <button type="button" onclick="quickFillCredentials('adamdighi_planner', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-sky-950/60 border border-slate-800 hover:border-sky-500/40 text-left transition text-xs group min-w-0">
+              <span class="font-bold text-sky-400 block truncate group-hover:text-sky-300 text-[11px]">📊 Planner</span>
               <span class="text-[9px] text-slate-400 font-mono block truncate">adamdighi_planner</span>
             </button>
-            <button type="button" onclick="quickFillCredentials('adamdighi_citizen', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-amber-950/60 border border-slate-800 hover:border-amber-500/40 text-left transition text-xs group">
-              <span class="font-bold text-amber-400 block truncate group-hover:text-amber-300">👥 Citizen</span>
+            <button type="button" onclick="quickFillCredentials('adamdighi_citizen', 'password')" class="p-2 rounded-xl bg-slate-950 hover:bg-amber-950/60 border border-slate-800 hover:border-amber-500/40 text-left transition text-xs group min-w-0">
+              <span class="font-bold text-amber-400 block truncate group-hover:text-amber-300 text-[11px]">👥 Citizen</span>
               <span class="text-[9px] text-slate-400 font-mono block truncate">adamdighi_citizen</span>
             </button>
           </div>
@@ -553,13 +573,13 @@
       if (tab === 'signup') {
         signupForm.classList.remove('hidden');
         signinForm.classList.add('hidden');
-        tabSignupBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md';
-        tabSigninBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white';
+        tabSignupBtn.className = 'flex-1 py-2 sm:py-2.5 px-2 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 sm:gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md min-w-0';
+        tabSigninBtn.className = 'flex-1 py-2 sm:py-2.5 px-2 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 sm:gap-2 text-slate-400 hover:text-white min-w-0';
       } else {
         signupForm.classList.add('hidden');
         signinForm.classList.remove('hidden');
-        tabSigninBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md';
-        tabSignupBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white';
+        tabSigninBtn.className = 'flex-1 py-2 sm:py-2.5 px-2 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 sm:gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md min-w-0';
+        tabSignupBtn.className = 'flex-1 py-2 sm:py-2.5 px-2 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 sm:gap-2 text-slate-400 hover:text-white min-w-0';
       }
     }
 

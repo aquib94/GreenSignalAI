@@ -50,39 +50,54 @@
       }
       .no-print { display: none !important; }
     }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+      width: 100%;
+    }
+    input, select, textarea, button {
+      box-sizing: border-box !important;
+      max-width: 100% !important;
+    }
+    select {
+      text-overflow: ellipsis;
+    }
   </style>
 </head>
 <body class="h-full flex flex-col font-sans bg-slate-950 text-slate-100 antialiased overflow-x-hidden">
 
   <!-- ==================== 1. LOGIN SCREEN ==================== -->
-  <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950">
-    <div class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl space-y-6">
+  <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 overflow-y-auto">
+    <div class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-xl space-y-4 sm:space-y-6 my-auto min-w-0">
       
       <!-- Brand Logo Header -->
       <div class="text-center space-y-2">
-        <div class="inline-flex items-center justify-center w-14 h-14 bg-emerald-600/20 border border-emerald-500/30 rounded-2xl text-emerald-400 mb-2 shadow-lg shadow-emerald-500/10">
-          <i class="fa-solid fa-compass-drafting text-2xl"></i>
+        <div class="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-emerald-600/20 border border-emerald-500/30 rounded-2xl text-emerald-400 mb-1 sm:mb-2 shadow-lg shadow-emerald-500/10">
+          <i class="fa-solid fa-compass-drafting text-xl sm:text-2xl"></i>
         </div>
-        <h1 class="text-xl font-bold text-white tracking-tight">GreenSignalAI</h1>
+        <h1 class="text-lg sm:text-xl font-bold text-white tracking-tight">GreenSignalAI</h1>
         <p class="text-xs text-slate-400">District Disaster Preparedness & Stock Planning System</p>
       </div>
 
       <!-- Login Form -->
-      <form id="loginForm" onsubmit="handlePlannerLogin(event)" class="space-y-4">
-        <div>
+      <form id="loginForm" onsubmit="handlePlannerLogin(event)" class="space-y-4 w-full min-w-0">
+        <div class="w-full min-w-0">
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Planner Account / Username</label>
-          <div class="relative">
+          <div class="relative w-full min-w-0">
             <i class="fa-solid fa-user-gear absolute left-3.5 top-3 text-slate-500 text-xs"></i>
             <input type="text" id="loginUser" required value="planner.bogura" 
-                   class="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
+                   class="w-full max-w-full box-border bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
           </div>
         </div>
 
-        <div>
+        <div class="w-full min-w-0">
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Assigned Administrative District</label>
-          <div class="relative">
+          <div class="relative w-full min-w-0">
             <i class="fa-solid fa-map-location-dot absolute left-3.5 top-3 text-slate-500 text-xs"></i>
-            <select id="loginDistrict" class="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
+            <select id="loginDistrict" class="w-full max-w-full box-border bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition truncate">
               <option value="Bogura">Bogura District (12 Upazilas)</option>
               <option value="Kurigram">Kurigram District (9 Upazilas)</option>
               <option value="Sunamganj">Sunamganj District (11 Upazilas)</option>
@@ -92,12 +107,12 @@
           </div>
         </div>
 
-        <div>
+        <div class="w-full min-w-0">
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Password</label>
-          <div class="relative">
+          <div class="relative w-full min-w-0">
             <i class="fa-solid fa-lock absolute left-3.5 top-3 text-slate-500 text-xs"></i>
             <input type="password" required value="password123" 
-                   class="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
+                   class="w-full max-w-full box-border bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
           </div>
         </div>
 

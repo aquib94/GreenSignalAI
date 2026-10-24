@@ -20,6 +20,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+      width: 100%;
+    }
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
     
@@ -36,7 +44,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-white flex flex-col">
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-white flex flex-col overflow-x-hidden">
 
   <!-- =========================================================================
        TOP NAVIGATION BAR
@@ -604,9 +612,9 @@
           </div>
           <h4 class="text-sm font-bold text-white">Privacy-Isolated Real-Time Messenger</h4>
           <ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
-            <li>Channel-isolated Socket.io event architecture separating public broadcast rooms (<code class="text-indigo-300">upazila-general</code>) from end-to-end direct conversations (<code class="text-indigo-300">direct-userIdA-userIdB</code>).</li>
-            <li>Debounced directory search across all system responders (by username, full name, role, organization, and phone number).</li>
-            <li>Strict access control preventing data leaks across accounts.</li>
+            <li>JWT-authenticated Socket.io rooms separate the shared responder channel, private direct conversations, and disaster incident groups scoped to Bangladesh administrative areas.</li>
+            <li>Browser-side AES-GCM message encryption, RSA-OAEP key wrapping, and RSA-PSS sender signatures; the server stores ciphertext and a recovery-key-encrypted private-key backup.</li>
+            <li>Debounced responder directory search, explicit group membership, and persisted incident, location, and message records.</li>
           </ul>
         </div>
 
