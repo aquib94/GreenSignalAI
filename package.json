@@ -1,41 +1,50 @@
 {
-  "name": "greensignal-ai",
-  "version": "1.0.0",
-  "description": "GreenSignalAI - Intelligent Disaster Response & Resource Optimization Platform",
+  "name": "react-example",
+  "private": true,
   "main": "dist/server.js",
   "scripts": {
-    "postinstall": "prisma generate",
-    "build": "prisma generate && tsc",
-    "lint": "tsc --noEmit",
-    "start": "node dist/server.js",
     "dev": "tsx src/server.ts",
+    "build": "prisma generate && tsc",
+    "start": "node dist/server.js",
+    "lint": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "postinstall": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "ts-node prisma/seed.ts"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@google/genai": "^2.4.0",
     "@prisma/client": "^5.10.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
     "pdfkit": "^0.20.2",
-    "socket.io": "^4.7.5"
+    "prisma": "^5.10.0",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "socket.io": "^4.7.5",
+    "vite": "^8.3.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
-    "@types/node": "^20.11.24",
+    "@types/node": "^22.14.0",
     "@types/pdfkit": "^0.17.6",
-    "prisma": "^5.10.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "autoprefixer": "^10.4.21",
+    "esbuild": "^0.25.0",
+    "tailwindcss": "^4.3.3",
     "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
-    "tsx": "^4.23.13",
-    "typescript": "^5.3.3"
+    "tsx": "^4.21.0",
+    "typescript": "^7.0.2"
   }
 }
