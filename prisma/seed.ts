@@ -2,7 +2,10 @@ import { PrismaClient, Role, NodeTier, SensorType, NodeStatus, PolicyStatus } fr
 import * as fs from 'fs';
 import * as path from 'path';
 import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
 import { generateSensorTimeSeries } from '../src/services/sensorTimeSeries';
+
+dotenv.config({ override: true });
 
 const prisma = new PrismaClient();
 
@@ -320,7 +323,7 @@ async function main() {
         longitude: row.lng,
         capacity: 1000,
         occupancy: 150,
-        contactNum: '+8801700000000',
+        contactNum: null,
         isOperational: true,
         stockPolicy: { beds: 600, food_packs: 1200, medical_kits: 300, vehicles: 6, tents: 80 },
         currentStock: { beds: 420, food_packs: 850, medical_kits: 180, vehicles: 4, tents: 50 },
